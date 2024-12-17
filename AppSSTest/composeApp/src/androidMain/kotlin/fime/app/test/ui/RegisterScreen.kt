@@ -30,6 +30,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import com.bumptech.glide.Glide
 import fime.app.test.R
 import java.util.Calendar
@@ -71,17 +73,19 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
     val context = LocalContext.current
 
     Box(
-        modifier = Modifier.fillMaxSize().background(Color(0xFF0288D1))
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0288D1))
     ) {
-        // Colocamos el botón de volver en la parte superior izquierda
         IconButton(
             onClick = onBackClicked,
             modifier = Modifier
-                .align(Alignment.TopStart) // Se asegura que se alinee a la parte superior izquierda
-                .padding(16.dp) // Espacio alrededor del ícono
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+                .zIndex(1f)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back), // Reemplaza con tu recurso de icono
+                imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Volver",
                 tint = Color.White
             )
@@ -127,40 +131,40 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 onValueChange = { firstName = it },
                 label = { Text("Nombre(s)") },
                 shape = RoundedCornerShape(12.dp),
-                colors=TextFieldDefaults.textFieldColors(backgroundColor=Color(0xFFF5F5F5)),
-                modifier=Modifier.fillMaxWidth()
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier=Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                value=lastName,
-                onValueChange={ lastName=it },
-                label={ Text("Apellido Paterno") },
-                shape=RoundedCornerShape(12.dp),
-                colors=TextFieldDefaults.textFieldColors(backgroundColor=Color(0xFFF5F5F5)),
-                modifier=Modifier.fillMaxWidth()
+                value = lastName,
+                onValueChange = { lastName = it },
+                label = { Text("Apellido Paterno") },
+                shape = RoundedCornerShape(12.dp),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier=Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                value=middleName,
-                onValueChange={ middleName=it },
-                label={ Text("Apellido Materno") },
-                shape=RoundedCornerShape(12.dp),
-                colors=TextFieldDefaults.textFieldColors(backgroundColor=Color(0xFFF5F5F5)),
-                modifier=Modifier.fillMaxWidth()
+                value = middleName,
+                onValueChange = { middleName = it },
+                label = { Text("Apellido Materno") },
+                shape = RoundedCornerShape(12.dp),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier=Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                value=gender,
-                onValueChange={ gender=it },
-                label={ Text("Género") },
-                shape=RoundedCornerShape(12.dp),
-                colors=TextFieldDefaults.textFieldColors(backgroundColor=Color(0xFFF5F5F5)),
-                modifier=Modifier.fillMaxWidth()
+                value = gender,
+                onValueChange = { gender = it },
+                label = { Text("Género") },
+                shape = RoundedCornerShape(12.dp),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier=Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             val datePickerDialog = remember {
                 DatePickerDialog(
@@ -174,22 +178,22 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 )
             }
 
-                TextField(
-                    value = birthDate,
-                    onValueChange = { birthDate = it },
-                    label = { Text("Fecha de Nacimiento (DD/MM/AAAA)") },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true, // Solo lectura
-                    trailingIcon = {
-                        IconButton(onClick = { datePickerDialog.show() }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
-                        }
+            TextField(
+                value = birthDate,
+                onValueChange = { birthDate = it },
+                label = { Text("Fecha de Nacimiento (DD/MM/AAAA)") },
+                shape = RoundedCornerShape(12.dp),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true, // Solo lectura
+                trailingIcon = {
+                    IconButton(onClick = { datePickerDialog.show() }) {
+                        Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
                     }
-                )
+                }
+            )
 
-            Spacer(modifier=Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
                 value = email,
@@ -279,16 +283,17 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
 
 @Composable
 fun GlideImageFromResource(resourceId: Int, modifier: Modifier) {
-    AndroidView(factory = { context: Context ->
-        ImageView(context).apply {
-            // Cargar la imagen desde los recursos locales usando Glide
-            Glide.with(context)
-                .load(resourceId)
-                .circleCrop()
-                .into(this)
-        }
-    },
+    AndroidView(
+        factory = { context: Context ->
+            ImageView(context).apply {
+                // Cargar la imagen desde los recursos locales usando Glide
+                Glide.with(context)
+                    .load(resourceId)
+                    .circleCrop()
+                    .into(this)
+            }
+        },
         modifier = modifier
     )
-  }
+}
 

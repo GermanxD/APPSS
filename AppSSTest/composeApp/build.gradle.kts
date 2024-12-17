@@ -102,6 +102,7 @@ dependencies {
     implementation(libs.compose)
     implementation(libs.firebase.database.ktx)
     implementation(libs.accompanist.insets)
+    implementation(libs.androidx.navigation.compose)
     debugImplementation(compose.uiTooling)
 }
 

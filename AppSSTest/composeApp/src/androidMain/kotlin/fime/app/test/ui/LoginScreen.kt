@@ -194,7 +194,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
 fun GlideImageFromResource(resourceId: Int, modifier: Modifier) {
     AndroidView(factory = { context: Context ->
         ImageView(context).apply {
-            // Cargar la imagen desde los recursos locales usando Glide
             Glide.with(context)
                 .load(resourceId)
                 .circleCrop()

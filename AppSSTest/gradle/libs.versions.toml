@@ -19,6 +19,7 @@ uiAndroid = "1.7.5"
 compose = "1.0.0-beta01"
 firebaseDatabaseKtx = "21.0.0"
 accompanistInsets = "0.31.5-beta"
+navigationCompose = "2.8.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -38,6 +39,7 @@ androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", vers
 compose = { group = "com.github.bumptech.glide", name = "compose", version.ref = "compose" }
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 accompanist-insets = { group = "com.google.accompanist", name = "accompanist-insets", version.ref = "accompanistInsets" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

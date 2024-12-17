@@ -1,7 +1,7 @@
 package fime.app.test.ui
 
-sealed class Screen {
-    data object Login: Screen()
-    data object Register : Screen()
-    data object Home : Screen()
+sealed class Screen(val route: String) {
+    data object Login : Screen("login")
+    data object Register : Screen("register")
+    data object Home : Screen("home")
 }

@@ -1,39 +1,36 @@
-package fime.app.test
-
-import LoginScreen
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import fime.app.test.ui.RegisterScreen
 import fime.app.test.ui.Screen
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-@Preview
 fun App() {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
+    val navController: NavHostController = rememberNavController()
 
-    when (currentScreen) {
-        is Screen.Home -> {
-            Text("Welcome to the app!")
-            // Aquí puedes agregar un botón para cerrar sesión y volver a Login
-        }
-        is Screen.Register -> {
-            RegisterScreen(
-                onRegisterSuccess = {
-                    currentScreen = Screen.Home
-                },
-                onBackClicked = { currentScreen = Screen.Login }
-            )
-        }
-        is Screen.Login -> {
+    NavHost(navController = navController, startDestination = Screen.Login.route) {
+        composable(Screen.Login.route) {
             LoginScreen(
-                onLoginSuccess = { currentScreen = Screen.Home },
-                onRegisterClicked = { currentScreen = Screen.Register }
+                onLoginSuccess = { navController.navigate(Screen.Home.route) },
+                onRegisterClicked = { navController.navigate(Screen.Register.route) }
             )
+        }
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                onRegisterSuccess = { navController.navigate(Screen.Home.route) },
+                onBackClicked = { navController.popBackStack() }
+            )
+        }
+        composable(Screen.Home.route) {
+            HomeScreen()
         }
     }
+}
+
+@Composable
+fun HomeScreen() {
+    Text("Welcome to the app!")
 }
