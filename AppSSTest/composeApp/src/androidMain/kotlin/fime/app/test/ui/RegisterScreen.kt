@@ -2,9 +2,7 @@ package fime.app.test.ui
 
 import GlideImageFromResource
 import android.app.DatePickerDialog
-import android.content.Context
 import android.widget.DatePicker
-import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,10 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -30,6 +28,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
@@ -41,18 +40,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
-import com.bumptech.glide.Glide
 import fime.app.test.R
+import fime.app.test.models.RegisterData
 import java.util.Calendar
+
 
 @Composable
 fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
@@ -67,16 +66,19 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
     var gender by remember { mutableStateOf("") }
     var birthDate by remember { mutableStateOf("") }
     var registerError by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     val calendar = Calendar.getInstance()
-    val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0288D1))
     ) {
+        // Botón de regresar
         IconButton(
             onClick = onBackClicked,
             modifier = Modifier
@@ -85,7 +87,7 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 .zIndex(1f)
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Volver",
                 tint = Color.White
             )
@@ -97,7 +99,7 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 .padding(16.dp)
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally // Alineación centrada para el resto del contenido
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(100.dp))
 
@@ -108,8 +110,10 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                     .background(Color.White, shape = CircleShape)
                     .padding(12.dp)
             )
+
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Campos de texto
             TextField(
                 value = username,
                 onValueChange = { username = it },
@@ -120,7 +124,8 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -134,6 +139,7 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
@@ -144,6 +150,7 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
@@ -154,6 +161,7 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
@@ -164,6 +172,7 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             val datePickerDialog = remember {
@@ -181,11 +190,11 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
             TextField(
                 value = birthDate,
                 onValueChange = { birthDate = it },
-                label = { Text("Fecha de Nacimiento (DD/MM/AAAA)") },
+                label = { Text("Fecha de Nacimiento") },
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = true, // Solo lectura
+                readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { datePickerDialog.show() }) {
                         Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
@@ -198,13 +207,9 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
             TextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Correo electronico") },
+                label = { Text("Correo Electrónico") },
                 shape = RoundedCornerShape(12.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFF5F5F5),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -216,17 +221,12 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
                 shape = RoundedCornerShape(12.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFF5F5F5),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
-                    val iconText = if (showPassword) "Hide" else "Show"
                     TextButton(onClick = { showPassword = !showPassword }) {
-                        Text(iconText, fontSize = 12.sp)
+                        Text(if (showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -237,13 +237,9 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
             TextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text("Confirmar contraseña") },
+                label = { Text("Repetir Contraseña") },
                 shape = RoundedCornerShape(12.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFF5F5F5),
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
+                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color(0xFFF5F5F5)),
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
@@ -253,25 +249,37 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
 
             Button(
                 onClick = {
-                    if (password == confirmPassword && username.isNotBlank() && email.isNotBlank()) {
+                    val registerData = RegisterData(
+                        username = username,
+                        email = email,
+                        password = password,
+                        confirmPassword = confirmPassword,
+                        firstName = firstName,
+                        lastName = lastName,
+                        middleName = middleName,
+                        gender = gender,
+                        birthDate = birthDate
+                    )
+
+                    if (registerData.isValid() && registerData.isEmailValid()) {
                         onRegisterSuccess()
                     } else {
                         registerError = true
+                        errorMessage = "Por favor, revisa tus datos. Asegúrate de que todos los campos sean válidos."
                     }
                 },
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(45.dp)
+                    .height(45.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Register", fontSize = 16.sp)
+                Text("Registrarse")
             }
 
             if (registerError) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Please check your input and try again",
+                    text = errorMessage,
                     color = MaterialTheme.colors.error,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
@@ -279,21 +287,5 @@ fun RegisterScreen(onRegisterSuccess: () -> Unit, onBackClicked: () -> Unit) {
             }
         }
     }
-}
-
-@Composable
-fun GlideImageFromResource(resourceId: Int, modifier: Modifier) {
-    AndroidView(
-        factory = { context: Context ->
-            ImageView(context).apply {
-                // Cargar la imagen desde los recursos locales usando Glide
-                Glide.with(context)
-                    .load(resourceId)
-                    .circleCrop()
-                    .into(this)
-            }
-        },
-        modifier = modifier
-    )
 }
 
