@@ -1,3 +1,4 @@
+package app.mamma.guard.ui
 
 import android.content.Context
 import android.graphics.Rect
@@ -27,6 +28,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,15 +46,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import app.mamma.guard.R
 import com.bumptech.glide.Glide
-import fime.app.test.R
-import fime.app.test.auth.AuthService
+import app.mamma.guard.auth.AuthService
 
 @Composable
 fun keyboardAwarePadding(): Dp {
     val view = LocalView.current
     val density = LocalDensity.current
-    var keyboardHeight by remember { mutableStateOf(0) }
+    var keyboardHeight by remember { mutableIntStateOf(0) }
 
     DisposableEffect(view) {
         val listener = ViewTreeObserver.OnGlobalLayoutListener {
@@ -82,7 +84,9 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
     var loginError by remember { mutableStateOf(false) }
 
     val keyboardHeight = keyboardAwarePadding()
-    val logoOffset by animateDpAsState(targetValue = if (keyboardHeight > 0.dp) 50.dp else 150.dp)
+    val logoOffset by animateDpAsState(targetValue = if (keyboardHeight > 0.dp) 50.dp else 150.dp,
+        label = ""
+    )
 
     Box(
         modifier = Modifier
@@ -156,10 +160,12 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
 
             Button(
                 onClick = {
-                    if (AuthService().login(username, password)) {
-                        onLoginSuccess()
-                    } else {
-                        loginError = true
+                    AuthService().login(username, password) { success ->
+                        if (success as Boolean) {
+                            onLoginSuccess()
+                        } else {
+                            loginError = true
+                        }
                     }
                 },
                 shape = RoundedCornerShape(8.dp),

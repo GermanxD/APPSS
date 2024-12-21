@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "855638962409",
+    "project_id": "appdb-f0dba",
+    "storage_bucket": "appdb-f0dba.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855638962409:android:2109548b7be3f2258d4078",
+        "android_client_info": {
+          "package_name": "app.mamma.guard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6jZqJHtHDmb2f1m6LloQ5mUz7ReV6ElY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

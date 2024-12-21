@@ -1,11 +1,14 @@
+package app.mamma.guard
+
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import fime.app.test.ui.RegisterScreen
-import fime.app.test.ui.Screen
+import app.mamma.guard.ui.LoginScreen
+import app.mamma.guard.ui.RegisterScreen
+import app.mamma.guard.ui.Screen
 
 @Composable
 fun App() {

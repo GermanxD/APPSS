@@ -1,4 +1,4 @@
-package fime.app.test.models
+package app.mamma.guard.models
 
 data class RegisterData(
     val username: String,

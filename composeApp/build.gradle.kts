@@ -9,6 +9,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    id("com.google.gms.google-services")
+
+
 }
 
 kotlin {
@@ -70,11 +73,11 @@ kotlin {
 }
 
 android {
-    namespace = "fime.app.test"
+    namespace = "app.mamma.guard"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "fime.app.test"
+        applicationId = "app.mamma.guard"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -103,6 +106,12 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.accompanist.insets)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.firebase.auth.ktx)
     debugImplementation(compose.uiTooling)
+
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    implementation("com.google.firebase:firebase-firestore")
 }
 

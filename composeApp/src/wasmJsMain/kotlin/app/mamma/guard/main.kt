@@ -1,4 +1,4 @@
-package fime.app.test
+package app.mamma.guard.test
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport

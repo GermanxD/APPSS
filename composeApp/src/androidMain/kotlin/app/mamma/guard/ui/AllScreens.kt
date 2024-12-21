@@ -1,4 +1,4 @@
-package fime.app.test.ui
+package app.mamma.guard.ui
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")

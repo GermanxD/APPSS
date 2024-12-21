@@ -20,6 +20,7 @@ compose = "1.0.0-beta01"
 firebaseDatabaseKtx = "21.0.0"
 accompanistInsets = "0.31.5-beta"
 navigationCompose = "2.8.5"
+firebaseAuthKtx = "23.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -40,6 +41,7 @@ compose = { group = "com.github.bumptech.glide", name = "compose", version.ref =
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 accompanist-insets = { group = "com.google.accompanist", name = "accompanist-insets", version.ref = "accompanistInsets" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
