@@ -94,8 +94,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF0288D1), // Superior fijo
-                        Color(0xFFB3E5FC) // Inferior (marea)
+                        Color(0xFF0288D1),
+                        Color(0xFFB3E5FC)
                     )
                 )
             )

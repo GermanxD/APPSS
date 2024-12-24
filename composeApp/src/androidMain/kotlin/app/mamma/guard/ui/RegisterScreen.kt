@@ -49,7 +49,6 @@ fun RegisterScreen(
     val scrollState = rememberScrollState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Date Picker Dialog
     val datePickerDialog = remember {
         DatePickerDialog(
             context,
@@ -62,7 +61,6 @@ fun RegisterScreen(
         )
     }
 
-    // Handle successful registration
     LaunchedEffect(key1 = state.isRegistered) {
         if (state.isRegistered) {
             onRegisterSuccess()
@@ -74,7 +72,6 @@ fun RegisterScreen(
             .fillMaxSize()
             .background(Color(0xFF0288D1))
     ) {
-        // Back Button
         IconButton(
             onClick = onBackClicked,
             modifier = Modifier
@@ -110,7 +107,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Username
             CustomTextField(
                 value = state.username,
                 onValueChange = { viewModel.onEvent(RegisterEvent.UsernameChanged(it)) },
@@ -122,7 +118,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // First Name
             CustomTextField(
                 value = state.firstName,
                 onValueChange = { viewModel.onEvent(RegisterEvent.FirstNameChanged(it)) },
@@ -132,7 +127,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Last Name
             CustomTextField(
                 value = state.lastName,
                 onValueChange = { viewModel.onEvent(RegisterEvent.LastNameChanged(it)) },
@@ -142,7 +136,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Middle Name
             CustomTextField(
                 value = state.middleName,
                 onValueChange = { viewModel.onEvent(RegisterEvent.MiddleNameChanged(it)) },
@@ -152,7 +145,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Gender
             CustomTextField(
                 value = state.gender,
                 onValueChange = { viewModel.onEvent(RegisterEvent.GenderChanged(it)) },
@@ -162,7 +154,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Birth Date
             CustomTextField(
                 value = state.birthDate,
                 onValueChange = { viewModel.onEvent(RegisterEvent.BirthDateChanged(it)) },
@@ -178,7 +169,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Email
             CustomTextField(
                 value = state.email,
                 onValueChange = { viewModel.onEvent(RegisterEvent.EmailChanged(it)) },
@@ -189,7 +179,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Password
             CustomTextField(
                 value = state.password,
                 onValueChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
@@ -206,7 +195,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Confirm Password
             CustomTextField(
                 value = state.confirmPassword,
                 onValueChange = { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
@@ -218,7 +206,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Error Message
             if (state.errorMessage != null) {
                 Text(
                     text = state.errorMessage,
@@ -229,7 +216,6 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Register Button
             Button(
                 onClick = { viewModel.onEvent(RegisterEvent.Register) },
                 modifier = Modifier
@@ -247,7 +233,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Clear Button
             Button(
                 onClick = { viewModel.onEvent(RegisterEvent.ClearForm) },
                 modifier = Modifier
