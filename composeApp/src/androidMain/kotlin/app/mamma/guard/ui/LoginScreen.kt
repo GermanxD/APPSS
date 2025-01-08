@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -161,7 +162,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
             Button(
                 onClick = {
                     AuthService().login(username, password) { success ->
-                        if (success as Boolean) {
+                        if (success) {
                             onLoginSuccess()
                         } else {
                             loginError = true
@@ -174,18 +175,20 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                     .fillMaxWidth()
                     .height(45.dp)
             ) {
-                Text("Iniciar sesion", fontSize = 16.sp)
+                Text("Iniciar sesión", fontSize = 16.sp)
             }
+
 
             if (loginError) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    "Invalido usuario o contraseña",
+                    text = "Usuario o contraseña inválidos.",
                     color = MaterialTheme.colors.error,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
             }
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
