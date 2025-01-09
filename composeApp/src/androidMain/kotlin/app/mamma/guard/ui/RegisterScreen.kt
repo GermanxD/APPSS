@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -14,10 +15,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -68,16 +74,11 @@ fun RegisterScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0288D1))
+        modifier = Modifier.fillMaxSize().background(Color(0xFF0288D1))
     ) {
         IconButton(
             onClick = onBackClicked,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-                .zIndex(1f)
+            modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -87,10 +88,7 @@ fun RegisterScreen(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(scrollState),
+            modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -99,10 +97,7 @@ fun RegisterScreen(
             Image(
                 painter = painterResource(R.drawable.img_logo_login),
                 contentDescription = "Logo",
-                modifier = Modifier
-                    .size(120.dp)
-                    .background(Color.White, shape = CircleShape)
-                    .padding(12.dp)
+                modifier = Modifier.size(120.dp).background(Color.White, shape = CircleShape).padding(12.dp)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -153,14 +148,8 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Género
-            CustomTextField(
-                value = state.gender,
-                onValueChange = { viewModel.onEvent(RegisterEvent.GenderChanged(it)) },
-                label = "Género",
-                maxLength = 10,
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Género (Menú desplegable)
+            ThemedGenderMenu(viewModel)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -199,61 +188,144 @@ fun RegisterScreen(
                 onValueChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
                 label = "Contraseña",
                 maxLength = 16,
-                visualTransformation = if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    TextButton(onClick = { viewModel.onEvent(RegisterEvent.TogglePasswordVisibility) }) {
-                        Text(if (state.showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp)
+                visualTransformation =
+                if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions =
+                KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon =
+                {
+                    TextButton(onClick =
+                    { viewModel.onEvent(RegisterEvent.TogglePasswordVisibility) }) {
+                        Text(if (state.showPassword) "Ocultar" else "Mostrar", fontSize =
+                        12.sp)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier =
+                Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier =
+            Modifier.height(8.dp))
 
             // Repetir Contraseña
             CustomTextField(
-                value = state.confirmPassword,
-                onValueChange = { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
-                label = "Repetir Contraseña",
-                maxLength = 16,
-                visualTransformation = if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
+                value =
+                state.confirmPassword,
+                onValueChange =
+                { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
+                label =
+                "Repetir Contraseña",
+                maxLength =
+                16,
+                visualTransformation =
+                if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions =
+                KeyboardOptions(keyboardType =
+                KeyboardType.Password),
+                modifier =
+                Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier =
+            Modifier.height(16.dp))
 
             // Mostrar errores
             if (state.errorMessage != null) {
                 Text(
-                    text = state.errorMessage,
-                    color = Color.Red,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    text =
+                    state.errorMessage,
+                    color =
+                    Color.Red,
+                    textAlign =
+                    TextAlign.Center,
+                    modifier =
+                    Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier =
+                Modifier.height(8.dp))
             }
 
             // Botón de Registro
             Button(
-                onClick = { viewModel.onEvent(RegisterEvent.Register) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(45.dp),
-                shape = RoundedCornerShape(8.dp),
-                enabled = !state.isLoading
+                onClick =
+                { viewModel.onEvent(RegisterEvent.Register) },
+                modifier =
+                Modifier.fillMaxWidth().height(45.dp),
+                shape =
+                RoundedCornerShape(8.dp),
+                enabled =
+                !state.isLoading
             ) {
                 if (state.isLoading) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(color =
+                    Color.White)
                 } else {
                     Text("Registrarse")
                 }
             }
-
         }
     }
 }
+
+@Composable
+fun ThemedGenderMenu(viewModel: RegisterViewModel) {
+    var genderMenuOpen by remember { mutableStateOf(false) }
+    var selectedGender by remember { mutableStateOf("Selecciona Género") }
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        // Botón simulando un TextField que despliega el menú
+        OutlinedTextField(
+            value = selectedGender,
+            onValueChange = {},
+            label = { Text("Género") },
+            readOnly = true,
+            enabled = false, // Evita la edición directa
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { genderMenuOpen = true }, // Abre el menú al hacer clic en cualquier parte
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "Abrir menú"
+                )
+            },
+            shape = RoundedCornerShape(12.dp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                backgroundColor = Color(0xFFF5F5F5),
+                focusedBorderColor = Color.Transparent,
+                unfocusedBorderColor = Color.Transparent
+            )
+        )
+
+        // Menú desplegable
+        DropdownMenu(
+            expanded = genderMenuOpen,
+            onDismissRequest = { genderMenuOpen = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+        ) {
+            DropdownMenuItem(onClick = {
+                selectedGender = "Masculino"
+                genderMenuOpen = false
+                viewModel.onEvent(RegisterEvent.GenderChanged(selectedGender))
+            }) {
+                Text("Masculino")
+            }
+            DropdownMenuItem(onClick = {
+                selectedGender = "Femenino"
+                genderMenuOpen = false
+                viewModel.onEvent(RegisterEvent.GenderChanged(selectedGender))
+            }) {
+                Text("Femenino")
+            }
+        }
+    }
+}
+
+
+
+
 
 
 @Composable
@@ -261,46 +333,44 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    modifier: Modifier = Modifier,
-    readOnly: Boolean = false,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    maxLength: Int? = null // Nuevo parámetro para definir el límite de caracteres
+    modifier: Modifier=Modifier,
+    readOnly: Boolean=false,
+    visualTransformation: VisualTransformation=VisualTransformation.None,
+    keyboardOptions: KeyboardOptions=KeyboardOptions.Default,
+    keyboardActions: KeyboardActions=KeyboardActions.Default,
+    trailingIcon: @Composable (() -> Unit)?=null,
+    maxLength: Int?=null // Nuevo parámetro para definir el límite de caracteres.
 ) {
-    Column(modifier = modifier) {
+    Column(modifier=modifier) {
         TextField(
-            value = value,
-            onValueChange = {
-                if (maxLength == null || it.length <= maxLength) {
+            value=value,
+            onValueChange={
+                if(maxLength==null || it.length <= maxLength) {
                     onValueChange(it)
                 }
             },
-            label = { Text(label) },
-            shape = RoundedCornerShape(12.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color(0xFFF5F5F5),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            readOnly = readOnly,
-            visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            trailingIcon = trailingIcon,
-            modifier = Modifier.fillMaxWidth()
+            label={Text(label)},
+            shape=RoundedCornerShape(12.dp),
+            colors=TextFieldDefaults.textFieldColors(
+                backgroundColor=Color(0xFFF5F5F5),
+                focusedIndicatorColor=Color.Transparent,
+                unfocusedIndicatorColor=Color.Transparent),
+            readOnly=readOnly,
+            visualTransformation=visualTransformation,
+            keyboardOptions=keyboardOptions,
+            keyboardActions=keyboardActions,
+            trailingIcon=trailingIcon,
+            modifier=Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier=Modifier.height(4.dp))
 
-        if (maxLength != null) {
-            Text(
-                text = "${value.length} / $maxLength",
-                style = MaterialTheme.typography.caption.copy(fontSize = 12.sp),
-                color = if (value.length > maxLength) Color.Red else Color.White,
-                modifier = Modifier.align(Alignment.End)
-            )
+        if(maxLength!=null){
+            Text(text="${value.length} / $maxLength", style=
+            MaterialTheme.typography.caption.copy(fontSize=
+            12.sp), color=
+            if(value.length>maxLength) Color.Red else Color.White, modifier=
+            Modifier.align(Alignment.End))
         }
     }
 }
