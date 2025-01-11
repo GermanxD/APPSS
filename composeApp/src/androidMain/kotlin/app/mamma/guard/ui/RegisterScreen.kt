@@ -2,6 +2,7 @@ package app.mamma.guard.ui
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import app.mamma.guard.R
 import app.mamma.guard.models.RegisterEvent
 import app.mamma.guard.models.RegisterViewModel
@@ -54,6 +56,7 @@ fun RegisterScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val keyboardController = LocalSoftwareKeyboardController.current
+    var selectedGender by remember { mutableStateOf<String?>(null) }
 
     val datePickerDialog = remember {
         DatePickerDialog(
@@ -76,23 +79,30 @@ fun RegisterScreen(
     Box(
         modifier = Modifier.fillMaxSize().background(Color(0xFF0288D1))
     ) {
-        IconButton(
-            onClick = onBackClicked,
-            modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Volver",
-                tint = Color.White
-            )
-        }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(scrollState),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(100.dp))
+            IconButton(
+                onClick = onBackClicked,
+                modifier = Modifier
+                    .align(Alignment.Start) // Asegura la posición en la esquina
+                    .zIndex(1f)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Volver",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .fillMaxSize()
+                )
+            }
 
             Image(
                 painter = painterResource(R.drawable.img_logo_login),
@@ -100,7 +110,31 @@ fun RegisterScreen(
                 modifier = Modifier.size(120.dp).background(Color.White, shape = CircleShape).padding(12.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.padding(16.dp))
+
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Datos personales",
+                style = MaterialTheme.typography.h6,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Usuario
             CustomTextField(
@@ -148,11 +182,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Género (Menú desplegable)
-            ThemedGenderMenu(viewModel)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             // Fecha de Nacimiento
             CustomTextField(
                 value = state.birthDate,
@@ -168,7 +197,51 @@ fun RegisterScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Botones de Género
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                GenderButton(
+                    gender = "Masculino",
+                    isSelected = selectedGender == "Masculino",
+                    onClick = {
+                        selectedGender = "Masculino"
+                        viewModel.onEvent(RegisterEvent.GenderChanged("Masculino"))
+                    }
+                )
+                GenderButton(
+                    gender = "Femenino",
+                    isSelected = selectedGender == "Femenino",
+                    onClick = {
+                        selectedGender = "Femenino"
+                        viewModel.onEvent(RegisterEvent.GenderChanged("Femenino"))
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(26.dp))
+
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Registra tu cuenta",
+                style = MaterialTheme.typography.h6,
+                color = Color.White
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Divider(
+                color = Color.White,
+                thickness = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.padding(top = 32.dp))
 
             // Correo Electrónico
             CustomTextField(
@@ -268,60 +341,19 @@ fun RegisterScreen(
 }
 
 @Composable
-fun ThemedGenderMenu(viewModel: RegisterViewModel) {
-    var genderMenuOpen by remember { mutableStateOf(false) }
-    var selectedGender by remember { mutableStateOf("Selecciona Género") }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        // Botón simulando un TextField que despliega el menú
-        OutlinedTextField(
-            value = selectedGender,
-            onValueChange = {},
-            label = { Text("Género") },
-            readOnly = true,
-            enabled = false, // Evita la edición directa
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { genderMenuOpen = true }, // Abre el menú al hacer clic en cualquier parte
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = "Abrir menú"
-                )
-            },
-            shape = RoundedCornerShape(12.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                backgroundColor = Color(0xFFF5F5F5),
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent
-            )
-        )
-
-        // Menú desplegable
-        DropdownMenu(
-            expanded = genderMenuOpen,
-            onDismissRequest = { genderMenuOpen = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-        ) {
-            DropdownMenuItem(onClick = {
-                selectedGender = "Masculino"
-                genderMenuOpen = false
-                viewModel.onEvent(RegisterEvent.GenderChanged(selectedGender))
-            }) {
-                Text("Masculino")
-            }
-            DropdownMenuItem(onClick = {
-                selectedGender = "Femenino"
-                genderMenuOpen = false
-                viewModel.onEvent(RegisterEvent.GenderChanged(selectedGender))
-            }) {
-                Text("Femenino")
-            }
-        }
+fun GenderButton(gender: String, isSelected: Boolean, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = if (isSelected) MaterialTheme.colors.primary else Color.White,
+            contentColor = if (isSelected) Color.White else Color.Gray // Cambiar color del texto.
+        ),
+        border = if (!isSelected) BorderStroke(1.dp, Color.Gray) else null // Opcional: agregar un borde para resaltar.
+    ) {
+        Text(text = gender)
     }
 }
+
 
 
 
@@ -376,3 +408,6 @@ fun CustomTextField(
 }
 
 
+fun navigateBack(navController: NavController) {
+    navController.popBackStack()
+}
