@@ -1,39 +1,95 @@
 package app.mamma.guard
 
+import android.content.Context
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import app.mamma.guard.auth.AuthService
+import app.mamma.guard.ui.HomeScreen
 import app.mamma.guard.ui.LoginScreen
 import app.mamma.guard.ui.RegisterScreen
 import app.mamma.guard.ui.Screen
 
 @Composable
-fun App() {
+fun App(
+    context: Context
+) {
     val navController: NavHostController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
+    val authService = AuthService()
+    val startDestination = if (authService.isUserLoggedIn(context)) {
+        Screen.Home.route
+    } else {
+        Screen.Login.route
+    }
+
+    NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Login.route) {
             LoginScreen(
-                onLoginSuccess = { navController.navigate(Screen.Home.route) },
-                onRegisterClicked = { navController.navigate(Screen.Register.route) }
+                onLoginSuccess = {
+                    authService.saveLoginState(context, true)
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
+                onRegisterClicked = {
+                    navController.navigate(Screen.Register.route)
+                }
             )
         }
         composable(Screen.Register.route) {
             RegisterScreen(
-                onRegisterSuccess = { navController.navigate(Screen.Home.route) },
+                onRegisterSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Register.route) { inclusive = true }
+                    }
+                },
                 onBackClicked = { navController.popBackStack() }
             )
         }
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                context = context,
+                navController = navController
+            )
+        }
+        composable(Screen.BloodPressure.route) {
+            BloodPressureScreen()
+        }
+        composable(Screen.HeartRate.route) {
+            HeartRateScreen()
+        }
+        composable(Screen.History.route) {
+            HistoryScreen()
+        }
+        composable(Screen.Settings.route) {
+            SettingsScreen()
         }
     }
 }
 
 @Composable
-fun HomeScreen() {
-    Text("Welcome to the app!")
+fun SettingsScreen() {
+    TODO("SettingsScreen")
 }
+
+@Composable
+fun HistoryScreen() {
+    TODO("HistoryScreen")
+}
+
+@Composable
+fun HeartRateScreen() {
+    TODO("HeartRateScreen")
+}
+
+@Composable
+fun BloodPressureScreen() {
+    TODO("BloodPressureScreen")
+}
+
+
+

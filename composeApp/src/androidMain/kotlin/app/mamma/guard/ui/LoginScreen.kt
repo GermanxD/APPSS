@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -111,12 +112,13 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
 
             Spacer(modifier = Modifier.height(logoOffset))
 
-            GlideImageFromResource(
-                resourceId = R.drawable.img_logo_login,
+            Image(
+                painter = painterResource(R.drawable.img_logo_login),
+                contentDescription = "Logo",
                 modifier = Modifier
-                    .size(170.dp)
+                    .size(180.dp)
                     .background(Color.White, shape = CircleShape)
-                    .padding(4.dp)
+                    .padding(20.dp)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -199,16 +201,3 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
     }
 }
 
-@Composable
-fun GlideImageFromResource(resourceId: Int, modifier: Modifier) {
-    AndroidView(factory = { context: Context ->
-        ImageView(context).apply {
-            Glide.with(context)
-                .load(resourceId)
-                .circleCrop()
-                .into(this)
-        }
-    },
-        modifier = modifier
-    )
-}
