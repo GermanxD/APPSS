@@ -1,7 +1,6 @@
 package app.mamma.guard
 
 import android.content.Context
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -56,40 +55,5 @@ fun App(
                 navController = navController
             )
         }
-        composable(Screen.BloodPressure.route) {
-            BloodPressureScreen()
-        }
-        composable(Screen.HeartRate.route) {
-            HeartRateScreen()
-        }
-        composable(Screen.History.route) {
-            HistoryScreen()
-        }
-        composable(Screen.Settings.route) {
-            SettingsScreen()
-        }
     }
 }
-
-@Composable
-fun SettingsScreen() {
-    TODO("SettingsScreen")
-}
-
-@Composable
-fun HistoryScreen() {
-    TODO("HistoryScreen")
-}
-
-@Composable
-fun HeartRateScreen() {
-    TODO("HeartRateScreen")
-}
-
-@Composable
-fun BloodPressureScreen() {
-    TODO("BloodPressureScreen")
-}
-
-
-

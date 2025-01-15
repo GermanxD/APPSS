@@ -1,82 +1,107 @@
 package app.mamma.guard.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.*
 import app.mamma.guard.auth.AuthService
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(context: Context, navController: NavController) {
-    // Interceptar el botón de retroceso
-    BackHandler {
-        // Bloquear la acción de volver atrás
-    }
+    val bottomNavController = rememberNavController()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Welcome to the app!", modifier = Modifier.padding(bottom = 24.dp))
-
-        val menuOptions = listOf(
-            "Presión Arterial" to Screen.BloodPressure.route,
-            "Ritmo Cardíaco" to Screen.HeartRate.route,
-            "Historial" to Screen.History.route,
-            "Configuraciones" to Screen.Settings.route
-        )
-
-        menuOptions.forEach { (label, route) ->
-            MenuOptionCard(label) {
-                navController.navigate(route)
-            }
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = bottomNavController)
         }
+    ) {
+        BottomNavHost(navController = bottomNavController, context = context)
+    }
+}
 
-        Button(
-            onClick = {
-                AuthService().logout(context) // Cerrar sesión
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(Screen.Home.route) { inclusive = true }
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    val items = listOf(
+        BottomNavItem("Home", "home", Icons.Default.Home),
+        BottomNavItem("Informacion", "information_navbar", Icons.Default.Info),
+        BottomNavItem("Foro", "foro_navbar", Icons.Default.Face),
+        BottomNavItem("Configuracion", "settings_navbar", Icons.Default.Settings)
+    )
+
+    BottomNavigation(backgroundColor = Color(0xFFBBDEFB)) {
+        val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+        items.forEach { item ->
+            BottomNavigationItem(
+                icon = { Icon(item.icon, contentDescription = item.title) },
+                label = { Text(item.title) },
+                selected = currentRoute == item.route,
+                onClick = {
+                    if (currentRoute != item.route) {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 }
-            },
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text("Cerrar sesión")
+            )
         }
     }
 }
 
 @Composable
-fun MenuOptionCard(label: String, onClick: () -> Unit) {
-    Card(
-        backgroundColor = Color(0xFFBBDEFB),
-        elevation = 4.dp,
-        modifier = Modifier
-            .padding(vertical = 8.dp)
-            .clickable { onClick() }
-    ) {
+fun BottomNavHost(navController: NavHostController, context: Context) {
+    NavHost(navController, startDestination = "home") {
+        composable("home") { HomeNavBarScreen() }
+        composable("information_navbar") { InfoNavBarScreen() }
+        composable("foro_navbar") { ForoNavBarScreen() }
+        composable("settings_navbar") { SettingsNavBarScreen(context) }
+    }
+}
+
+@Composable
+fun HomeNavBarScreen() {
+    CenteredText("Pantalla Principal")
+}
+
+@Composable
+fun InfoNavBarScreen() {
+    CenteredText("Informacion")
+}
+
+@Composable
+fun ForoNavBarScreen() {
+    CenteredText("Foro")
+}
+
+@Composable
+fun SettingsNavBarScreen(context: Context) {
+    CenteredText("Configuraciones")
+}
+
+@Composable
+fun CenteredText(text: String) {
+    Surface(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = label,
-            fontSize = 18.sp,
-            color = Color.Black,
-            modifier = Modifier.padding(16.dp)
+            text = text,
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Black
         )
     }
 }
+
 
