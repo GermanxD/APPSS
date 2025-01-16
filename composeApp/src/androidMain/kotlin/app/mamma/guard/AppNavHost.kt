@@ -1,6 +1,5 @@
 package app.mamma.guard
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -50,7 +49,7 @@ fun AppNavHost(
         }
 
         composable("home") {
-            HomeScreen(context = context, navController)
+            HomeScreen(context = context)
         }
     }
 }

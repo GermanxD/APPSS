@@ -51,8 +51,7 @@ fun App(
         }
         composable(Screen.Home.route) {
             HomeScreen(
-                context = context,
-                navController = navController
+                context = context
             )
         }
     }

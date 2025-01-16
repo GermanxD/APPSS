@@ -9,7 +9,6 @@ sealed class Screen(val route: String) {
 }
 
 data class BottomNavItem(
-    val title: String,
     val route: String,
     val icon: ImageVector
 )
