@@ -35,11 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -93,35 +95,63 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF0288D1),
-                        Color(0xFFB3E5FC)
-                    )
-                )
-            )
     ) {
-        Column(
+        // Fondo rosa que cubre toda la pantalla
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
+                .background(Color(0xFFF2D3D0)) // Aplica el color rosa a todo el fondo
+        )
+
+        // Parte superior con el logo
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxSize(0.3f), // Ajusta la altura de la parte superior
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Spacer(modifier = Modifier.height(logoOffset))
-
             Image(
                 painter = painterResource(R.drawable.img_logo_login),
                 contentDescription = "Logo",
                 modifier = Modifier
                     .size(180.dp)
-                    .background(Color.White, shape = CircleShape)
+                    .background(color = Color.Transparent, shape = CircleShape)
                     .padding(20.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.height(32.dp))
+        // Parte inferior (Columna blanca con esquinas redondeadas)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxSize(0.7f) // Ocupa la parte inferior
+                .align(Alignment.BottomCenter) // Se coloca en la parte inferior del Box
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(topEnd = 70.dp) // Esquinas redondeadas
+                )
+                .clip(RoundedCornerShape(topEnd = 70.dp))
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Text(
+                text = "INICIO",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(16.dp),
+                color = Color(0xFF594012),
+                fontSize = 30.sp
+            )
+
+            Text(
+                text = "Inicie sesión para continuar",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = Color(0xFF594012),
+                fontSize = 16.sp
+            )
 
             TextField(
                 value = username,
@@ -129,7 +159,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                 label = { Text("Usuario") },
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFF5F5F5),
+                    backgroundColor = Color(0xFFD4D2D3),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
@@ -144,16 +174,16 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                 label = { Text("Contraseña") },
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFF5F5F5),
+                    backgroundColor = Color(0xFFD4D2D3),
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
-                    val iconText = if (showPassword) "Hide" else "Show"
+                    val iconText = if (showPassword) "Hide" else "Mostrar"
                     TextButton(onClick = { showPassword = !showPassword }) {
-                        Text(iconText, fontSize = 12.sp)
+                        Text(iconText, fontSize = 12.sp, color = Color(0xFF594012))
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -172,14 +202,17 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                     }
                 },
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF4A0C0)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(45.dp)
             ) {
-                Text("Iniciar sesión", fontSize = 16.sp)
+                Text(
+                    text = "Iniciar sesión",
+                    fontSize = 16.sp,
+                    color = Color(0xFF594012),
+                )
             }
-
 
             if (loginError) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -191,13 +224,20 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                 )
             }
 
-
             Spacer(modifier = Modifier.height(8.dp))
 
+            Text(
+                text = "¿Has olvidad tu contraseña?",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(16.dp),
+                color = Color(0xFF594012)
+            )
+
             TextButton(onClick = { onRegisterClicked() }) {
-                Text("Registrate ahora", color = MaterialTheme.colors.primary)
+                Text("Registrate ahora", color = Color(0xFF594012))
             }
         }
     }
+
 }
 
