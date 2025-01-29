@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -146,14 +147,19 @@ fun RegisterScreen(
                     "¿Ya estás registrado?",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Text(
-                    "Inicia sesión aquí",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
+                    color = Color.Black,
+                    style = TextStyle(),
+                    )
+
+                TextButton(onClick =  onBackClicked ) {
+                    Text(
+                        "Inicia sesión aquí",
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        style = TextStyle(),
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 CustomTextField(
@@ -278,7 +284,7 @@ fun GenderButton(gender: String, isSelected: Boolean, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) MaterialTheme.colors.primary else Color.White,
+            backgroundColor = if (isSelected) Color(0xFFF4A0C0) else Color.White,
             contentColor = if (isSelected) Color.White else Color.Gray // Cambiar color del texto.
         ),
         border = if (!isSelected) BorderStroke(
@@ -317,7 +323,9 @@ fun CustomTextField(
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color(0xFFD4D2D3),
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color(0xFF594012),
+                focusedLabelColor = Color(0xFF594012),
             ),
             readOnly = readOnly,
             visualTransformation = visualTransformation,

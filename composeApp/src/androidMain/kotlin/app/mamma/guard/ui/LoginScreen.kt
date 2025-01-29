@@ -38,6 +38,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -153,7 +155,9 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color(0xFFD4D2D3),
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = Color(0xFF594012),
+                    focusedLabelColor = Color(0xFF594012),
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -168,12 +172,14 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color(0xFFD4D2D3),
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = Color(0xFF594012),
+                    focusedLabelColor = Color(0xFF594012),
                 ),
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
-                    val iconText = if (showPassword) "Hide" else "Mostrar"
+                    val iconText = if (showPassword) "Ocultar" else "Mostrar"
                     TextButton(onClick = { showPassword = !showPassword }) {
                         Text(iconText, fontSize = 12.sp, color = Color(0xFF594012))
                     }
@@ -186,7 +192,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
 
             Button(
                 onClick = {
-                    AuthService().login(username, password, context) { success, _ ->
+                    AuthService().loginWithUsername(username, password, context) { success, _ ->
                         if (success) {
                             onLoginSuccess()
                         } else {
@@ -220,14 +226,21 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "¿Has olvidad tu contraseña?",
+                text = "¿Has olvidado tu contraseña?",
+                style = TextStyle(),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp),
-                color = Color(0xFF594012)
+                color = Color(0xFF594012),
+                fontSize = 16.sp
             )
 
             TextButton(onClick = { onRegisterClicked() }) {
-                Text("Registrate ahora", color = Color(0xFF594012))
+                Text(
+                    text = "Regístrate ahora",
+                    style = TextStyle(),
+                    color = Color(0xFF594012),
+                    fontSize = 16.sp
+                )
             }
         }
     }
