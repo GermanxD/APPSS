@@ -1,6 +1,8 @@
 package app.mamma.guard
 
+import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,8 +17,11 @@ fun AppNavHost(
     context: android.content.Context,
     navController: NavHostController = rememberNavController()
 ) {
-    val authService = AuthService()
-    val startDestination = if (authService.isUserLoggedIn(context)) "home" else "login"
+    val authService = remember { AuthService() }
+    val isUserLoggedIn = authService.isUserLoggedIn(context)
+
+    // Determina el destino de inicio dependiendo del estado de la sesión
+    val startDestination = if (isUserLoggedIn) "home" else "login"
 
     NavHost(
         navController = navController,
@@ -49,10 +54,7 @@ fun AppNavHost(
         }
 
         composable("home") {
-            HomeScreen(context = context)
+            HomeScreen(context = context, authService = authService, navController = navController)
         }
     }
 }
-
-
-

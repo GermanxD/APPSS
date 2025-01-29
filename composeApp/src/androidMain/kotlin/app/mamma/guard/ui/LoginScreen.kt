@@ -1,10 +1,7 @@
 package app.mamma.guard.ui
 
-import android.content.Context
 import android.graphics.Rect
 import android.view.ViewTreeObserver
-import android.widget.ImageView
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,8 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -49,9 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import app.mamma.guard.R
-import com.bumptech.glide.Glide
 import app.mamma.guard.auth.AuthService
 
 @Composable
@@ -187,10 +182,11 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+            val context = LocalContext.current
 
             Button(
                 onClick = {
-                    AuthService().login(username, password) { success ->
+                    AuthService().login(username, password, context) { success, _ ->
                         if (success) {
                             onLoginSuccess()
                         } else {

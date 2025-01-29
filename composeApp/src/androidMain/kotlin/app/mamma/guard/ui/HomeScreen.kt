@@ -37,10 +37,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import app.mamma.guard.auth.AuthService
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(context: Context) {
+fun HomeScreen(context: Context, authService: AuthService, navController: NavHostController) {
     val bottomNavController = rememberNavController()
 
     Scaffold(
