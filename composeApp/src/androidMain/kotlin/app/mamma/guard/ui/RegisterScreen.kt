@@ -27,10 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -77,263 +79,194 @@ fun RegisterScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(Color(0xFF0288D1))
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-
-        Column(
+        // Fondo rosa con el logo y el botón de retroceso
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .fillMaxHeight(0.35f)
+                .background(Color(0xFFF2D3D0)),
+            contentAlignment = Alignment.TopCenter
         ) {
-            IconButton(
-                onClick = onBackClicked,
-                modifier = Modifier
-                    .align(Alignment.Start) // Asegura la posición en la esquina
-                    .zIndex(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(36.dp)
-                        .fillMaxSize()
-                )
-            }
-
             Image(
                 painter = painterResource(R.drawable.img_logo_login),
                 contentDescription = "Logo",
-                modifier = Modifier.size(120.dp).background(Color.White, shape = CircleShape).padding(12.dp)
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(vertical = 15.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.padding(16.dp))
-
-            Divider(
-                color = Color.White,
-                thickness = 2.dp,
-                modifier = Modifier.fillMaxWidth()
+        IconButton(
+            onClick = onBackClicked,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Volver",
+                tint = Color.White,
+                modifier = Modifier.size(36.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        // Contenedor blanco con scroll
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 120.dp)
+                .background(Color.White, shape = RoundedCornerShape(topStart = 70.dp))
+                .clip(RoundedCornerShape(topStart = 70.dp))
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-            Text(
-                text = "Datos personales",
-                style = MaterialTheme.typography.h6,
-                color = Color.White
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Crea una nueva cuenta",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Divider(
-                color = Color.White,
-                thickness = 2.dp,
-                modifier = Modifier.fillMaxWidth()
-            )
+                Text(
+                    "¿Ya estás registrado?",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Text(
+                    "Inicia sesión aquí",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                CustomTextField(
+                    value = state.username,
+                    onValueChange = { viewModel.onEvent(RegisterEvent.UsernameChanged(it)) },
+                    label = "Usuario",
+                    maxLength = 20,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // Usuario
-            CustomTextField(
-                value = state.username,
-                onValueChange = { viewModel.onEvent(RegisterEvent.UsernameChanged(it)) },
-                label = "Usuario",
-                maxLength = 20,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
-                modifier = Modifier.fillMaxWidth()
-            )
+                CustomTextField(
+                    value = state.fullname,
+                    onValueChange = { viewModel.onEvent(RegisterEvent.FullNameChanged(it)) },
+                    label = "Nombre completo",
+                    maxLength = 50,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+                CustomTextField(
+                    value = state.birthDate,
+                    onValueChange = {},
+                    label = "Fecha de Nacimiento",
+                    maxLength = 10,
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { datePickerDialog.show() }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            // Nombre(s)
-            CustomTextField(
-                value = state.firstName,
-                onValueChange = { viewModel.onEvent(RegisterEvent.FirstNameChanged(it)) },
-                label = "Nombre(s)",
-                maxLength = 50,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Apellido Paterno
-            CustomTextField(
-                value = state.lastName,
-                onValueChange = { viewModel.onEvent(RegisterEvent.LastNameChanged(it)) },
-                label = "Apellido Paterno",
-                maxLength = 50,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Apellido Materno
-            CustomTextField(
-                value = state.middleName,
-                onValueChange = { viewModel.onEvent(RegisterEvent.MiddleNameChanged(it)) },
-                label = "Apellido Materno",
-                maxLength = 50,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Fecha de Nacimiento
-            CustomTextField(
-                value = state.birthDate,
-                onValueChange = { viewModel.onEvent(RegisterEvent.BirthDateChanged(it)) },
-                maxLength = 10,
-                label = "Fecha de Nacimiento",
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = true,
-                trailingIcon = {
-                    IconButton(onClick = { datePickerDialog.show() }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
-                    }
-                }
-            )
-
-            // Botones de Género
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                GenderButton(
-                    gender = "Masculino",
-                    isSelected = selectedGender == "Masculino",
-                    onClick = {
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    GenderButton(gender = "Masculino", isSelected = selectedGender == "Masculino") {
                         selectedGender = "Masculino"
                         viewModel.onEvent(RegisterEvent.GenderChanged("Masculino"))
                     }
-                )
-                GenderButton(
-                    gender = "Femenino",
-                    isSelected = selectedGender == "Femenino",
-                    onClick = {
+                    GenderButton(gender = "Femenino", isSelected = selectedGender == "Femenino") {
                         selectedGender = "Femenino"
                         viewModel.onEvent(RegisterEvent.GenderChanged("Femenino"))
                     }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                CustomTextField(
+                    value = state.email,
+                    onValueChange = { viewModel.onEvent(RegisterEvent.EmailChanged(it)) },
+                    label = "Correo Electrónico",
+                    maxLength = 100,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(26.dp))
+                CustomTextField(
+                    value = state.password,
+                    onValueChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
+                    label = "Contraseña",
+                    maxLength = 16,
+                    visualTransformation = if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        TextButton(onClick = { viewModel.onEvent(RegisterEvent.TogglePasswordVisibility) }) {
+                            Text(if (state.showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp,  color = Color(0xFF594012))
 
-            Divider(
-                color = Color.White,
-                thickness = 2.dp,
-                modifier = Modifier.fillMaxWidth()
-            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                CustomTextField(
+                    value = state.confirmPassword,
+                    onValueChange = { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
+                    label = "Confirmar contraseña",
+                    maxLength = 16,
+                    visualTransformation = if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Registra tu cuenta",
-                style = MaterialTheme.typography.h6,
-                color = Color.White
-            )
+                if (state.errorMessage != null) {
+                    Text(
+                        text = state.errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Divider(
-                color = Color.White,
-                thickness = 2.dp,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.padding(top = 32.dp))
-
-            // Correo Electrónico
-            CustomTextField(
-                value = state.email,
-                onValueChange = { viewModel.onEvent(RegisterEvent.EmailChanged(it)) },
-                label = "Correo Electrónico",
-                maxLength = 100,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Contraseña
-            CustomTextField(
-                value = state.password,
-                onValueChange = { viewModel.onEvent(RegisterEvent.PasswordChanged(it)) },
-                label = "Contraseña",
-                maxLength = 16,
-                visualTransformation =
-                if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions =
-                KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon =
-                {
-                    TextButton(onClick =
-                    { viewModel.onEvent(RegisterEvent.TogglePasswordVisibility) }) {
-                        Text(if (state.showPassword) "Ocultar" else "Mostrar", fontSize =
-                        12.sp)
+                Button(
+                    onClick = { viewModel.onEvent(RegisterEvent.Register) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF4A0C0)),
+                    enabled = !state.isLoading
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(color = Color.White)
+                    } else {
+                        Text("Registrarse",
+                            fontSize = 16.sp,
+                            color = Color(0xFF594012)
+                        )
                     }
-                },
-                modifier =
-                Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier =
-            Modifier.height(8.dp))
-
-            // Repetir Contraseña
-            CustomTextField(
-                value =
-                state.confirmPassword,
-                onValueChange =
-                { viewModel.onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
-                label =
-                "Repetir Contraseña",
-                maxLength =
-                16,
-                visualTransformation =
-                if (state.showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions =
-                KeyboardOptions(keyboardType =
-                KeyboardType.Password),
-                modifier =
-                Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier =
-            Modifier.height(16.dp))
-
-            // Mostrar errores
-            if (state.errorMessage != null) {
-                Text(
-                    text =
-                    state.errorMessage,
-                    color =
-                    Color.Red,
-                    textAlign =
-                    TextAlign.Center,
-                    modifier =
-                    Modifier.fillMaxWidth()
-                )
-                Spacer(modifier =
-                Modifier.height(8.dp))
-            }
-
-            // Botón de Registro
-            Button(
-                onClick =
-                { viewModel.onEvent(RegisterEvent.Register) },
-                modifier =
-                Modifier.fillMaxWidth().height(45.dp),
-                shape =
-                RoundedCornerShape(8.dp),
-                enabled =
-                !state.isLoading
-            ) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(color =
-                    Color.White)
-                } else {
-                    Text("Registrarse")
                 }
             }
         }
@@ -348,16 +281,14 @@ fun GenderButton(gender: String, isSelected: Boolean, onClick: () -> Unit) {
             backgroundColor = if (isSelected) MaterialTheme.colors.primary else Color.White,
             contentColor = if (isSelected) Color.White else Color.Gray // Cambiar color del texto.
         ),
-        border = if (!isSelected) BorderStroke(1.dp, Color.Gray) else null // Opcional: agregar un borde para resaltar.
+        border = if (!isSelected) BorderStroke(
+            1.dp,
+            Color.Gray
+        ) else null // Opcional: agregar un borde para resaltar.
     ) {
         Text(text = gender)
     }
 }
-
-
-
-
-
 
 
 @Composable
@@ -365,44 +296,49 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    modifier: Modifier=Modifier,
-    readOnly: Boolean=false,
-    visualTransformation: VisualTransformation=VisualTransformation.None,
-    keyboardOptions: KeyboardOptions=KeyboardOptions.Default,
-    keyboardActions: KeyboardActions=KeyboardActions.Default,
-    trailingIcon: @Composable (() -> Unit)?=null,
-    maxLength: Int?=null // Nuevo parámetro para definir el límite de caracteres.
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    maxLength: Int? = null // Nuevo parámetro para definir el límite de caracteres.
 ) {
-    Column(modifier=modifier) {
+    Column(modifier = modifier) {
         TextField(
-            value=value,
-            onValueChange={
-                if(maxLength==null || it.length <= maxLength) {
+            value = value,
+            onValueChange = {
+                if (maxLength == null || it.length <= maxLength) {
                     onValueChange(it)
                 }
             },
-            label={Text(label)},
-            shape=RoundedCornerShape(12.dp),
-            colors=TextFieldDefaults.textFieldColors(
-                backgroundColor=Color(0xFFF5F5F5),
-                focusedIndicatorColor=Color.Transparent,
-                unfocusedIndicatorColor=Color.Transparent),
-            readOnly=readOnly,
-            visualTransformation=visualTransformation,
-            keyboardOptions=keyboardOptions,
-            keyboardActions=keyboardActions,
-            trailingIcon=trailingIcon,
-            modifier=Modifier.fillMaxWidth()
+            label = { Text(label) },
+            shape = RoundedCornerShape(12.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color(0xFFD4D2D3),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            readOnly = readOnly,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            trailingIcon = trailingIcon,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier=Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
-        if(maxLength!=null){
-            Text(text="${value.length} / $maxLength", style=
-            MaterialTheme.typography.caption.copy(fontSize=
-            12.sp), color=
-            if(value.length>maxLength) Color.Red else Color.White, modifier=
-            Modifier.align(Alignment.End))
+        if (maxLength != null) {
+            Text(
+                text = "${value.length} / $maxLength", style =
+                MaterialTheme.typography.caption.copy(
+                    fontSize =
+                    12.sp
+                ), color =
+                if (value.length > maxLength) Color.Red else Color.White, modifier =
+                Modifier.align(Alignment.End)
+            )
         }
     }
 }

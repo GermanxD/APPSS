@@ -87,10 +87,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
     var showPassword by remember { mutableStateOf(false) }
     var loginError by remember { mutableStateOf(false) }
 
-    val keyboardHeight = keyboardAwarePadding()
-    val logoOffset by animateDpAsState(targetValue = if (keyboardHeight > 0.dp) 50.dp else 150.dp,
-        label = ""
-    )
+    keyboardAwarePadding()
 
     Box(
         modifier = Modifier

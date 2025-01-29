@@ -108,6 +108,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.material3.android)
+    implementation(libs.core.ktx)
+    implementation(libs.androidx.datastore.preferences)
     debugImplementation(compose.uiTooling)
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))

@@ -21,9 +21,7 @@ class RegisterViewModel : ViewModel() {
                 registerUser()
             }
             is RegisterEvent.UsernameChanged -> _state.value = state.copy(username = event.username)
-            is RegisterEvent.FirstNameChanged -> _state.value = state.copy(firstName = event.firstName)
-            is RegisterEvent.LastNameChanged -> _state.value = state.copy(lastName = event.lastName)
-            is RegisterEvent.MiddleNameChanged -> _state.value = state.copy(middleName = event.middleName)
+            is RegisterEvent.FullNameChanged -> _state.value = state.copy(fullname = event.fullname)
             is RegisterEvent.GenderChanged -> _state.value = state.copy(gender = event.gender)
             is RegisterEvent.BirthDateChanged -> _state.value = state.copy(birthDate = event.birthDate)
             is RegisterEvent.EmailChanged -> _state.value = state.copy(email = event.email)
@@ -49,8 +47,7 @@ class RegisterViewModel : ViewModel() {
                     user?.let {
                         val userData = hashMapOf(
                             "username" to state.username,
-                            "firstName" to state.firstName,
-                            "lastName" to state.lastName,
+                            "fullname" to state.fullname,
                             "email" to state.email,
                             "birthDate" to state.birthDate,
                             "gender" to state.gender
