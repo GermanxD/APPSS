@@ -7,17 +7,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -25,6 +28,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,8 +52,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.mamma.guard.R
 import app.mamma.guard.auth.AuthService
+import app.mamma.guard.models.LoginViewModel
+import app.mamma.guard.models.RegisterViewModel
 
 @Composable
 fun keyboardAwarePadding(): Dp {
@@ -78,7 +85,12 @@ fun keyboardAwarePadding(): Dp {
 }
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    onRegisterClicked: () -> Unit,
+    viewModel: LoginViewModel = viewModel(),
+) {
+    val state = viewModel.state.collectAsState().value
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
@@ -192,25 +204,24 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
 
             Button(
                 onClick = {
-                    AuthService().loginWithUsername(username, password, context) { success, _ ->
-                        if (success) {
-                            onLoginSuccess()
-                        } else {
-                            loginError = true
-                        }
-                    }
+                    viewModel.loginWithUsername(username, password, context, onLoginSuccess, { loginError = true })
                 },
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF4A0C0)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(45.dp)
+                    .height(45.dp),
+                enabled = !state.isLoading
             ) {
-                Text(
-                    text = "Iniciar sesión",
-                    fontSize = 16.sp,
-                    color = Color(0xFF594012),
-                )
+                if (state.isLoading) {
+                    CircularProgressIndicator(color = Color.White)
+                } else {
+                    Text(
+                        text = "Iniciar sesión",
+                        fontSize = 16.sp,
+                        color = Color(0xFF594012),
+                    )
+                }
             }
 
             if (loginError) {
@@ -234,13 +245,34 @@ fun LoginScreen(onLoginSuccess: () -> Unit, onRegisterClicked: () -> Unit) {
                 fontSize = 16.sp
             )
 
-            TextButton(onClick = { onRegisterClicked() }) {
-                Text(
-                    text = "Regístrate ahora",
-                    style = TextStyle(),
-                    color = Color(0xFF594012),
-                    fontSize = 16.sp
-                )
+            var loadingRegister by remember { mutableStateOf(false) }
+
+            TextButton(
+                onClick = {
+                    loadingRegister = true
+                    onRegisterClicked()
+                },
+                enabled = !loadingRegister
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    if(loadingRegister){
+                        CircularProgressIndicator(
+                            color = Color(0xFF594012),
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+
+                    Text(
+                        text = "Regístrate ahora",
+                        style = TextStyle(),
+                        color = Color(0xFF594012),
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     }

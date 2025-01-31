@@ -1,10 +1,14 @@
 package app.mamma.guard.models
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.mamma.guard.auth.AuthService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel() {
@@ -17,9 +21,7 @@ class RegisterViewModel : ViewModel() {
 
     fun onEvent(event: RegisterEvent) {
         when (event) {
-            is RegisterEvent.Register -> {
-                registerUser()
-            }
+            is RegisterEvent.Register -> registerUser() // Llama a registerUser para iniciar el registro
             is RegisterEvent.UsernameChanged -> _state.value = state.copy(username = event.username)
             is RegisterEvent.FullNameChanged -> _state.value = state.copy(fullname = event.fullname)
             is RegisterEvent.GenderChanged -> _state.value = state.copy(gender = event.gender)
@@ -38,7 +40,7 @@ class RegisterViewModel : ViewModel() {
             return
         }
 
-        _state.value = state.copy(isLoading = true)
+        _state.value = state.copy(isLoading = true) // Activar loading al iniciar el registro
 
         auth.createUserWithEmailAndPassword(state.email, state.password)
             .addOnCompleteListener { task ->
@@ -57,16 +59,45 @@ class RegisterViewModel : ViewModel() {
                             .document(user.uid)
                             .set(userData)
                             .addOnSuccessListener {
-                                _state.value = state.copy(isRegistered = true, isLoading = false)
+                                _state.value = state.copy(isRegistered = true, isLoading = false, errorMessage = null)  // Registro exitoso y loading false
                             }
                             .addOnFailureListener { exception ->
-                                _state.value = state.copy(errorMessage = exception.message, isLoading = false)
+                                _state.value = state.copy(errorMessage = exception.message, isLoading = false)  // Error en Firestore
                             }
                     }
                 } else {
-                    _state.value = state.copy(errorMessage = task.exception?.message, isLoading = false)
+                    _state.value = state.copy(errorMessage = task.exception?.message, isLoading = false)  // Error en autenticación
                 }
             }
     }
 }
 
+class LoginViewModel : ViewModel() {
+
+    private val _state = MutableStateFlow(LoginState())
+    val state: StateFlow<LoginState> = _state
+
+    // Función simulada de inicio de sesión
+    fun loginWithUsername(username: String, password: String, context: Context, successCallback: () -> Unit, errorCallback: () -> Unit) {
+        _state.value = _state.value.copy(isLoading = true) // Activar loading
+
+        viewModelScope.launch {
+            // Simulación de un proceso de login
+            AuthService().loginWithUsername(username, password, context) { success, _ ->
+                _state.value = _state.value.copy(isLoading = false) // Desactivar loading
+
+                if (success) {
+                    successCallback()
+                } else {
+                    errorCallback()
+                }
+            }
+        }
+    }
+
+}
+
+
+data class LoginState(
+    val isLoading: Boolean = false,
+)
