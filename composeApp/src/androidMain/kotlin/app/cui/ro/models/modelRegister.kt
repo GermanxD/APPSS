@@ -1,4 +1,4 @@
-package app.mamma.guard.models
+package app.cui.ro.models
 
 data class RegisterState(
     val username: String = "",

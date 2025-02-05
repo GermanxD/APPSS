@@ -1,4 +1,4 @@
-package app.mamma.guard.ui
+package app.cui.ro.ui
 
 import android.graphics.Rect
 import android.view.ViewTreeObserver
@@ -43,7 +43,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -53,10 +52,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import app.mamma.guard.R
-import app.mamma.guard.auth.AuthService
-import app.mamma.guard.models.LoginViewModel
-import app.mamma.guard.models.RegisterViewModel
+import app.cui.ro.R
+import app.cui.ro.models.LoginViewModel
 
 @Composable
 fun keyboardAwarePadding(): Dp {

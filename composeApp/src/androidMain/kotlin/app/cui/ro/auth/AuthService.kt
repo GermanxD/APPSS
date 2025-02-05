@@ -1,4 +1,4 @@
-package app.mamma.guard.auth
+package app.cui.ro.auth
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -10,44 +10,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 class AuthService {
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val PREF_NAME = "app_mamma_guard"
+    private val PREF_NAME = "app_cui_ro"
     private val KEY_LOGGED_IN = "logged_in"
     private val TAG = "AuthService" // Etiqueta para los logs
 
     // Obtener usuario actual
     fun getCurrentUser(): FirebaseUser? {
         return firebaseAuth.currentUser
-    }
-
-    // Registrar usuario con email y password
-    fun register(email: String, password: String, username: String, callback: (Boolean, String?) -> Unit) {
-        Log.d(TAG, "Registrando usuario con email: $email y username: $username")
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG, "Registro exitoso para el usuario: $email")
-                    val user = firebaseAuth.currentUser
-                    user?.let {
-                        val userData = hashMapOf(
-                            "uid" to it.uid,
-                            "email" to email,
-                            "username" to username
-                        )
-                        firestore.collection("users").document(it.uid).set(userData)
-                            .addOnSuccessListener {
-                                Log.d(TAG, "Datos del usuario guardados en Firestore")
-                                callback(true, null)
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e(TAG, "Error al guardar datos del usuario en Firestore: ${e.localizedMessage}")
-                                callback(false, e.localizedMessage)
-                            }
-                    }
-                } else {
-                    Log.e(TAG, "Error en el registro: ${task.exception?.localizedMessage}")
-                    callback(false, task.exception?.localizedMessage)
-                }
-            }
     }
 
     // Iniciar sesión con email y password

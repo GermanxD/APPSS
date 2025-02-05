@@ -1,4 +1,4 @@
-package app.mamma.guard.session
+package app.cui.ro.session
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey

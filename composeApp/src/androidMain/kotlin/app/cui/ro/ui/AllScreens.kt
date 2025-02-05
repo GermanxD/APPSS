@@ -1,4 +1,4 @@
-package app.mamma.guard.ui
+package app.cui.ro.ui
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

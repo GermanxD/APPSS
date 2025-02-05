@@ -73,11 +73,11 @@ kotlin {
 }
 
 android {
-    namespace = "app.mamma.guard"
+    namespace = "app.cui.ro"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "app.mamma.guard"
+        applicationId = "app.cui.ro"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

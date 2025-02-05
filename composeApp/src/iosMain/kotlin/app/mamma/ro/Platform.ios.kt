@@ -1,4 +1,4 @@
-package app.mamma.guard
+package app.cui.ro
 
 import platform.UIKit.UIDevice
 

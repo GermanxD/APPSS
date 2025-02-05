@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "855638962409",
-    "project_id": "appdb-f0dba",
-    "storage_bucket": "appdb-f0dba.firebasestorage.app"
+    "project_number": "116816200184",
+    "project_id": "cuirodb",
+    "storage_bucket": "cuirodb.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:855638962409:android:2109548b7be3f2258d4078",
+        "mobilesdk_app_id": "1:116816200184:android:59a4ba9bf13299c013960d",
         "android_client_info": {
-          "package_name": "app.mamma.guard"
+          "package_name": "app.cui.ro"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA6jZqJHtHDmb2f1m6LloQ5mUz7ReV6ElY"
+          "current_key": "AIzaSyBxdIG0X-VRtrxKgDlX6F9rfGpV9137P0s"
         }
       ],
       "services": {

@@ -1,4 +1,4 @@
-package app.mamma.guard.test
+package app.cui.ro.test
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport

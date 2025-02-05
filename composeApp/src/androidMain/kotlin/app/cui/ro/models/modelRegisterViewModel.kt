@@ -1,10 +1,10 @@
-package app.mamma.guard.models
+package app.cui.ro.models
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.mamma.guard.auth.AuthService
+import app.cui.ro.auth.AuthService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow

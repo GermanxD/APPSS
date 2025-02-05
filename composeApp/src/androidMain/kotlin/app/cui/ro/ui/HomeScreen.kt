@@ -1,4 +1,4 @@
-package app.mamma.guard.ui
+package app.cui.ro.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -37,7 +37,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import app.mamma.guard.auth.AuthService
+import app.cui.ro.auth.AuthService
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable

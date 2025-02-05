@@ -1,4 +1,4 @@
-package app.mamma.guard
+package app.cui.ro
 
 import android.app.Application
 import android.os.Bundle

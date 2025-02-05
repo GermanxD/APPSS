@@ -1,16 +1,15 @@
-package app.mamma.guard
+package app.cui.ro
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import app.mamma.guard.auth.AuthService
-import app.mamma.guard.ui.HomeScreen
-import app.mamma.guard.ui.LoginScreen
-import app.mamma.guard.ui.RegisterScreen
+import app.cui.ro.auth.AuthService
+import app.cui.ro.ui.HomeScreen
+import app.cui.ro.ui.LoginScreen
+import app.cui.ro.ui.RegisterScreen
 
 @Composable
 fun AppNavHost(
