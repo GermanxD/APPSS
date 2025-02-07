@@ -1,6 +1,6 @@
 package app.cui.ro.ui
 
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
 }
 
 data class BottomNavItem(
+    val name: String,
     val route: String,
-    val icon: ImageVector
+    val icon: Painter
 )

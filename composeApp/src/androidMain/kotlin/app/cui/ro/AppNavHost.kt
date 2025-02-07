@@ -53,7 +53,7 @@ fun AppNavHost(
         }
 
         composable("home") {
-            HomeScreen(context = context, authService = authService, navController = navController)
+            HomeScreen(context = context)
         }
     }
 }
