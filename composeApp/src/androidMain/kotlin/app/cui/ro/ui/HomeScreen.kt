@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,12 +29,15 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -143,24 +147,77 @@ fun BottomNavHost(navController: NavHostController, context: Context) {
 
 @Composable
 fun HomeNavBarScreen() {
-    Column {
-        CustomTopAppBar(
-            onMenuClick = { /* Lógica para el clic del menú */ },
-            onNotificationsClick = { /* Lógica para el clic de notificaciones */ },
-            title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\""
-        )
-
-        Box(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Column {
+            CustomTopAppBar(
+                onMenuClick = { /* Lógica para el clic del menú */ },
+                onNotificationsClick = { /* Lógica para el clic de notificaciones */ },
+                title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\""
+            )
+        }
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f),
-            contentAlignment = Alignment.Center
+                .padding(16.dp),
         ) {
-            Text(
-                text = "Contenido de la pantalla Home",
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body1
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.img_logo_login),
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(80.dp)
+                        .background(color = Color.Black, shape = CircleShape)
+                )
+                Column(
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    Text(
+                        text = "Olivia Wilson",
+                        textAlign = TextAlign.Left,
+                        style = MaterialTheme.typography.body1
+                    )
+
+                    Text(
+                        text = "@reallygreatsite",
+                        textAlign = TextAlign.Left,
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = FontWeight.Light
+                    )
+                }
+            }
+            Row (
+                modifier = Modifier
+                    .background(Color.Gray)
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+            ){
+                Icon(
+                    Icons.Rounded.Search,
+                    contentDescription = "Icono de Busqueda",
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(36.dp),
+                    tint = Color.White,
+                )
+
+                Text(
+                    text = "¿Necesitas ayuda?",
+                    textAlign = TextAlign.Left,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
         }
     }
 }
