@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
@@ -195,7 +196,7 @@ fun HomeNavBarScreen() {
             }
             Row (
                 modifier = Modifier
-                    .background(Color.Gray)
+                    .background(color = Color(0xFFF6A1C8))
                     .fillMaxWidth()
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.Start,
@@ -217,6 +218,108 @@ fun HomeNavBarScreen() {
                     fontSize = 20.sp,
                     modifier = Modifier.padding(start = 10.dp)
                 )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Registro de información",
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp,
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+                ) {
+                    Text(
+                        text = "Ver más...",
+                        textAlign = TextAlign.End,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_right),
+                        contentDescription = "",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.Gray,
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.img_logo_login),
+                        contentDescription = "Datos Clinicos",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .background(color = Color(0xFFF6A1C8))
+                    )
+                    Text(
+                        text = "Datos clinicos",
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 4.dp).width(80.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.img_logo_login),
+                        contentDescription = "Efectos del tratamiento",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .background(color = Color(0xFFF6A1C8))
+                    )
+                    Text(
+                        text = "Efectos del tratamiento",
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 4.dp).width(80.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.img_logo_login),
+                        contentDescription = "Medicamentos",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .background(color = Color(0xFFF6A1C8))
+                    )
+                    Text(
+                        text = "Medicamentos",
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 4.dp).width(80.dp)
+                    )
+                }
             }
         }
     }
