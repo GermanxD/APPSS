@@ -9,17 +9,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -35,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -59,10 +64,18 @@ fun HomeScreen(context: Context) {
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController = bottomNavController)
+        },
+        content = { paddingValues ->
+            // Aplicar el paddingValues al contenido para evitar superposiciones
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues) // Asegura que el contenido no se superponga con el BottomNavigationBar
+            ) {
+                BottomNavHost(navController = bottomNavController, context = context)
+            }
         }
-    ) {
-        BottomNavHost(navController = bottomNavController, context = context)
-    }
+    )
 }
 
 @Composable
@@ -149,8 +162,7 @@ fun BottomNavHost(navController: NavHostController, context: Context) {
 @Composable
 fun HomeNavBarScreen() {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Column {
             CustomTopAppBar(
@@ -162,166 +174,288 @@ fun HomeNavBarScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .verticalScroll(rememberScrollState()),
         ) {
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.img_logo_login),
-                    contentDescription = "Logo",
+                    .fillMaxSize()
+                    .padding(16.dp)
+            )
+            {
+                Row(
                     modifier = Modifier
-                        .size(80.dp)
-                        .background(color = Color.Black, shape = CircleShape)
-                )
-                Column(
-                    modifier = Modifier.padding(start = 16.dp)
+                        .fillMaxWidth()
+                        .padding(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Olivia Wilson",
-                        textAlign = TextAlign.Left,
-                        style = MaterialTheme.typography.body1
+                    Image(
+                        painter = painterResource(R.drawable.img_profile),
+                        contentDescription = "Logo",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(CircleShape) // Recorta la imagen en forma circular
+                            .background(
+                                color = Color.Black,
+                                shape = CircleShape
+                            ) // Fondo circular (opcional)
+                    )
+                    Column(
+                        modifier = Modifier.padding(start = 16.dp)
+                    ) {
+                        Text(
+                            text = "Olivia Wilson",
+                            textAlign = TextAlign.Left,
+                            style = MaterialTheme.typography.body1
+                        )
+
+                        Text(
+                            text = "@reallygreatsite",
+                            textAlign = TextAlign.Left,
+                            style = MaterialTheme.typography.body1,
+                            fontWeight = FontWeight.Light
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .background(color = Color(0xFFF6A1C8))
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Rounded.Search,
+                        contentDescription = "Icono de Busqueda",
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(36.dp),
+                        tint = Color.White,
                     )
 
                     Text(
-                        text = "@reallygreatsite",
+                        text = "¿Necesitas ayuda?",
                         textAlign = TextAlign.Left,
-                        style = MaterialTheme.typography.body1,
-                        fontWeight = FontWeight.Light
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(start = 10.dp)
                     )
                 }
-            }
-            Row (
-                modifier = Modifier
-                    .background(color = Color(0xFFF6A1C8))
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-            ){
-                Icon(
-                    Icons.Rounded.Search,
-                    contentDescription = "Icono de Busqueda",
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .size(36.dp),
-                    tint = Color.White,
-                )
-
-                Text(
-                    text = "¿Necesitas ayuda?",
-                    textAlign = TextAlign.Left,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(start = 10.dp)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "Registro de información",
-                    textAlign = TextAlign.Start,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
-                )
                 Row(
-                    verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Ver más...",
-                        textAlign = TextAlign.End,
+                        text = "Registro de información",
+                        textAlign = TextAlign.Start,
                         fontWeight = FontWeight.Normal,
                         fontSize = 14.sp,
-                        color = Color.Gray,
                     )
-                    Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_right),
-                        contentDescription = "",
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.Gray,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+                    ) {
+                        Text(
+                            text = "Ver más...",
+                            textAlign = TextAlign.End,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_right),
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.Gray,
+                        )
+                    }
+                }
+
+                // Modified section to prevent text from pushing images up.
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+                ) {
+                    DataColumn(
+                        imageResId = R.drawable.img_logo_login,
+                        text = "Datos clinicos"
+                    )
+                    DataColumn(
+                        imageResId = R.drawable.img_logo_login,
+                        text = "Efectos del tratamiento"
+                    )
+                    DataColumn(
+                        imageResId = R.drawable.img_logo_login,
+                        text = "Medicamentos"
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Recomendaciones sobre...",
+                        textAlign = TextAlign.Start,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp,
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+                    ) {
+                        Text(
+                            text = "Ver más...",
+                            textAlign = TextAlign.End,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_right),
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.Gray,
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+                ) {
+                    DataColumn(
+                        imageResId = R.drawable.img_logo_login,
+                        text = "Datos clinicos"
+                    )
+                    DataColumn(
+                        imageResId = R.drawable.img_logo_login,
+                        text = "Efectos del tratamiento"
+                    )
+                    DataColumn(
+                        imageResId = R.drawable.img_logo_login,
+                        text = "Medicamentos"
                     )
                 }
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
+
+// Sección modificada
+            Column {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp) // Altura fija para la Row
+                        .background(color = Color(0xFFFFDCDA))
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.img_logo_login),
-                        contentDescription = "Datos Clinicos",
+                    Column(
                         modifier = Modifier
-                            .size(100.dp)
-                            .background(color = Color(0xFFF6A1C8))
-                    )
-                    Text(
-                        text = "Datos clinicos",
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        Text(
+                            "Medicamentos",
+                            fontSize = 20.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            "Olivia, el siguiente medicamento es:",
+                            fontSize = 12.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            "Tamoxifeno (Nolvadex):",
+                            fontSize = 12.sp,
+                            color = Color.Black,
+                        )
+                        Text(
+                            "Hora: 12:00 hrs",
+                            fontSize = 12.sp,
+                            color = Color.Black,
+                        )
+                        Text(
+                            "Recordarme: Si",
+                            fontSize = 12.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            "Informacion del medicamento aqui",
+                            fontSize = 12.sp,
+                            color = Color.Black,
+                        )
+                    }
+
+                    Divider(
                         color = Color.Black,
-                        modifier = Modifier.padding(top = 4.dp).width(80.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.img_logo_login),
-                        contentDescription = "Efectos del tratamiento",
                         modifier = Modifier
-                            .size(100.dp)
-                            .background(color = Color(0xFFF6A1C8))
+                            .fillMaxHeight()
+                            .width(1.dp)
                     )
-                    Text(
-                        text = "Efectos del tratamiento",
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 4.dp).width(80.dp)
-                    )
-                }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.img_logo_login),
-                        contentDescription = "Medicamentos",
+                    Column(
                         modifier = Modifier
-                            .size(100.dp)
-                            .background(color = Color(0xFFF6A1C8))
-                    )
-                    Text(
-                        text = "Medicamentos",
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 4.dp).width(80.dp)
-                    )
+                            .fillMaxHeight()
+                            .weight(1f)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .background(Color.Black)
+                                .weight(1f)
+                        ) { }
+
+                        Divider(
+                            color = Color.Black,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .background(Color.White)
+                                .weight(1f)
+                        ) { }
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DataColumn(imageResId: Int, text: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center, // Center content vertically
+        modifier = Modifier.width(100.dp) // Fixed width for consistent layout
+    ) {
+        Image(
+            painter = painterResource(id = imageResId),
+            contentDescription = text,
+            modifier = Modifier
+                .size(100.dp)
+                .background(color = Color(0xFFF6A1C8))
+                .clip(CircleShape) // Optional: If you want the image to be a circle
+        )
+        Spacer(modifier = Modifier.height(4.dp)) // Add some space between image and text
+        Text(
+            text = text,
+            textAlign = TextAlign.Center,
+            fontSize = 14.sp,
+            color = Color.Black,
+        )
     }
 }
 
