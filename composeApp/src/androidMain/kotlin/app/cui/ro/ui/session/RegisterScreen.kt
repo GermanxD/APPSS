@@ -1,4 +1,4 @@
-package app.cui.ro.ui
+package app.cui.ro.ui.session
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker

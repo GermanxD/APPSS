@@ -1,4 +1,4 @@
-package app.cui.ro.ui
+package app.cui.ro.ui.session
 
 import android.graphics.Rect
 import android.view.ViewTreeObserver

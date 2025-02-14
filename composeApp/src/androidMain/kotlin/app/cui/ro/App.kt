@@ -7,9 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.cui.ro.auth.AuthService
-import app.cui.ro.ui.HomeScreen
-import app.cui.ro.ui.LoginScreen
-import app.cui.ro.ui.RegisterScreen
+import app.cui.ro.ui.screens.HomeScreen
+import app.cui.ro.ui.session.LoginScreen
+import app.cui.ro.ui.session.RegisterScreen
 import app.cui.ro.ui.Screen
 
 @Composable
