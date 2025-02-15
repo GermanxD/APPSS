@@ -242,27 +242,14 @@ fun LoginScreen(
                 fontSize = 16.sp
             )
 
-            var loadingRegister by remember { mutableStateOf(false) }
-
             TextButton(
                 onClick = {
-                    loadingRegister = true
                     onRegisterClicked()
-                },
-                enabled = !loadingRegister
+                }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ){
-                    if(loadingRegister){
-                        CircularProgressIndicator(
-                            color = Color(0xFF594012),
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
-
                     Text(
                         text = "Regístrate ahora",
                         style = TextStyle(),

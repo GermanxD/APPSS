@@ -156,7 +156,7 @@ fun HomeNavBarScreen() {
                     Text(
                         text = "Registro de información",
                         textAlign = TextAlign.Start,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                     )
                     Row(
@@ -209,7 +209,7 @@ fun HomeNavBarScreen() {
                     Text(
                         text = "Recomendaciones sobre...",
                         textAlign = TextAlign.Start,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                     )
                     Row(
@@ -252,11 +252,11 @@ fun HomeNavBarScreen() {
                 }
             }
 
-// Sección modificada
+            // Sección modificada
             Column {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .height(500.dp) // Altura fija para la Row
                         .background(color = Color(0xFFFFDCDA))
                 ) {
@@ -277,10 +277,11 @@ fun HomeNavBarScreen() {
                                 "Medicamentos",
                                 fontSize = 20.sp,
                                 color = Color.Black,
+                                fontWeight = FontWeight.Bold
                             )
 
                             Image(
-                                painter = painterResource(R.drawable.ic_profile),
+                                painter = painterResource(R.drawable.ic_clock),
                                 contentDescription = "",
                                 modifier = Modifier
                                     .size(50.dp)
@@ -289,7 +290,8 @@ fun HomeNavBarScreen() {
                         }
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth().padding(5.dp),
+                                .fillMaxWidth()
+                                .padding(5.dp),
                             horizontalAlignment = Alignment.Start,
                         ) {
                             Text(
@@ -302,6 +304,7 @@ fun HomeNavBarScreen() {
                                 "Tamoxifeno (Nolvadex):",
                                 fontSize = 12.sp,
                                 color = Color.Black,
+                                fontWeight = FontWeight.Bold
                             )
                             Text(
                                 "Hora: 12:00 hrs",
@@ -314,27 +317,33 @@ fun HomeNavBarScreen() {
                                 color = Color.Black,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        )
+                        {
+                            Column {
                                 Text(
                                     "Informacion del medicamento aqui",
-                                    fontSize = 12.sp,
+                                    fontSize = 14.sp,
                                     color = Color.Black,
+                                    fontWeight = FontWeight.Bold
                                 )
-
+                            }
+                            Column {
                                 Image(
                                     painter = painterResource(R.drawable.ic_add),
                                     contentDescription = "",
                                     modifier = Modifier
                                         .size(50.dp)
-                                        .padding(start = 10.dp),
                                 )
                             }
+
                         }
+
                     }
 
                     Divider(
@@ -346,14 +355,41 @@ fun HomeNavBarScreen() {
 
                     Column(
                         modifier = Modifier
-                            .fillMaxHeight()
+                            .fillMaxSize()
                             .weight(1f)
+                            .padding(5.dp)
                     ) {
                         Row(
                             modifier = Modifier
-                                .background(Color.Black)
                                 .weight(1f)
-                        ) { }
+                        ) {
+                            Column {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Start,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        "Pasos",
+                                        fontSize = 20.sp,
+                                        color = Color.Black,
+                                        fontWeight = FontWeight.Bold
+                                    )
+
+                                    Spacer(
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                    )
+                                }
+
+                                Text(
+                                    "Hola Olivia, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
+                                    fontSize = 12.sp,
+                                    color = Color.Black,
+                                )
+                            }
+                        }
 
                         Divider(
                             color = Color.Black,
@@ -364,9 +400,22 @@ fun HomeNavBarScreen() {
 
                         Row(
                             modifier = Modifier
-                                .background(Color.White)
                                 .weight(1f)
-                        ) { }
+                        ) {
+                            Column {
+                                Text(
+                                    "Hidratacion",
+                                    fontSize = 20.sp,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    "Hola Olivia, hoy no has registrado tu consumo de agua, registralo",
+                                    fontSize = 12.sp,
+                                    color = Color.Black,
+                                )
+                            }
+                        }
                     }
                 }
             }

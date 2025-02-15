@@ -110,6 +110,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.core.ktx)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.core.ktx)
     debugImplementation(compose.uiTooling)
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
