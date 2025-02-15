@@ -187,15 +187,15 @@ fun HomeNavBarScreen() {
                     horizontalArrangement = Arrangement.SpaceAround // This is crucial!
                 ) {
                     DataColumn(
-                        imageResId = R.drawable.img_logo_login,
+                        imageResId = R.drawable.ic_datos_clinicos,
                         text = "Datos clinicos"
                     )
                     DataColumn(
-                        imageResId = R.drawable.img_logo_login,
+                        imageResId = R.drawable.ic_efectos_del_tratamiento,
                         text = "Efectos del tratamiento"
                     )
                     DataColumn(
-                        imageResId = R.drawable.img_logo_login,
+                        imageResId = R.drawable.ic_medicamentos,
                         text = "Medicamentos"
                     )
                 }
@@ -238,16 +238,16 @@ fun HomeNavBarScreen() {
                     horizontalArrangement = Arrangement.SpaceAround // This is crucial!
                 ) {
                     DataColumn(
-                        imageResId = R.drawable.img_logo_login,
-                        text = "Datos clinicos"
+                        imageResId = R.drawable.ic_informacion,
+                        text = "Informacion"
                     )
                     DataColumn(
-                        imageResId = R.drawable.img_logo_login,
-                        text = "Efectos del tratamiento"
+                        imageResId = R.drawable.ic_quimioterapia,
+                        text = "Quimioterapia"
                     )
                     DataColumn(
-                        imageResId = R.drawable.img_logo_login,
-                        text = "Medicamentos"
+                        imageResId = R.drawable.ic_nutricion,
+                        text = "Nutricion"
                     )
                 }
             }
@@ -314,11 +314,26 @@ fun HomeNavBarScreen() {
                                 color = Color.Black,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
-                            Text(
-                                "Informacion del medicamento aqui",
-                                fontSize = 12.sp,
-                                color = Color.Black,
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    "Informacion del medicamento aqui",
+                                    fontSize = 12.sp,
+                                    color = Color.Black,
+                                )
+
+                                Image(
+                                    painter = painterResource(R.drawable.ic_add),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .padding(start = 10.dp),
+                                )
+                            }
                         }
                     }
 
