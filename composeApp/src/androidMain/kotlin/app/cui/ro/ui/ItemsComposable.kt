@@ -45,8 +45,7 @@ fun DataColumn(imageResId: Int, text: String) {
             contentDescription = text,
             modifier = Modifier
                 .size(100.dp)
-                .background(color = Color(0xFFF6A1C8))
-                .clip(CircleShape) // Optional: If you want the image to be a circle
+                .background(color = Color(0xFFF6A1C8)) // Optional: If you want the image to be a circle
         )
         Spacer(modifier = Modifier.height(4.dp)) // Add some space between image and text
         Text(

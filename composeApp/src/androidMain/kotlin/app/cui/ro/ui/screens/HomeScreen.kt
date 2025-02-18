@@ -325,7 +325,9 @@ fun HomeNavBarScreen() {
                             verticalAlignment = Alignment.CenterVertically,
                         )
                         {
-                            Column {
+                            Column(
+                                modifier = Modifier.weight(0.6f)
+                            ) {
                                 Text(
                                     "Informacion del medicamento aqui",
                                     fontSize = 14.sp,
@@ -333,12 +335,14 @@ fun HomeNavBarScreen() {
                                     fontWeight = FontWeight.Bold
                                 )
                             }
-                            Column {
+                            Column(
+                                modifier = Modifier.weight(0.3f)
+                            ) {
                                 Image(
                                     painter = painterResource(R.drawable.ic_add),
                                     contentDescription = "",
                                     modifier = Modifier
-                                        .size(50.dp)
+                                        .size(30.dp)
                                 )
                             }
 
