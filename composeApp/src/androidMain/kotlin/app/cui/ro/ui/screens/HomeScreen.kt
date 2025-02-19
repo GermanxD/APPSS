@@ -253,11 +253,14 @@ fun HomeNavBarScreen() {
             }
 
             // Sección modificada
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .height(500.dp) // Altura fija para la Row
+                        .fillMaxWidth() // Ocupa todo el ancho disponible
+                        .fillMaxHeight() // Ocupa toda la altura disponible dentro del Column padre
                         .background(color = Color(0xFFFFDCDA))
                 ) {
                     Column(
@@ -347,7 +350,6 @@ fun HomeNavBarScreen() {
                             }
 
                         }
-
                     }
 
                     Divider(
@@ -359,42 +361,68 @@ fun HomeNavBarScreen() {
 
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxHeight()
                             .weight(1f)
-                            .padding(5.dp)
+                            .padding(5.dp),
+                        horizontalAlignment = Alignment.Start,
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .weight(1f)
+                        // Sección de Pasos
+                        Column(
+                            modifier = Modifier.padding(5.dp)
                         ) {
-                            Column {
-                                Row(
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    "Pasos",
+                                    fontSize = 20.sp,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                Spacer(
                                     modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically,
+                                        .size(40.dp)
+                                )
+                            }
+
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            )
+                            {
+                                Column(
+                                    modifier = Modifier.weight(0.7f).padding(vertical = 10.dp)
                                 ) {
                                     Text(
-                                        "Pasos",
-                                        fontSize = 20.sp,
+                                        "Hola Olivia, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
+                                        fontSize = 12.sp,
                                         color = Color.Black,
-                                        fontWeight = FontWeight.Bold
                                     )
+                                }
 
-                                    Spacer(
+                                Column(
+                                    modifier = Modifier
+                                        .weight(0.3f)
+                                        .fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_pasos),
+                                        contentDescription = "",
                                         modifier = Modifier
                                             .size(50.dp)
                                     )
                                 }
-
-                                Text(
-                                    "Hola Olivia, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
-                                    fontSize = 12.sp,
-                                    color = Color.Black,
-                                )
                             }
                         }
 
+
+                        // Divider entre Pasos e Hidratacion
                         Divider(
                             color = Color.Black,
                             modifier = Modifier
@@ -402,21 +430,69 @@ fun HomeNavBarScreen() {
                                 .height(1.dp)
                         )
 
-                        Row(
-                            modifier = Modifier
-                                .weight(1f)
+                        // Sección de Hidratación
+                        Column(
+                            modifier = Modifier.padding(5.dp)
                         ) {
-                            Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
                                     "Hidratacion",
                                     fontSize = 20.sp,
                                     color = Color.Black,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(
-                                    "Hola Olivia, hoy no has registrado tu consumo de agua, registralo",
-                                    fontSize = 12.sp,
-                                    color = Color.Black,
+
+                                Spacer(
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                )
+                            }
+
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            )
+                            {
+                                Column(
+                                    modifier = Modifier.weight(0.7f)
+                                ) {
+                                    Text(
+                                        "Hola Olivia, hoy no has registrado tu consumo de agua, registralo.",
+                                        fontSize = 12.sp,
+                                        color = Color.Black,
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .weight(0.3f)
+                                        .fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_persona_agua),
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .size(50.dp)
+                                    )
+                                }
+                            }
+
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally)
+                            ){
+                                Image(
+                                    painter = painterResource(R.drawable.ic_add),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(30.dp)
                                 )
                             }
                         }
@@ -426,3 +502,7 @@ fun HomeNavBarScreen() {
         }
     }
 }
+
+
+
+
