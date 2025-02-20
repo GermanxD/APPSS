@@ -256,263 +256,262 @@ fun HomeNavBarScreen() {
                 }
             }
 
-// Sección modificada
-// Sección modificada
-                    Row(
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = Color.Black)
+                    .height(IntrinsicSize.Min) // Añadido para igualar la altura
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .background(Color(0xFFFFDCDA)), // importante mantener el mismo background
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Column( // Agregado un Column interno para el padding
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(color = Color.Black)
-                            .height(IntrinsicSize.Min) // Añadido para igualar la altura
+                            .padding(5.dp) // Mover el padding aquí
                     ) {
-
-                        Column(
+                        Row(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(1f)
-                                .background(Color(0xFFFFDCDA)), // importante mantener el mismo background
-                            horizontalAlignment = Alignment.Start,
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Column( // Agregado un Column interno para el padding
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp) // Mover el padding aquí
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        "Medicamentos",
-                                        fontSize = 20.sp,
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold
-                                    )
-
-                                    Image(
-                                        painter = painterResource(R.drawable.ic_clock),
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .size(50.dp)
-                                            .padding(start = 10.dp),
-                                    )
-                                }
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-
-                                ) {
-                                    Text(
-                                        "Olivia, el siguiente medicamento es:",
-                                        fontSize = 12.sp,
-                                        color = Color.Black,
-                                        modifier = Modifier.padding(bottom = 8.dp)
-                                    )
-                                    Text(
-                                        "Tamoxifeno (Nolvadex):",
-                                        fontSize = 12.sp,
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(
-                                        "Hora: 12:00 hrs",
-                                        fontSize = 12.sp,
-                                        color = Color.Black,
-                                    )
-                                    Text(
-                                        "Recordarme: Si",
-                                        fontSize = 12.sp,
-                                        color = Color.Black,
-                                        modifier = Modifier.padding(bottom = 8.dp)
-                                    )
-                                }
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                )
-                                {
-                                    Column(
-                                        modifier = Modifier.weight(0.6f)
-                                    ) {
-                                        Text(
-                                            "Informacion del medicamento aqui",
-                                            fontSize = 14.sp,
-                                            color = Color.Black,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                    Column(
-                                        modifier = Modifier.weight(0.3f)
-                                    ) {
-                                        Image(
-                                            painter = painterResource(R.drawable.ic_add),
-                                            contentDescription = "",
-                                            modifier = Modifier
-                                                .size(30.dp)
-                                        )
-                                    }
-
-                                }
-                            }
-                        }
-
-                        VerticalDivider(
-                            color = Color.Black, // el mismo color del background de las columnas
-                            thickness = 1.dp,
-                            modifier = Modifier
-                                .fillMaxHeight()
-                        )
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(1f)
-                                .background(Color(0xFFFFDCDA)), // importante mantener el mismo background
-                            horizontalAlignment = Alignment.Start,
-                        ) {
-                            // Sección de Pasos
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        "Pasos",
-                                        fontSize = 20.sp,
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold
-                                    )
-
-                                    Spacer(
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                    )
-                                }
-
-                                Row(
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                )
-                                {
-                                    Column(
-                                        modifier = Modifier
-                                            .weight(0.7f)
-                                            .padding(vertical = 10.dp)
-                                    ) {
-                                        Text(
-                                            "Hola Olivia, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
-                                            fontSize = 12.sp,
-                                            color = Color.Black,
-                                        )
-                                    }
-
-                                    Column(
-                                        modifier = Modifier
-                                            .weight(0.3f)
-                                            .fillMaxWidth(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        Image(
-                                            painter = painterResource(R.drawable.ic_pasos),
-                                            contentDescription = "",
-                                            modifier = Modifier
-                                                .size(50.dp)
-                                        )
-                                    }
-                                }
-                            }
-
-
-                            // Divider entre Pasos e Hidratacion
-                            Divider(
+                            Text(
+                                "Medicamentos",
+                                fontSize = 20.sp,
                                 color = Color.Black,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(1.dp)
+                                fontWeight = FontWeight.Bold
                             )
 
-                            // Sección de Hidratación
+                            Image(
+                                painter = painterResource(R.drawable.ic_clock),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .padding(start = 10.dp),
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+
+                        ) {
+                            Text(
+                                "Olivia, el siguiente medicamento es:",
+                                fontSize = 12.sp,
+                                color = Color.Black,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Text(
+                                "Tamoxifeno (Nolvadex):",
+                                fontSize = 12.sp,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "Hora: 12:00 hrs",
+                                fontSize = 12.sp,
+                                color = Color.Black,
+                            )
+                            Text(
+                                "Recordarme: Si",
+                                fontSize = 12.sp,
+                                color = Color.Black,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        )
+                        {
+                            Column(
+                                modifier = Modifier.weight(0.6f)
+                            ) {
+                                Text(
+                                    "Informacion del medicamento aqui",
+                                    fontSize = 14.sp,
+                                    color = Color.Black,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Column(
+                                modifier = Modifier.weight(0.3f)
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_add),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                )
+                            }
+
+                        }
+                    }
+                }
+
+                VerticalDivider(
+                    color = Color.Black, // el mismo color del background de las columnas
+                    thickness = 1.dp,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .background(Color(0xFFFFDCDA)), // importante mantener el mismo background
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    // Sección de Pasos
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                "Pasos",
+                                fontSize = 20.sp,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .size(40.dp)
+                            )
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        )
+                        {
                             Column(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp)
+                                    .weight(0.7f)
+                                    .padding(vertical = 10.dp)
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        "Hidratacion",
-                                        fontSize = 20.sp,
-                                        color = Color.Black,
-                                        fontWeight = FontWeight.Bold
-                                    )
-
-                                    Spacer(
-                                        modifier = Modifier
-                                            .size(50.dp)
-                                    )
-                                }
-
-                                Row(
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically,
+                                Text(
+                                    "Hola Olivia, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
+                                    fontSize = 12.sp,
+                                    color = Color.Black,
                                 )
-                                {
-                                    Column(
-                                        modifier = Modifier.weight(0.7f)
-                                    ) {
-                                        Text(
-                                            "Hola Olivia, hoy no has registrado tu consumo de agua, registralo.",
-                                            fontSize = 12.sp,
-                                            color = Color.Black,
-                                        )
-                                    }
-                                    Column(
-                                        modifier = Modifier
-                                            .weight(0.3f)
-                                            .fillMaxWidth(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        Image(
-                                            painter = painterResource(R.drawable.ic_persona_agua),
-                                            contentDescription = "",
-                                            modifier = Modifier
-                                                .size(50.dp)
-                                        )
-                                    }
-                                }
+                            }
 
-                                Row(
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically,
+                            Column(
+                                modifier = Modifier
+                                    .weight(0.3f)
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_pasos),
+                                    contentDescription = "",
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .align(Alignment.CenterHorizontally)
-                                ) {
-                                    Image(
-                                        painter = painterResource(R.drawable.ic_add),
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .size(30.dp)
-                                    )
-                                }
+                                        .size(50.dp)
+                                )
                             }
                         }
                     }
+
+
+                    // Divider entre Pasos e Hidratacion
+                    Divider(
+                        color = Color.Black,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                    )
+
+                    // Sección de Hidratación
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                "Hidratacion",
+                                fontSize = 20.sp,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(
+                                modifier = Modifier
+                                    .size(50.dp)
+                            )
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        )
+                        {
+                            Column(
+                                modifier = Modifier.weight(0.7f)
+                            ) {
+                                Text(
+                                    "Hola Olivia, hoy no has registrado tu consumo de agua, registralo.",
+                                    fontSize = 12.sp,
+                                    color = Color.Black,
+                                )
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .weight(0.3f)
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_persona_agua),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                )
+                            }
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally)
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_add),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(30.dp)
+                            )
+                        }
+                    }
+                }
+                
+            }
         }
     }
 }
