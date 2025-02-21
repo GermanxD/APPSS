@@ -26,7 +26,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,17 +40,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
-import app.cui.ro.models.RegisterState
 import app.cui.ro.navigation.BottomNavHost
 import app.cui.ro.navigation.BottomNavigationBar
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
-import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Locale
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -78,13 +77,15 @@ fun HomeScreen(context: Context) {
 @Composable
 fun HomeNavBarScreen(authService: AuthService) {
     val userId = remember { authService.getUserId() }
-    var userFullName by remember { mutableStateOf("Usuario") }
+    var userFullNameDB by remember { mutableStateOf("Usuario") } // Estado para el nombre completo
+    var usernameDB by remember { mutableStateOf("Usuario") } // Estado para el username
 
     LaunchedEffect(userId) {
         if (userId != null) {
-            authService.getUserFullName(userId) { name ->
-                if (name != null) {
-                    userFullName = name
+            authService.getAllData(userId) { userFullName, username ->
+                if (userFullName != null && username != null) {
+                    userFullNameDB = userFullName // Actualiza el estado del nombre completo
+                    usernameDB = username // Actualiza el estado del username
                 }
             }
         }
@@ -132,13 +133,13 @@ fun HomeNavBarScreen(authService: AuthService) {
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         Text(
-                            text = userFullName,
+                            text = userFullNameDB,
                             textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.body1
                         )
 
                         Text(
-                            text = "@reallygreatsite",
+                            text = "@$usernameDB".lowercase(Locale.getDefault()),
                             textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.body1,
                             fontWeight = FontWeight.Light

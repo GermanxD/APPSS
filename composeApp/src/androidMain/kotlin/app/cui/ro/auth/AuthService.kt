@@ -24,19 +24,20 @@ class AuthService {
         return currentUser?.uid // Devuelve el UID del usuario actual o null si no está autenticado
     }
 
-    fun getUserFullName(userId: String, callback: (String?) -> Unit) {
+    fun getAllData(userId: String, callback: (String?, String?) -> Unit) {
         firestore.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val name = document.getString("fullname")
-                    callback(name)
+                    val username = document.getString("username")
+                    callback(name, username) // Devuelve ambos valores
                 } else {
-                    callback(null)
+                    callback(null, null) // Si el documento no existe
                 }
             }
             .addOnFailureListener { exception ->
-                Log.e(TAG, "Error al obtener el nombre del usuario: ${exception.localizedMessage}")
-                callback(null)
+                Log.e(TAG, "Error al obtener los datos del usuario: ${exception.localizedMessage}")
+                callback(null, null) // En caso de error
             }
     }
 
