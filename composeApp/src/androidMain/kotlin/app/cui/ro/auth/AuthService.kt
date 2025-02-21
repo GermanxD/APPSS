@@ -19,6 +19,44 @@ class AuthService {
         return firebaseAuth.currentUser
     }
 
+    fun getUserId(): String? {
+        val currentUser = getCurrentUser()
+        return currentUser?.uid // Devuelve el UID del usuario actual o null si no está autenticado
+    }
+
+    fun getUserFullName(userId: String, callback: (String?) -> Unit) {
+        firestore.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val name = document.getString("fullname")
+                    callback(name)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Error al obtener el nombre del usuario: ${exception.localizedMessage}")
+                callback(null)
+            }
+    }
+
+    fun getUserFirstName(userId: String, callback: (String?) -> Unit) {
+        firestore.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val fullName = document.getString("fullname")
+                    val firstName = fullName?.split(" ")?.get(0) // Extrae el primer nombre
+                    callback(firstName)
+                } else {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Error al obtener el nombre del usuario: ${exception.localizedMessage}")
+                callback(null)
+            }
+    }
+
     // Iniciar sesión con email y password
     fun login(email: String, password: String, context: Context, callback: (Boolean, String?) -> Unit) {
         Log.d(TAG, "Intentando iniciar sesión con email: $email")

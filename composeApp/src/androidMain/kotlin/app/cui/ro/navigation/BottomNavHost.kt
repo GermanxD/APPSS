@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import app.cui.ro.R
+import app.cui.ro.auth.AuthService
 import app.cui.ro.ui.BottomNavItem
 import app.cui.ro.ui.screens.ContactsNavBarScreen
 import app.cui.ro.ui.screens.ForoNavBarScreen
@@ -30,7 +31,9 @@ import app.cui.ro.ui.screens.ProfileNavBarScreen
 @Composable
 fun BottomNavHost(navController: NavHostController, context: Context) {
     NavHost(navController, startDestination = "home_route") {
-        composable("home_route") { HomeNavBarScreen() }
+        composable("home_route") { HomeNavBarScreen(
+            authService = AuthService()
+        ) }
         composable("profile_route") { ProfileNavBarScreen() }
         composable("contacts_route") { ContactsNavBarScreen() }
         composable("foro_route") { ForoNavBarScreen() }
