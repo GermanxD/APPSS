@@ -115,7 +115,7 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-analytics")
-
     implementation("com.google.firebase:firebase-firestore")
+    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")
 }
 

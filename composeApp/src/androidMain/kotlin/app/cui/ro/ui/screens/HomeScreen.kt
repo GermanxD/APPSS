@@ -179,6 +179,7 @@ fun HomeNavBarScreen(authService: AuthService) {
         }
     }
 }
+
 @Composable
 fun SeccionInformacion() {
     Row(
@@ -303,6 +304,7 @@ fun SeccionSeguimiento(authService: AuthService) {
             }
         }
     }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -454,11 +456,11 @@ fun SeccionSeguimiento(authService: AuthService) {
                             .weight(0.7f)
                             .padding(vertical = 10.dp)
                     ) {
-                        Text(
-                            "$userFirstName, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
-                            fontSize = 12.sp,
-                            color = Color.Black,
+
+                        MedicionPasos(
+                            authService = AuthService()
                         )
+
                     }
 
                     Column(
@@ -562,6 +564,27 @@ fun SeccionSeguimiento(authService: AuthService) {
     }
 }
 
+@Composable
+fun MedicionPasos(authService: AuthService) {
+    val userId = remember { authService.getUserId() }
+    var userFirstName by remember { mutableStateOf("Usuario") }
 
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            authService.getUserFirstName(userId) { name ->
+                if (name != null) {
+                    userFirstName = name
+                }
+            }
+        }
+    }
+
+    Text(
+        "$userFirstName, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
+        fontSize = 12.sp,
+        color = Color.Black,
+    )
+
+}
 
 
