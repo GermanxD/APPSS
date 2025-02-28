@@ -1,5 +1,6 @@
 package app.cui.ro.ui.screens
 
+import androidx.health.connect.client.time.TimeRangeFilter // Import this!
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -37,12 +38,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.navigation.compose.rememberNavController
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
@@ -50,6 +55,8 @@ import app.cui.ro.navigation.BottomNavHost
 import app.cui.ro.navigation.BottomNavigationBar
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -457,8 +464,10 @@ fun SeccionSeguimiento(authService: AuthService) {
                             .padding(vertical = 10.dp)
                     ) {
 
+                        val context = LocalContext.current
                         MedicionPasos(
-                            authService = AuthService()
+                            authService = AuthService(),
+                            context = context
                         )
 
                     }
@@ -565,10 +574,12 @@ fun SeccionSeguimiento(authService: AuthService) {
 }
 
 @Composable
-fun MedicionPasos(authService: AuthService) {
+fun MedicionPasos(authService: AuthService, context: Context) {
     val userId = remember { authService.getUserId() }
     var userFirstName by remember { mutableStateOf("Usuario") }
+    var stepsCount by remember { mutableStateOf(0) }
 
+    // Obtener el nombre del usuario
     LaunchedEffect(userId) {
         if (userId != null) {
             authService.getUserFirstName(userId) { name ->
@@ -579,12 +590,41 @@ fun MedicionPasos(authService: AuthService) {
         }
     }
 
+    // Obtener pasos del día
+    LaunchedEffect(Unit) {
+        val healthClient = HealthConnectClient.getOrCreate(context)
+        val today = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
+        val steps = readStepsForDate(healthClient, today)
+        stepsCount = steps.toInt()
+    }
+
     Text(
-        "$userFirstName, hoy has dado 0 pasos (0 min). Animo, tu puedes dar algunos.",
+        "$userFirstName, hoy has dado $stepsCount pasos. ¡Ánimo, tú puedes dar algunos más!",
         fontSize = 12.sp,
         color = Color.Black,
     )
-
 }
+
+// Función para leer pasos desde Health Connect
+suspend fun readStepsForDate(client: HealthConnectClient, date: ZonedDateTime): Long {
+    // Convertir ZonedDateTime a Instant
+    val startTime = date.toInstant()
+    val endTime = date.plusDays(1).toInstant()
+
+    // Crear el filtro de rango de tiempo
+    val timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+
+    // Leer los registros de pasos
+    val response = client.readRecords(
+        ReadRecordsRequest(
+            recordType = StepsRecord::class,
+            timeRangeFilter = timeRangeFilter
+        )
+    )
+
+    // Sumar el conteo de pasos de todos los registros
+    return response.records.sumOf { it.count }
+}
+
 
 

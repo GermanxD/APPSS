@@ -1,22 +1,19 @@
 package app.cui.ro
 
 import android.content.Context
-import android.os.Bundle
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.records.StepsRecord
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
-import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.StepsRecord
+
 
 class MainActivity : ComponentActivity() {
 
