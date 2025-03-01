@@ -27,7 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
-import app.cui.ro.ui.BottomNavItem
+import app.cui.ro.models.BottomNavItem
 import app.cui.ro.ui.screens.NavBarScreenContact
 import app.cui.ro.ui.screens.NavBarScreenForo
 import app.cui.ro.ui.screens.NavBarScreenMessage

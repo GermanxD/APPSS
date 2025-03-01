@@ -1,4 +1,4 @@
-package app.cui.ro
+package app.cui.ro.main
 
 import android.content.Context
 import android.content.Intent

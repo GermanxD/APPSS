@@ -1,4 +1,4 @@
-package app.cui.ro
+package app.cui.ro.main
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -10,7 +10,7 @@ import app.cui.ro.auth.AuthService
 import app.cui.ro.navigation.NavBarScreenStart
 import app.cui.ro.ui.session.LoginScreen
 import app.cui.ro.ui.session.RegisterScreen
-import app.cui.ro.ui.Screen
+import app.cui.ro.models.Screen
 
 @Composable
 fun App(

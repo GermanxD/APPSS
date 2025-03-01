@@ -1,4 +1,4 @@
-package app.cui.ro
+package app.cui.ro.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

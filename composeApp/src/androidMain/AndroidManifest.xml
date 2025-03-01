@@ -16,7 +16,7 @@
 
         <!-- Actividad principal -->
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode">
             <intent-filter>
@@ -27,7 +27,7 @@
 
         <!-- Para Android 13 y versiones anteriores -->
         <activity
-            android:name=".PermissionsRationaleActivity"
+            android:name=".ui.PermissionsRationaleActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
@@ -38,7 +38,7 @@
         <activity-alias
             android:name="ViewPermissionUsageActivity"
             android:exported="true"
-            android:targetActivity=".PermissionsRationaleActivity"
+            android:targetActivity=".ui.PermissionsRationaleActivity"
             android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />

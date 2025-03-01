@@ -308,27 +308,33 @@ fun SeccionSeguimiento(authService: AuthService) {
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
                 ) {
+                    // Texto
                     Text(
-                        "Medicamentos",
-                        fontSize = 20.sp,
+                        text = "Medicamentos",
+                        fontSize = 18.sp,
                         color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .weight(1f) // Ocupa el espacio restante
+                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
                     )
 
+                    // Imagen
                     Image(
-                        painter = painterResource(R.drawable.ic_clock),
+                        painter = painterResource(R.drawable.ic_medicamentos),
                         contentDescription = "",
                         modifier = Modifier
                             .size(50.dp)
-                            .padding(start = 10.dp),
+                            .align(Alignment.CenterVertically) // Alinea la imagen verticalmente
                     )
                 }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-
+                        .padding(vertical = 10.dp)
                 ) {
                     Text(
                         text = "$userFirstName, el siguiente medicamento es:",
@@ -359,27 +365,28 @@ fun SeccionSeguimiento(authService: AuthService) {
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                )
-                {
+                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
+                ) {
+                    // Texto
+                    Text(
+                        text = "Informacion del medicamento aqui",
+                        fontSize = 14.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .weight(1f) // Ocupa el espacio restante
+                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
+                    )
+
+                    // Imagen
                     Column(
-                        modifier = Modifier.weight(0.6f)
-                    ) {
-                        Text(
-                            "Informacion del medicamento aqui",
-                            fontSize = 14.sp,
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Column(
-                        modifier = Modifier.weight(0.3f)
-                    ) {
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    ){
                         Image(
                             painter = painterResource(R.drawable.ic_add),
                             contentDescription = "",
                             modifier = Modifier
-                                .size(30.dp)
+                                .size(30.dp)// Alinea la imagen verticalmente
                         )
                     }
 
@@ -398,31 +405,39 @@ fun SeccionSeguimiento(authService: AuthService) {
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .background(Color(0xFFFFDCDA)), // importante mantener el mismo background
+                .background(Color(0xFFFFDCDA))
+                .padding(5.dp), // importante mantener el mismo background
             horizontalAlignment = Alignment.Start,
         ) {
             // Sección de Pasos
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
                 ) {
+                    // Texto
                     Text(
-                        "Pasos",
-                        fontSize = 20.sp,
+                        text = "Pasos",
+                        fontSize = 18.sp,
                         color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .weight(1f) // Ocupa el espacio restante
+                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
                     )
 
-                    Spacer(
+                    // Imagen
+                    Image(
+                        painter = painterResource(R.drawable.ic_pasos),
+                        contentDescription = "",
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(50.dp)
+                            .align(Alignment.CenterVertically) // Alinea la imagen verticalmente
                     )
                 }
 
@@ -444,24 +459,8 @@ fun SeccionSeguimiento(authService: AuthService) {
                         )
 
                     }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(0.3f)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_pasos),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(50.dp)
-                        )
-                    }
                 }
             }
-
 
             // Divider entre Pasos e Hidratacion
             Divider(
@@ -475,70 +474,62 @@ fun SeccionSeguimiento(authService: AuthService) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
                 ) {
+                    // Texto
                     Text(
-                        "Hidratacion",
-                        fontSize = 20.sp,
+                        text = "Hidratacion",
+                        fontSize = 18.sp,
                         color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .weight(1f) // Ocupa el espacio restante
+                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
                     )
 
-                    Spacer(
-                        modifier = Modifier
-                            .size(50.dp)
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                )
-                {
-                    Column(
-                        modifier = Modifier.weight(0.7f)
-                    ) {
-                        Text(
-                            "$userFirstName, hoy no has registrado tu consumo de agua, registralo.",
-                            fontSize = 12.sp,
-                            color = Color.Black,
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .weight(0.3f)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_persona_agua),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(50.dp)
-                        )
-                    }
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                ) {
+                    // Imagen
                     Image(
-                        painter = painterResource(R.drawable.ic_add),
+                        painter = painterResource(R.drawable.ic_persona_agua),
                         contentDescription = "",
                         modifier = Modifier
-                            .size(30.dp)
+                            .size(50.dp)
+                            .align(Alignment.CenterVertically)// Alinea la imagen verticalmente
                     )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
+                ) {
+                    // Texto
+                    Text(
+                        text = "$userFirstName, hoy no has registrado tu consumo de agua, registralo.",
+                        fontSize = 12.sp,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .weight(1f) // Ocupa el espacio restante
+                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
+                    )
+
+                    // Imagen
+                    Column(
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    ){
+                        Image(
+                            painter = painterResource(R.drawable.ic_add),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(30.dp)// Alinea la imagen verticalmente
+                        )
+                    }
+
                 }
             }
         }

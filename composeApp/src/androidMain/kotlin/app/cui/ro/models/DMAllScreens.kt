@@ -1,4 +1,4 @@
-package app.cui.ro.ui
+package app.cui.ro.models
 
 import androidx.compose.ui.graphics.painter.Painter
 
