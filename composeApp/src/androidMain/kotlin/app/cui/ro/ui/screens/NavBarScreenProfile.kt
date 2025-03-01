@@ -4,6 +4,6 @@ import androidx.compose.runtime.Composable
 import app.cui.ro.ui.CenteredText
 
 @Composable
-fun ForoNavBarScreen() {
-    CenteredText("Foro")
+fun NavBarScreenProfile() {
+    CenteredText("Perfil")
 }

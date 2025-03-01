@@ -5,6 +5,6 @@ import app.cui.ro.ui.CenteredText
 
 
 @Composable
-fun ContactsNavBarScreen() {
+fun NavBarScreenContact() {
     CenteredText("Contactos")
 }

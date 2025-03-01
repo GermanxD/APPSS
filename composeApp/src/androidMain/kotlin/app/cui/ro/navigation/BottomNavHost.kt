@@ -1,11 +1,16 @@
 package app.cui.ro.navigation
 
+import android.annotation.SuppressLint
 import android.content.Context
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,25 +24,48 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.ui.BottomNavItem
-import app.cui.ro.ui.screens.ContactsNavBarScreen
-import app.cui.ro.ui.screens.ForoNavBarScreen
-import app.cui.ro.ui.screens.HomeNavBarScreen
-import app.cui.ro.ui.screens.MessagesNavBarScreen
-import app.cui.ro.ui.screens.ProfileNavBarScreen
+import app.cui.ro.ui.screens.NavBarScreenContact
+import app.cui.ro.ui.screens.NavBarScreenForo
+import app.cui.ro.ui.screens.NavBarScreenMessage
+import app.cui.ro.ui.screens.NavBarScreenHome
+import app.cui.ro.ui.screens.NavBarScreenProfile
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun NavBarScreenStart(context: Context) {
+    val bottomNavController = rememberNavController()
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = bottomNavController)
+        },
+        content = { paddingValues ->
+            // Aplicar el paddingValues al contenido para evitar superposiciones
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues) // Asegura que el contenido no se superponga con el BottomNavigationBar
+            ) {
+                BottomNavHost(navController = bottomNavController, context = context)
+            }
+        }
+    )
+}
 
 @Composable
 fun BottomNavHost(navController: NavHostController, context: Context) {
     NavHost(navController, startDestination = "home_route") {
-        composable("home_route") { HomeNavBarScreen(
+        composable("home_route") { NavBarScreenHome(
             authService = AuthService()
         ) }
-        composable("profile_route") { ProfileNavBarScreen() }
-        composable("contacts_route") { ContactsNavBarScreen() }
-        composable("foro_route") { ForoNavBarScreen() }
-        composable("messages_route") { MessagesNavBarScreen() }
+        composable("profile_route") { NavBarScreenProfile() }
+        composable("contacts_route") { NavBarScreenContact() }
+        composable("foro_route") { NavBarScreenForo() }
+        composable("messages_route") { NavBarScreenMessage() }
     }
 }
 

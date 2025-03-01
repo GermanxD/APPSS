@@ -40,14 +40,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import app.cui.ro.R
 import app.cui.ro.models.RegisterEvent
-import app.cui.ro.models.RegisterViewModel
+import app.cui.ro.models.VMRegister
 import java.util.Calendar
 
 @Composable
 fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onBackClicked: () -> Unit,
-    viewModel: RegisterViewModel = viewModel()
+    viewModel: VMRegister = viewModel()
 ) {
     val state = viewModel.state
     val calendar = Calendar.getInstance()

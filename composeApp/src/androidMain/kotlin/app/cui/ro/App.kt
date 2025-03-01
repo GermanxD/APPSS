@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.cui.ro.auth.AuthService
-import app.cui.ro.ui.screens.HomeScreen
+import app.cui.ro.navigation.NavBarScreenStart
 import app.cui.ro.ui.session.LoginScreen
 import app.cui.ro.ui.session.RegisterScreen
 import app.cui.ro.ui.Screen
@@ -50,7 +50,7 @@ fun App(
             )
         }
         composable(Screen.Home.route) {
-            HomeScreen(
+            NavBarScreenStart(
                 context = context
             )
         }
