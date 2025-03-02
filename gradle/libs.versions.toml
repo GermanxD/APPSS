@@ -1,5 +1,5 @@
 [versions]
-agp = "8.5.2"
+agp = "8.7.2"
 android-compileSdk = "35"
 android-minSdk = "26"
 android-targetSdk = "35"
@@ -25,6 +25,12 @@ material3Android = "1.3.1"
 coreKtx = "1.13.0"
 datastorePreferences = "1.1.2"
 healthServicesClient = "1.1.0-alpha05"
+firebaseStorage = "21.0.1"
+firebaseFirestore = "25.1.2"
+modernstorageBom = "1.0.0-alpha06"
+modernstorageStorage = "1.0.0-alpha06"
+modernstoragePhotopicker = "1.0.0-alpha06"
+coilCompose = "3.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -50,6 +56,12 @@ androidx-material3-android = { group = "androidx.compose.material3", name = "mat
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 androidx-health-services-client = { group = "androidx.health", name = "health-services-client", version.ref = "healthServicesClient" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+modernstorage-bom = { group = "com.google.modernstorage", name = "modernstorage-bom", version.ref = "modernstorageBom" }
+modernstorage-storage = { group = "com.google.modernstorage", name = "modernstorage-storage", version.ref = "modernstorageStorage" }
+modernstorage-photopicker = { group = "com.google.modernstorage", name = "modernstorage-photopicker", version.ref = "modernstoragePhotopicker" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -25,6 +25,7 @@ class VMRegister : ViewModel() {
             is RegisterEvent.ConfirmPasswordChanged -> _state.value = state.copy(confirmPassword = event.confirmPassword)
             is RegisterEvent.TogglePasswordVisibility -> _state.value = state.copy(showPassword = !state.showPassword)
             is RegisterEvent.ClearForm -> _state.value = RegisterState() // Limpiar formulario
+            is RegisterEvent.ProfileImageUrl -> _state.value = state.copy(profileImageUrl = null)
         }
     }
 
@@ -46,7 +47,8 @@ class VMRegister : ViewModel() {
                             "fullname" to state.fullname,
                             "email" to state.email,
                             "birthDate" to state.birthDate,
-                            "gender" to state.gender
+                            "gender" to state.gender,
+                            "profileImageUrl" to state.profileImageUrl,
                         )
 
                         firestore.collection("users")

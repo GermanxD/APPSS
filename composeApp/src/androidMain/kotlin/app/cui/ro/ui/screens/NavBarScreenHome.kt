@@ -1,40 +1,28 @@
 package app.cui.ro.ui.screens
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,14 +30,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.HealthConnectClient
-import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Locale
@@ -57,23 +49,52 @@ import java.util.Locale
 @Composable
 fun NavBarScreenHome(authService: AuthService) {
     val userId = remember { authService.getUserId() }
-    var userFullNameDB by remember { mutableStateOf("Usuario") } // Estado para el nombre completo
-    var usernameDB by remember { mutableStateOf("Usuario") } // Estado para el username
+    var userFullNameDB by remember { mutableStateOf("Usuario") }
+    var usernameDB by remember { mutableStateOf("Usuario") }
+    var profileImageUrl by remember { mutableStateOf<String?>(null) } // URL de la imagen desde Firestore
+    val context = LocalContext.current
 
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            authService.getAllData(userId) { userFullName, username ->
-                if (userFullName != null && username != null) {
-                    userFullNameDB = userFullName // Actualiza el estado del nombre completo
-                    usernameDB = username // Actualiza el estado del username
+    // Lanzador para seleccionar una imagen desde la galería
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            if (userId != null) {
+                uploadImageToFirebase(uri, userId) { imageUrl ->
+                    saveImageUrlToFirestore(userId, imageUrl) {
+                        profileImageUrl = imageUrl  // Actualiza la URL después de guardar en Firestore
+                        Log.d("ProfileScreen", "Imagen subida y URL guardada: $imageUrl")
+                    }
                 }
             }
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    // Obtener los datos del usuario (nombre completo, usuario e imagen)
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            authService.getAllData(userId) { userFullName, username ->
+                if (userFullName != null && username != null) {
+                    userFullNameDB = userFullName
+                    usernameDB = username
+                }
+            }
+
+            // Obtener la URL de la imagen desde Firestore
+            val firestore = FirebaseFirestore.getInstance()
+            firestore.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.contains("profileImage")) {
+                        profileImageUrl = document.getString("profileImage")
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.w("ProfileScreen", "Error getting document", e)
+                }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
         Column {
             CustomTopAppBar(
                 onMenuClick = { /* Lógica para el clic del menú */ },
@@ -90,24 +111,29 @@ fun NavBarScreenHome(authService: AuthService) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
-            )
-            {
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.img_profile),
-                        contentDescription = "Logo",
+                    // Mostrar la imagen de perfil usando AsyncImage de Coil
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(profileImageUrl ?: R.drawable.img_profile)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Profile Image",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(80.dp)
-                            .clip(CircleShape) // Recorta la imagen en forma circular
-                            .background(
-                                color = Color.Black,
-                                shape = CircleShape
-                            ) // Fondo circular (opcional)
+                            .clip(CircleShape)
+                            .clickable {
+                                photoPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
                     )
                     Column(
                         modifier = Modifier.padding(start = 16.dp)
@@ -117,7 +143,6 @@ fun NavBarScreenHome(authService: AuthService) {
                             textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.body1
                         )
-
                         Text(
                             text = "@$usernameDB".lowercase(Locale.getDefault()),
                             textAlign = TextAlign.Left,
@@ -162,46 +187,7 @@ fun NavBarScreenHome(authService: AuthService) {
 
 @Composable
 fun SeccionInformacion() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = "Registro de información",
-            textAlign = TextAlign.Start,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
-        ) {
-            Text(
-                text = "Ver más...",
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Gray,
-            )
-            Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_right),
-                contentDescription = "",
-                modifier = Modifier.size(20.dp),
-                tint = Color.Gray,
-            )
-        }
-    }
-
-    // Modified section to prevent text from pushing images up.
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
-    ) {
+    SeccionConTextoYFlecha(title = "Registro de información") {
         DataColumn(
             imageResId = R.drawable.ic_datos_clinicos,
             text = "Datos clinicos"
@@ -215,7 +201,24 @@ fun SeccionInformacion() {
             text = "Medicamentos"
         )
     }
+    SeccionConTextoYFlecha(title = "Recomendaciones sobre...") {
+        DataColumn(
+            imageResId = R.drawable.ic_informacion,
+            text = "Informacion"
+        )
+        DataColumn(
+            imageResId = R.drawable.ic_quimioterapia,
+            text = "Quimioterapia"
+        )
+        DataColumn(
+            imageResId = R.drawable.ic_nutricion,
+            text = "Nutricion"
+        )
+    }
+}
 
+@Composable
+fun SeccionConTextoYFlecha(title: String, content: @Composable () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -224,13 +227,13 @@ fun SeccionInformacion() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Recomendaciones sobre...",
+            text = title,
             textAlign = TextAlign.Start,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
         )
         Row(
-            verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = "Ver más...",
@@ -239,7 +242,7 @@ fun SeccionInformacion() {
                 fontSize = 14.sp,
                 color = Color.Gray,
             )
-            Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
+            Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 painter = painterResource(R.drawable.ic_arrow_right),
                 contentDescription = "",
@@ -253,20 +256,9 @@ fun SeccionInformacion() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
-        DataColumn(
-            imageResId = R.drawable.ic_informacion,
-            text = "Informacion"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_quimioterapia,
-            text = "Quimioterapia"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_nutricion,
-            text = "Nutricion"
-        )
+        content()
     }
 }
 
@@ -573,4 +565,39 @@ fun MedicionPasos(
     )
 }
 
+fun uploadImageToFirebase(uri: Uri, userId: String, onSuccess: (String) -> Unit) {
+    val storageRef = FirebaseStorage.getInstance().reference
+    val imageRef: StorageReference = storageRef.child("images/$userId/${java.util.UUID.randomUUID()}")
+    val uploadTask = imageRef.putFile(uri)
 
+    uploadTask.continueWithTask { task ->
+        if (!task.isSuccessful) {
+            task.exception?.let {
+                throw it
+            }
+        }
+        imageRef.downloadUrl
+    }.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val downloadUri = task.result
+            onSuccess(downloadUri.toString())
+        } else {
+            // Handle failures
+            Log.e("Firebase", "Error al subir la imagen: ${task.exception?.message}")
+        }
+    }
+}
+
+fun saveImageUrlToFirestore(userId: String, imageUrl: String, onSuccess: () -> Unit) {
+    val firestore = FirebaseFirestore.getInstance()
+    val userRef = firestore.collection("users").document(userId)
+
+    userRef.update("profileImage", imageUrl)
+        .addOnSuccessListener {
+            Log.d("Firestore", "URL de la imagen guardada correctamente")
+            onSuccess()
+        }
+        .addOnFailureListener { exception ->
+            Log.e("Firestore", "Error al guardar la URL de la imagen: ${exception.message}")
+        }
+}
