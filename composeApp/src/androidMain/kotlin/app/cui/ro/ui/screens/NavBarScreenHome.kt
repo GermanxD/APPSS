@@ -8,7 +8,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -26,9 +28,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -583,10 +587,9 @@ fun MedicionPasos(
 @Composable
 fun ProfileScreen(userId: String) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var base64Image by remember { mutableStateOf<String?>(null) } // Estado para la imagen en base64
+    var base64Image by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
-    // Cargar la imagen al iniciar la pantalla
     LaunchedEffect(userId) {
         loadProfileImageFromFirestore(userId) { image ->
             base64Image = image
@@ -600,14 +603,12 @@ fun ProfileScreen(userId: String) {
             imageUri = it
             val base64 = convertImageToBase64(it, context)
             saveImageToFirestore(userId, base64) {
-                // Actualizar el estado de la UI después de guardar la imagen
                 base64Image = base64
             }
         }
     }
 
-    Column {
-        // Mostrar la imagen del perfil
+    Box(modifier = Modifier.size(80.dp)) {
         if (!base64Image.isNullOrEmpty()) {
             val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
             val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
@@ -618,25 +619,36 @@ fun ProfileScreen(userId: String) {
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
+                    .clickable { launcher.launch("image/*") }
             )
         } else {
-            // Mostrar una imagen predeterminada si no hay imagen
             Image(
-                painter = rememberAsyncImagePainter(R.drawable.img_profile),
+                imageVector = Icons.Default.Person,
                 contentDescription = "Default Profile Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
+                    .clickable { launcher.launch("image/*") }
             )
         }
 
-        // Botón para cambiar la imagen
-        Button(onClick = { launcher.launch("image/*") }) {
-            Text("Cambiar foto de perfil")
+        IconButton(
+            onClick = { launcher.launch("image/*") },
+            modifier = Modifier
+                .size(2.dp)
+                .align(Alignment.BottomEnd)
+                .background(Color.Gray.copy(alpha = 0.6f), shape = CircleShape)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Edit Profile Image",
+                tint = Color.White
+            )
         }
     }
 }
+
 
 
 fun convertImageToBase64(uri: Uri, context: Context): String {
