@@ -12,7 +12,6 @@ data class RegisterState(
     val isLoading: Boolean = false,
     val isRegistered: Boolean = false,
     val errorMessage: String? = null,
-    val profileImageUrl: String? = null
 )
 
 sealed class RegisterEvent {
@@ -26,5 +25,4 @@ sealed class RegisterEvent {
     data object TogglePasswordVisibility : RegisterEvent()
     data object Register : RegisterEvent()
     data object ClearForm : RegisterEvent()
-    data class ProfileImageUrl(val url: String) : RegisterEvent()
 }
