@@ -4,13 +4,10 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -26,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -36,6 +34,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,26 +51,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.HealthConnectClient
-import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
-import coil3.Bitmap
 import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
-import coil3.request.crossfade
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
+import com.google.firebase.firestore.firestore
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Locale
-import java.util.UUID
 
 @Composable
 fun NavBarScreenHome(authService: AuthService) {
@@ -117,15 +112,11 @@ fun NavBarScreenHome(authService: AuthService) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Mostrar la imagen de perfil
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            R.drawable.img_profile // Usar la imagen predeterminada
-                        ),
-                        contentDescription = "Profile Image",
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clip(CircleShape)
-                    )
+                    userId?.let {
+                        ProfileScreen(
+                            userId = it
+                        )
+                    }
                     Column(
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
@@ -561,7 +552,7 @@ fun MedicionPasos(
 ) {
     val userId = remember { authService.getUserId() }
     var userFirstName by remember { mutableStateOf("Usuario") }
-    var stepsCount by remember { mutableStateOf(0) }
+    var stepsCount by remember { mutableIntStateOf(0) }
 
     // Obtener el nombre del usuario
     LaunchedEffect(userId) {
@@ -589,4 +580,108 @@ fun MedicionPasos(
     )
 }
 
+@Composable
+fun ProfileScreen(userId: String) {
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var base64Image by remember { mutableStateOf<String?>(null) } // Estado para la imagen en base64
+    val context = LocalContext.current
 
+    // Cargar la imagen al iniciar la pantalla
+    LaunchedEffect(userId) {
+        loadProfileImageFromFirestore(userId) { image ->
+            base64Image = image
+        }
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            imageUri = it
+            val base64 = convertImageToBase64(it, context)
+            saveImageToFirestore(userId, base64) {
+                // Actualizar el estado de la UI después de guardar la imagen
+                base64Image = base64
+            }
+        }
+    }
+
+    Column {
+        // Mostrar la imagen del perfil
+        if (!base64Image.isNullOrEmpty()) {
+            val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = "Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+            )
+        } else {
+            // Mostrar una imagen predeterminada si no hay imagen
+            Image(
+                painter = rememberAsyncImagePainter(R.drawable.img_profile),
+                contentDescription = "Default Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+            )
+        }
+
+        // Botón para cambiar la imagen
+        Button(onClick = { launcher.launch("image/*") }) {
+            Text("Cambiar foto de perfil")
+        }
+    }
+}
+
+
+fun convertImageToBase64(uri: Uri, context: Context): String {
+    val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    inputStream?.use { input ->
+        byteArrayOutputStream.use { output ->
+            input.copyTo(output)
+        }
+    }
+    val byteArray = byteArrayOutputStream.toByteArray()
+    return Base64.encodeToString(byteArray, Base64.DEFAULT)
+}
+
+fun saveImageToFirestore(userId: String, base64Image: String, onSuccess: () -> Unit) {
+    val db: FirebaseFirestore = Firebase.firestore
+
+    db.collection("users")
+        .document(userId)
+        .update("profileImage", base64Image)
+        .addOnSuccessListener {
+            println("Imagen actualizada correctamente en Firestore")
+            onSuccess() // Ejecutar el callback después de guardar
+        }
+        .addOnFailureListener { e ->
+            println("Error al actualizar la imagen: ${e.message}")
+        }
+}
+
+fun loadProfileImageFromFirestore(userId: String, onImageLoaded: (String?) -> Unit) {
+    val db: FirebaseFirestore = Firebase.firestore
+
+    db.collection("users")
+        .document(userId)
+        .get()
+        .addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val image = document.getString("profileImage")
+                onImageLoaded(image) // Pasar la imagen al callback
+            } else {
+                onImageLoaded(null) // No hay imagen
+            }
+        }
+        .addOnFailureListener { e ->
+            println("Error al recuperar la imagen: ${e.message}")
+            onImageLoaded(null) // Manejar el error
+        }
+}
