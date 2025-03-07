@@ -164,6 +164,7 @@ fun NavBarScreenHome(authService: AuthService) {
                 }
 
                 SeccionInformacion()
+                SeccionRecomendaciones()
             }
 
             SeccionSeguimiento(authService = AuthService())
@@ -197,12 +198,14 @@ fun SeccionInformacion() {
                 color = Color.Gray,
             )
             Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_right),
-                contentDescription = "",
-                modifier = Modifier.size(20.dp),
-                tint = Color.Gray,
-            )
+            IconButton(onClick = { /**/ }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_right),
+                    contentDescription = "",
+                    modifier = Modifier.size(20.dp),
+                    tint = Color.Gray,
+                )
+            }
         }
     }
 
@@ -226,7 +229,10 @@ fun SeccionInformacion() {
             text = "Medicamentos"
         )
     }
+}
 
+@Composable
+fun SeccionRecomendaciones() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -392,7 +398,7 @@ fun SeccionSeguimiento(authService: AuthService) {
                     // Imagen
                     Column(
                         modifier = Modifier.padding(horizontal = 10.dp)
-                    ){
+                    ) {
                         Image(
                             painter = painterResource(R.drawable.ic_add),
                             contentDescription = "",
@@ -532,7 +538,7 @@ fun SeccionSeguimiento(authService: AuthService) {
                     // Imagen
                     Column(
                         modifier = Modifier.padding(horizontal = 10.dp)
-                    ){
+                    ) {
                         Image(
                             painter = painterResource(R.drawable.ic_add),
                             contentDescription = "",
@@ -545,6 +551,63 @@ fun SeccionSeguimiento(authService: AuthService) {
             }
         }
 
+    }
+}
+
+@Composable
+fun SeccionInformacion2() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "Registro de información",
+            textAlign = TextAlign.Start,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+        ) {
+            Text(
+                text = "Ver más...",
+                textAlign = TextAlign.End,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Gray,
+            )
+            Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = "",
+                modifier = Modifier.size(20.dp),
+                tint = Color.Gray,
+            )
+        }
+    }
+
+    // Modified section to prevent text from pushing images up.
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+    ) {
+        DataColumn(
+            imageResId = R.drawable.ic_datos_clinicos,
+            text = "Datos clinicos"
+        )
+        DataColumn(
+            imageResId = R.drawable.ic_efectos_del_tratamiento,
+            text = "Efectos del tratamiento"
+        )
+        DataColumn(
+            imageResId = R.drawable.ic_medicamentos,
+            text = "Medicamentos"
+        )
     }
 }
 
@@ -634,8 +697,6 @@ fun ProfileScreen(userId: String) {
         }
     }
 }
-
-
 
 fun convertImageToBase64(uri: Uri, context: Context): String {
     val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
