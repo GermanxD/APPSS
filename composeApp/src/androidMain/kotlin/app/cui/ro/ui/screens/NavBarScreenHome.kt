@@ -32,6 +32,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.VerticalDivider
@@ -76,6 +77,7 @@ fun NavBarScreenHome(authService: AuthService) {
     val userId = remember { authService.getUserId() }
     var userFullNameDB by remember { mutableStateOf("Usuario") }
     var usernameDB by remember { mutableStateOf("Usuario") }
+    var showSeccionInformacion2 by remember { mutableStateOf(false) } // Estado para controlar la visibilidad
 
     // Obtener los datos del usuario
     LaunchedEffect(userId) {
@@ -163,7 +165,20 @@ fun NavBarScreenHome(authService: AuthService) {
                     )
                 }
 
-                SeccionInformacion()
+                // Mostrar RegistroInformacion solo si showSeccionInformacion2 es false
+                if (!showSeccionInformacion2) {
+                    SeccionInformacion(
+                        onVerMasClick = { showSeccionInformacion2 = true } // Pasar el callback al hacer clic en "Ver más"
+                    )
+                }
+
+                // Mostrar SeccionInformacion2 solo si showSeccionInformacion2 es true
+                if (showSeccionInformacion2) {
+                    SeccionInformacion2(
+                        onDismiss = { showSeccionInformacion2 = false } // Ocultar la sección al cerrar
+                    )
+                }
+
                 SeccionRecomendaciones()
             }
 
@@ -173,7 +188,9 @@ fun NavBarScreenHome(authService: AuthService) {
 }
 
 @Composable
-fun SeccionInformacion() {
+fun SeccionInformacion(
+    onVerMasClick: () -> Unit // Callback para manejar el clic en "Ver más"
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,7 +205,8 @@ fun SeccionInformacion() {
             fontSize = 14.sp,
         )
         Row(
-            verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { onVerMasClick() } // Manejar el clic en "Ver más"
         ) {
             Text(
                 text = "Ver más...",
@@ -197,15 +215,13 @@ fun SeccionInformacion() {
                 fontSize = 14.sp,
                 color = Color.Gray,
             )
-            Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
-            IconButton(onClick = { /**/ }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_right),
-                    contentDescription = "",
-                    modifier = Modifier.size(20.dp),
-                    tint = Color.Gray,
-                )
-            }
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_right),
+                contentDescription = "",
+                modifier = Modifier.size(20.dp),
+                tint = Color.Gray,
+            )
         }
     }
 
@@ -555,7 +571,9 @@ fun SeccionSeguimiento(authService: AuthService) {
 }
 
 @Composable
-fun SeccionInformacion2() {
+fun SeccionInformacion2(
+    onDismiss: () -> Unit // Callback para cerrar la sección
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -563,52 +581,48 @@ fun SeccionInformacion2() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = "Registro de información",
-            textAlign = TextAlign.Start,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
-        ) {
             Text(
-                text = "Ver más...",
+                text = "Registro de información",
+                textAlign = TextAlign.Start,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+            )
+
+            Text(
+                text = "Ver menos...",
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
                 color = Color.Gray,
             )
-            Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
+            Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 painter = painterResource(R.drawable.ic_arrow_right),
                 contentDescription = "",
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(20.dp).clickable { onDismiss() },
                 tint = Color.Gray,
             )
         }
-    }
 
-    // Modified section to prevent text from pushing images up.
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
-    ) {
-        DataColumn(
-            imageResId = R.drawable.ic_datos_clinicos,
-            text = "Datos clinicos"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_efectos_del_tratamiento,
-            text = "Efectos del tratamiento"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_medicamentos,
-            text = "Medicamentos"
-        )
-    }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+        ) {
+            DataColumn(
+                imageResId = R.drawable.ic_datos_clinicos,
+                text = "Hidratación"
+            )
+            DataColumn(
+                imageResId = R.drawable.ic_efectos_del_tratamiento,
+                text = "Signos vitales"
+            )
+            DataColumn(
+                imageResId = R.drawable.ic_medicamentos,
+                text = "Reporte de salud"
+            )
+        }
 }
 
 @Composable
@@ -744,3 +758,4 @@ fun loadProfileImageFromFirestore(userId: String, onImageLoaded: (String?) -> Un
             onImageLoaded(null) // Manejar el error
         }
 }
+
