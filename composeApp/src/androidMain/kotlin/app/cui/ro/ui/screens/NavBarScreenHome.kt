@@ -632,20 +632,6 @@ fun ProfileScreen(userId: String) {
                     .clickable { launcher.launch("image/*") }
             )
         }
-
-        IconButton(
-            onClick = { launcher.launch("image/*") },
-            modifier = Modifier
-                .size(2.dp)
-                .align(Alignment.BottomEnd)
-                .background(Color.Gray.copy(alpha = 0.6f), shape = CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Edit Profile Image",
-                tint = Color.White
-            )
-        }
     }
 }
 
