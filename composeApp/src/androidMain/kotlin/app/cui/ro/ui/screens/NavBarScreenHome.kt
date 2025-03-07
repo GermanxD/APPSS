@@ -168,14 +168,18 @@ fun NavBarScreenHome(authService: AuthService) {
                 // Mostrar RegistroInformacion solo si showSeccionInformacion2 es false
                 if (!showSeccionInformacion2) {
                     SeccionInformacion(
-                        onVerMasClick = { showSeccionInformacion2 = true } // Pasar el callback al hacer clic en "Ver más"
+                        onVerMasClick = {
+                            showSeccionInformacion2 = true
+                        } // Pasar el callback al hacer clic en "Ver más"
                     )
                 }
 
                 // Mostrar SeccionInformacion2 solo si showSeccionInformacion2 es true
                 if (showSeccionInformacion2) {
                     SeccionInformacion2(
-                        onDismiss = { showSeccionInformacion2 = false } // Ocultar la sección al cerrar
+                        onDismiss = {
+                            showSeccionInformacion2 = false
+                        } // Ocultar la sección al cerrar
                     )
                 }
 
@@ -581,13 +585,15 @@ fun SeccionInformacion2(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-            Text(
-                text = "Registro de información",
-                textAlign = TextAlign.Start,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-            )
-
+        Text(
+            text = "Registro de información",
+            textAlign = TextAlign.Start,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(
                 text = "Ver menos...",
                 textAlign = TextAlign.End,
@@ -597,32 +603,35 @@ fun SeccionInformacion2(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Icon(
-                painter = painterResource(R.drawable.ic_arrow_right),
+                imageVector = Icons.Default.Close,
                 contentDescription = "",
-                modifier = Modifier.size(20.dp).clickable { onDismiss() },
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable { onDismiss() },
                 tint = Color.Gray,
             )
         }
+    }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp),
-            horizontalArrangement = Arrangement.SpaceAround // This is crucial!
-        ) {
-            DataColumn(
-                imageResId = R.drawable.ic_datos_clinicos,
-                text = "Hidratación"
-            )
-            DataColumn(
-                imageResId = R.drawable.ic_efectos_del_tratamiento,
-                text = "Signos vitales"
-            )
-            DataColumn(
-                imageResId = R.drawable.ic_medicamentos,
-                text = "Reporte de salud"
-            )
-        }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+    ) {
+        DataColumn(
+            imageResId = R.drawable.ic_datos_clinicos,
+            text = "Hidratación"
+        )
+        DataColumn(
+            imageResId = R.drawable.ic_efectos_del_tratamiento,
+            text = "Signos vitales"
+        )
+        DataColumn(
+            imageResId = R.drawable.ic_medicamentos,
+            text = "Reporte de salud"
+        )
+    }
 }
 
 @Composable
