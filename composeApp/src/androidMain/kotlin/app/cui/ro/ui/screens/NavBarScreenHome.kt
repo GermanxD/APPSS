@@ -34,6 +34,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
@@ -841,9 +842,9 @@ fun ProfileScreen(userId: String) {
             }
             ImageUploadState.SUCCESS -> {
                 Icon(
-                    imageVector = Icons.Filled.CheckCircle,
+                    imageVector = Icons.Filled.Check,
                     contentDescription = "Imagen actualizada",
-                    tint = Color.Green,
+                    tint = Color.Black,
                     modifier = Modifier.size(24.dp).align(Alignment.BottomEnd)
                 )
                 LaunchedEffect(Unit) {
@@ -857,14 +858,8 @@ fun ProfileScreen(userId: String) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Error al actualizar",
-                        tint = Color.Red,
+                        tint = Color.Black,
                         modifier = Modifier.size(24.dp)
-                    )
-                    Text(
-                        text = errorMessage.ifEmpty { "Intenta con otra imagen" }, // Usar el mensaje específico
-                        style = MaterialTheme.typography.h1, // Usar un estilo más pequeño
-                        color = Color.Red,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
                 LaunchedEffect(Unit) {
@@ -878,7 +873,7 @@ fun ProfileScreen(userId: String) {
 
 fun getFileSize(uri: Uri, context: Context): Long {
     val contentResolver = context.contentResolver
-    var fileSize = 0L
+    var fileSize = 3L
     contentResolver.openInputStream(uri)?.use { inputStream ->
         fileSize = inputStream.available().toLong()
     }
