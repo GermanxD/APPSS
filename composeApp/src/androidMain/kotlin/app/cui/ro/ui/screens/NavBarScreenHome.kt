@@ -1,6 +1,7 @@
 package app.cui.ro.ui.screens
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
@@ -26,12 +27,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Search
@@ -66,6 +69,11 @@ import coil3.compose.rememberAsyncImagePainter
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.time.ZonedDateTime
@@ -744,11 +752,22 @@ fun MedicionPasos(
     )
 }
 
+enum class ImageUploadState {
+    IDLE,
+    UPLOADING,
+    SUCCESS,
+    ERROR,
+    SIZE_EXCEEDED // Nuevo estado
+}
+
 @Composable
 fun ProfileScreen(userId: String) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var base64Image by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+
+    var uploadState by remember { mutableStateOf(ImageUploadState.IDLE) }
+    var errorMessage by remember { mutableStateOf("") } // Mensaje de error específico
 
     LaunchedEffect(userId) {
         loadProfileImageFromFirestore(userId) { image ->
@@ -759,11 +778,32 @@ fun ProfileScreen(userId: String) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let {
-            imageUri = it
-            val base64 = convertImageToBase64(it, context)
-            saveImageToFirestore(userId, base64) {
-                base64Image = base64
+        uri?.let { selectedUri ->
+            imageUri = selectedUri
+            val fileSizeInBytes = getFileSize(selectedUri, context)
+            val maxFileSizeInBytes = 500 * 1024 // 500KB (ajusta según tus necesidades)
+
+            if (fileSizeInBytes > maxFileSizeInBytes) {
+                uploadState = ImageUploadState.SIZE_EXCEEDED
+                errorMessage = "La imagen excede el tamaño máximo permitido (500KB)." // Cambia el mensaje si es necesario
+            } else {
+                uploadState = ImageUploadState.UPLOADING
+                errorMessage = "" // Limpiar el mensaje de error
+                CoroutineScope(Dispatchers.IO).launch {
+                    val base64 = convertImageToBase64(selectedUri, context) // Convertir y comprimir
+                    withContext(Dispatchers.Main) { // Volver al hilo principal para actualizar la UI
+                        saveImageToFirestore(userId, base64,
+                            onSuccess = {
+                                base64Image = base64
+                                uploadState = ImageUploadState.SUCCESS
+                            },
+                            onFailure = {
+                                uploadState = ImageUploadState.ERROR
+                                errorMessage = "Error al guardar la imagen. Intenta de nuevo."
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -792,22 +832,76 @@ fun ProfileScreen(userId: String) {
                     .clickable { launcher.launch("image/*") }
             )
         }
+
+        // Mostrar mensaje de estado
+        when (uploadState) {
+            ImageUploadState.IDLE -> {}
+            ImageUploadState.UPLOADING -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+            ImageUploadState.SUCCESS -> {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    contentDescription = "Imagen actualizada",
+                    tint = Color.Green,
+                    modifier = Modifier.size(24.dp).align(Alignment.BottomEnd)
+                )
+                LaunchedEffect(Unit) {
+                    delay(2000)
+                    uploadState = ImageUploadState.IDLE
+                }
+            }
+            ImageUploadState.SIZE_EXCEEDED,
+            ImageUploadState.ERROR -> {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Error al actualizar",
+                        tint = Color.Red,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = errorMessage.ifEmpty { "Intenta con otra imagen" }, // Usar el mensaje específico
+                        style = MaterialTheme.typography.h1, // Usar un estilo más pequeño
+                        color = Color.Red,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+                LaunchedEffect(Unit) {
+                    delay(3000)
+                    uploadState = ImageUploadState.IDLE
+                }
+            }
+        }
     }
 }
 
-fun convertImageToBase64(uri: Uri, context: Context): String {
-    val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-    val byteArrayOutputStream = ByteArrayOutputStream()
-    inputStream?.use { input ->
-        byteArrayOutputStream.use { output ->
-            input.copyTo(output)
-        }
+fun getFileSize(uri: Uri, context: Context): Long {
+    val contentResolver = context.contentResolver
+    var fileSize = 0L
+    contentResolver.openInputStream(uri)?.use { inputStream ->
+        fileSize = inputStream.available().toLong()
     }
+    return fileSize
+}
+
+fun convertImageToBase64(imageUri: Uri, context: Context): String {
+    val inputStream: InputStream? = context.contentResolver.openInputStream(imageUri)
+    val bitmap = BitmapFactory.decodeStream(inputStream)
+
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    // Comprime la imagen (ajusta la calidad según tus necesidades)
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)  // Reduce la calidad a 70%
     val byteArray = byteArrayOutputStream.toByteArray()
     return Base64.encodeToString(byteArray, Base64.DEFAULT)
 }
 
-fun saveImageToFirestore(userId: String, base64Image: String, onSuccess: () -> Unit) {
+fun saveImageToFirestore(
+    userId: String,
+    base64Image: String,
+    onSuccess: () -> Unit,
+    onFailure: () -> Unit
+) {
     val db: FirebaseFirestore = Firebase.firestore
 
     db.collection("users")
@@ -819,6 +913,7 @@ fun saveImageToFirestore(userId: String, base64Image: String, onSuccess: () -> U
         }
         .addOnFailureListener { e ->
             println("Error al actualizar la imagen: ${e.message}")
+            onFailure()
         }
 }
 
@@ -841,4 +936,3 @@ fun loadProfileImageFromFirestore(userId: String, onImageLoaded: (String?) -> Un
             onImageLoaded(null) // Manejar el error
         }
 }
-
