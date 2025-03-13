@@ -78,6 +78,7 @@ fun NavBarScreenHome(authService: AuthService) {
     var userFullNameDB by remember { mutableStateOf("Usuario") }
     var usernameDB by remember { mutableStateOf("Usuario") }
     var showSeccionInformacion2 by remember { mutableStateOf(false) } // Estado para controlar la visibilidad
+    var showSeccionRecomendaciones2 by remember { mutableStateOf(false) }
 
     // Obtener los datos del usuario
     LaunchedEffect(userId) {
@@ -183,7 +184,21 @@ fun NavBarScreenHome(authService: AuthService) {
                     )
                 }
 
-                SeccionRecomendaciones()
+                if (!showSeccionRecomendaciones2) {
+                    SeccionRecomendaciones(
+                        onVerMasClick = {
+                            showSeccionRecomendaciones2 = true
+                        } // Pasar el callback al hacer clic en "Ver más"
+                    )
+                }
+
+                if(showSeccionRecomendaciones2){
+                    SeccionRecomendaciones2(
+                        onDismiss = {
+                            showSeccionRecomendaciones2 = false
+                        }
+                    )
+                }
             }
 
             SeccionSeguimiento(authService = AuthService())
@@ -252,7 +267,9 @@ fun SeccionInformacion(
 }
 
 @Composable
-fun SeccionRecomendaciones() {
+fun SeccionRecomendaciones(
+    onVerMasClick: () -> Unit // Callback para manejar el clic en "Ver más"
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -267,7 +284,8 @@ fun SeccionRecomendaciones() {
             fontSize = 14.sp,
         )
         Row(
-            verticalAlignment = Alignment.CenterVertically, // Alinea el texto y la imagen verticalmente
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { onVerMasClick() } // Manejar el clic en "Ver más"
         ) {
             Text(
                 text = "Ver más...",
@@ -620,16 +638,72 @@ fun SeccionInformacion2(
         horizontalArrangement = Arrangement.SpaceAround // This is crucial!
     ) {
         DataColumn(
-            imageResId = R.drawable.ic_datos_clinicos,
+            imageResId = R.drawable.ic_hidratacion,
             text = "Hidratación"
         )
         DataColumn(
-            imageResId = R.drawable.ic_efectos_del_tratamiento,
+            imageResId = R.drawable.ic_signos_vitales,
             text = "Signos vitales"
         )
         DataColumn(
-            imageResId = R.drawable.ic_medicamentos,
+            imageResId = R.drawable.ic_reporte_salud,
             text = "Reporte de salud"
+        )
+    }
+}
+
+@Composable
+fun SeccionRecomendaciones2(
+    onDismiss: () -> Unit // Callback para cerrar la sección
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "Recomendaciones sobre...",
+            textAlign = TextAlign.Start,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Ver menos...",
+                textAlign = TextAlign.End,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Gray,
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "",
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable { onDismiss() },
+                tint = Color.Gray,
+            )
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+    ) {
+        DataColumn(
+            imageResId = R.drawable.ic_ejercicio_fisico,
+            text = "Ejercicio fisico"
+        )
+        DataColumn(
+            imageResId = R.drawable.ic_sexualidad,
+            text = "Sexualidad"
         )
     }
 }
