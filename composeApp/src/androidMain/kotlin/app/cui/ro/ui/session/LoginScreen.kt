@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.R
 import app.cui.ro.models.LoginViewModel
+import app.cui.ro.ui.theme.Colors
 
 @Composable
 fun keyboardAwarePadding(): Dp {
@@ -103,7 +104,7 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF2D3D0)) // Aplica el color rosa a todo el fondo
+                .background(Colors.PrimaryPink) // Aplica el color rosa a todo el fondo
         )
 
         // Parte superior con el logo
@@ -144,7 +145,7 @@ fun LoginScreen(
                 text = "INICIO",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp),
-                color = Color(0xFF594012),
+                color = Colors.FontBrown,
                 fontSize = 30.sp
             )
 
@@ -152,7 +153,7 @@ fun LoginScreen(
                 text = "Inicie sesión para continuar",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp),
-                color = Color(0xFF594012),
+                color = Colors.FontBrown,
                 fontSize = 16.sp
             )
 
@@ -162,11 +163,11 @@ fun LoginScreen(
                 label = { Text("Usuario") },
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFD4D2D3),
+                    backgroundColor = Colors.PinkFields,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color(0xFF594012),
-                    focusedLabelColor = Color(0xFF594012),
+                    cursorColor = Colors.FontBrown,
+                    focusedLabelColor = Colors.FontBrown,
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -179,18 +180,18 @@ fun LoginScreen(
                 label = { Text("Contraseña") },
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color(0xFFD4D2D3),
+                    backgroundColor = Colors.PinkFields,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color(0xFF594012),
-                    focusedLabelColor = Color(0xFF594012),
+                    cursorColor = Colors.FontBrown,
+                    focusedLabelColor = Colors.FontBrown,
                 ),
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     val iconText = if (showPassword) "Ocultar" else "Mostrar"
                     TextButton(onClick = { showPassword = !showPassword }) {
-                        Text(iconText, fontSize = 12.sp, color = Color(0xFF594012))
+                        Text(iconText, fontSize = 12.sp, color = Colors.FontBrown)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -204,7 +205,7 @@ fun LoginScreen(
                     viewModel.loginWithUsername(username, password, context, onLoginSuccess, { loginError = true })
                 },
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF4A0C0)),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Colors.ObjectsPink),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(45.dp),
@@ -216,7 +217,7 @@ fun LoginScreen(
                     Text(
                         text = "Iniciar sesión",
                         fontSize = 16.sp,
-                        color = Color(0xFF594012),
+                        color = Colors.FontBrown,
                     )
                 }
             }
@@ -238,7 +239,7 @@ fun LoginScreen(
                 style = TextStyle(),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp),
-                color = Color(0xFF594012),
+                color = Colors.FontBrown,
                 fontSize = 16.sp
             )
 
@@ -253,7 +254,7 @@ fun LoginScreen(
                     Text(
                         text = "Regístrate ahora",
                         style = TextStyle(),
-                        color = Color(0xFF594012),
+                        color = Colors.FontBrown,
                         fontSize = 16.sp
                     )
                 }

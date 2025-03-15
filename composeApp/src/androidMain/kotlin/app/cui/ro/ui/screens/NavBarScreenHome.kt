@@ -78,6 +78,7 @@ import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.models.VMProfileImage
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
+import app.cui.ro.ui.theme.Colors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -205,7 +206,7 @@ fun NavBarScreenHome(
                 }
                 Row(
                     modifier = Modifier
-                        .background(color = Color(0xFFF6A1C8))
+                        .background(color = Colors.SecondaryRose)
                         .fillMaxWidth()
                         .padding(4.dp),
                     horizontalArrangement = Arrangement.Start,
@@ -428,7 +429,7 @@ fun SeccionSeguimiento(authService: AuthService, hasPermissions: Boolean) {
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .background(Color(0xFFFFDCDA)), // importante mantener el mismo background
+                .background(Colors.SectionsPink), // importante mantener el mismo background
             horizontalAlignment = Alignment.Start,
         ) {
             Column( // Agregado un Column interno para el padding
@@ -537,7 +538,7 @@ fun SeccionSeguimiento(authService: AuthService, hasPermissions: Boolean) {
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .background(Color(0xFFFFDCDA))
+                .background(Colors.SectionsPink)
                 .padding(5.dp), // importante mantener el mismo background
             horizontalAlignment = Alignment.Start,
         ) {

@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cui.ro.R
+import app.cui.ro.ui.theme.Colors
 
 @Composable
 fun DataColumn(imageResId: Int, text: String) {
@@ -45,7 +46,7 @@ fun DataColumn(imageResId: Int, text: String) {
             contentDescription = text,
             modifier = Modifier
                 .size(100.dp)
-                .background(color = Color(0xFFF6A1C8)) // Optional: If you want the image to be a circle
+                .background(color = Colors.SecondaryRose) // Optional: If you want the image to be a circle
         )
         Spacer(modifier = Modifier.height(4.dp)) // Add some space between image and text
         Text(
@@ -105,7 +106,7 @@ fun CustomTopAppBar(
                 )
             }
         },
-        backgroundColor = Color(0xFFF4A0C0),
+        backgroundColor = Colors.ObjectsPink,
         contentColor = Color.Black,
         navigationIcon = null,
         actions = {}
