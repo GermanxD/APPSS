@@ -24,7 +24,7 @@ class VMProfileImage : ViewModel() {
 
     fun getFileSize(uri: Uri, context: Context): Long {
         val contentResolver = context.contentResolver
-        var fileSize = 3L
+        var fileSize = 0L
         contentResolver.openInputStream(uri)?.use { inputStream ->
             fileSize = inputStream.available().toLong()
         }

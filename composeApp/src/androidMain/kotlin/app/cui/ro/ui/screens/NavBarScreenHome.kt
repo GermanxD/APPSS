@@ -1,8 +1,6 @@
 package app.cui.ro.ui.screens
 
 import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
@@ -26,18 +24,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
@@ -45,7 +48,6 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -65,11 +67,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
@@ -77,19 +78,12 @@ import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.models.VMProfileImage
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
-import coil3.compose.rememberAsyncImagePainter
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Locale
@@ -104,16 +98,17 @@ fun NavBarScreenHome(
     var usernameDB by remember { mutableStateOf("Usuario") }
     var showSeccionInformacion2 by remember { mutableStateOf(false) } // Estado para controlar la visibilidad
     var showSeccionRecomendaciones2 by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val context = LocalContext.current
     val healthConnectClient = remember { HealthConnectClient.getOrCreate(context) }
     val coroutineScope = rememberCoroutineScope()
-
-    // State to track if Health Connect permissions are granted
     val hasHealthConnectPermissions = remember { MutableStateFlow(false) }
-
-    // Variable mutable para almacenar el ActivityResultLauncher
-    var requestPermissionLauncher by remember { mutableStateOf<ActivityResultLauncher<Array<String>>?>(null) }
+    var requestPermissionLauncher by remember {
+        mutableStateOf<ActivityResultLauncher<Array<String>>?>(
+            null
+        )
+    }
 
     // Inicializar el launcher
     val launcher = rememberLauncherForActivityResult(
@@ -139,7 +134,12 @@ fun NavBarScreenHome(
 
     // Verificar la disponibilidad de HealthConnect y solicitar permisos
     LaunchedEffect(Unit) {
-        vmHealthConnect.checkHealthConnectAvailability(context, healthConnectClient, requestPermissionLauncher!!, hasHealthConnectPermissions)
+        vmHealthConnect.checkHealthConnectAvailability(
+            context,
+            healthConnectClient,
+            requestPermissionLauncher!!,
+            hasHealthConnectPermissions
+        )
     }
 
     // Obtener los datos del usuario
@@ -184,7 +184,7 @@ fun NavBarScreenHome(
                     userId?.let {
                         ProfileScreen(
                             userId = it,
-                            vmProfileImage = VMProfileImage()
+                            vmProfileImage = VMProfileImage(),
                         )
                     }
                     Column(
@@ -271,6 +271,15 @@ fun NavBarScreenHome(
                 SeccionSeguimiento(authService = AuthService(), hasPermissions = false)
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
+        ) { snackbarData ->
+            Snackbar(snackbarData)
+        }
+
     }
 }
 
@@ -810,7 +819,7 @@ fun MedicionPasos(
             val today = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
             val steps = vmHealthConnect.readStepsForDate(healthClient, today)
             stepsCount = steps.toInt()
-        }catch (e: SecurityException){
+        } catch (e: SecurityException) {
             // Handle the security exception, possibly by logging or showing a message to the user.
             Log.e("MedicionPasos", "Security exception: ${e.message}")
             // Optionally, you could set stepsCount to a default value or show an error message.
@@ -825,14 +834,23 @@ fun MedicionPasos(
     )
 }
 
+
 @Composable
-fun ProfileScreen(userId: String, vmProfileImage: VMProfileImage) {
+fun ProfileScreen(
+    userId: String,
+    vmProfileImage: VMProfileImage,
+) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var base64Image by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
     var uploadState by remember { mutableStateOf(VMProfileImage.ImageUploadState.IDLE) }
-    var errorMessage by remember { mutableStateOf("") } // Mensaje de error específico
+    var errorMessage by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var isSuccess by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId) {
         vmProfileImage.loadProfileImageFromFirestore(userId) { image ->
@@ -846,26 +864,46 @@ fun ProfileScreen(userId: String, vmProfileImage: VMProfileImage) {
         uri?.let { selectedUri ->
             imageUri = selectedUri
             val fileSizeInBytes = vmProfileImage.getFileSize(selectedUri, context)
-            val maxFileSizeInBytes = 500 * 1024 // 500KB (ajusta según tus necesidades)
+            val maxFileSizeInBytes = 3000 * 1024 // 1MB
 
             if (fileSizeInBytes > maxFileSizeInBytes) {
                 uploadState = VMProfileImage.ImageUploadState.SIZE_EXCEEDED
-                errorMessage =
-                    "La imagen excede el tamaño máximo permitido (500KB)." // Cambia el mensaje si es necesario
+                errorMessage = "La imagen excede el tamaño máximo permitido (3MB)."
+                dialogMessage = "La imagen excede el tamaño máximo permitido (3MB)."
+                isSuccess = false
+                showDialog = true
+                scope.launch {
+                    delay(1000)
+                    showDialog = false
+                }
             } else {
                 uploadState = VMProfileImage.ImageUploadState.UPLOADING
-                errorMessage = "" // Limpiar el mensaje de error
+                errorMessage = ""
                 CoroutineScope(Dispatchers.IO).launch {
-                    val base64 = vmProfileImage.convertImageToBase64(selectedUri, context) // Convertir y comprimir
-                    withContext(Dispatchers.Main) { // Volver al hilo principal para actualizar la UI
+                    val base64 = vmProfileImage.convertImageToBase64(selectedUri, context)
+                    withContext(Dispatchers.Main) {
                         vmProfileImage.saveImageToFirestore(userId, base64,
                             onSuccess = {
                                 base64Image = base64
                                 uploadState = VMProfileImage.ImageUploadState.SUCCESS
+                                dialogMessage = "Imagen actualizada con éxito!"
+                                isSuccess = true
+                                showDialog = true
+                                scope.launch {
+                                    delay(1000)
+                                    showDialog = false
+                                }
                             },
                             onFailure = {
                                 uploadState = VMProfileImage.ImageUploadState.ERROR
                                 errorMessage = "Error al guardar la imagen. Intenta de nuevo."
+                                dialogMessage = "Error al guardar la imagen. Intenta de nuevo."
+                                isSuccess = false
+                                showDialog = true
+                                scope.launch {
+                                    delay(1000)
+                                    showDialog = false
+                                }
                             }
                         )
                     }
@@ -887,53 +925,74 @@ fun ProfileScreen(userId: String, vmProfileImage: VMProfileImage) {
                     .clip(CircleShape)
                     .clickable { launcher.launch("image/*") }
             )
-        } else {
-            Image(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Default Profile Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .clickable { launcher.launch("image/*") }
-            )
-        }
 
-        // Mostrar mensaje de estado
-        when (uploadState) {
-            VMProfileImage.ImageUploadState.IDLE -> {}
-            VMProfileImage.ImageUploadState.UPLOADING -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-
-            VMProfileImage.ImageUploadState.SUCCESS -> {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = "Imagen actualizada",
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .align(Alignment.BottomEnd)
+            if (uploadState == VMProfileImage.ImageUploadState.UPLOADING) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(80.dp),
+                    strokeWidth = 4.dp,
+                    color = MaterialTheme.colors.primary
                 )
-                LaunchedEffect(Unit) {
-                    delay(2000)
-                    uploadState = VMProfileImage.ImageUploadState.IDLE
-                }
             }
+        } else {
+            if (uploadState == VMProfileImage.ImageUploadState.UPLOADING) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(80.dp),
+                    strokeWidth = 4.dp,
+                    color = MaterialTheme.colors.primary
+                )
+            } else {
+                Image(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Default Profile Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .clickable { launcher.launch("image/*") }
+                )
+            }
+        }
+    }
 
-            VMProfileImage.ImageUploadState.SIZE_EXCEEDED,
-            VMProfileImage.ImageUploadState.ERROR -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Error al actualizar",
-                        tint = Color.Black,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                LaunchedEffect(Unit) {
-                    delay(3000)
-                    uploadState = VMProfileImage.ImageUploadState.IDLE
+    if (showDialog) {
+        Dialog(onDismissRequest = { showDialog = false }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Card(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Black,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            val icon =
+                                if (isSuccess) Icons.Filled.CheckCircle else Icons.Filled.Close
+                            val tint = if (isSuccess) Color.Green else Color.Red
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = if (isSuccess) "Éxito" else "Error",
+                                tint = tint,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = dialogMessage,
+                                fontSize = 16.sp,
+                            )
+                        }
+                    }
                 }
             }
         }
