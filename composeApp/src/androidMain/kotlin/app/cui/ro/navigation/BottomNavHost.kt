@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.BottomNavItem
+import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.ui.screens.NavBarScreenContact
 import app.cui.ro.ui.screens.NavBarScreenForo
 import app.cui.ro.ui.screens.NavBarScreenMessage
@@ -60,7 +61,8 @@ fun NavBarScreenStart(context: Context) {
 fun BottomNavHost(navController: NavHostController, context: Context) {
     NavHost(navController, startDestination = "home_route") {
         composable("home_route") { NavBarScreenHome(
-            authService = AuthService()
+            authService = AuthService(),
+            vmHealthConnect = VMHealthConnect()
         ) }
         composable("profile_route") { NavBarScreenProfile() }
         composable("contacts_route") { NavBarScreenContact() }

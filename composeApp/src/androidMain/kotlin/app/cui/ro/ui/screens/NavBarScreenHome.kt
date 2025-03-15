@@ -1,11 +1,14 @@
 package app.cui.ro.ui.screens
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,10 +45,13 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,10 +66,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.VMHealthConnect
+import app.cui.ro.models.VMProfileImage
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
 import coil3.compose.rememberAsyncImagePainter
@@ -73,6 +84,8 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -82,12 +95,52 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @Composable
-fun NavBarScreenHome(authService: AuthService) {
+fun NavBarScreenHome(
+    authService: AuthService,
+    vmHealthConnect: VMHealthConnect
+) {
     val userId = remember { authService.getUserId() }
     var userFullNameDB by remember { mutableStateOf("Usuario") }
     var usernameDB by remember { mutableStateOf("Usuario") }
     var showSeccionInformacion2 by remember { mutableStateOf(false) } // Estado para controlar la visibilidad
     var showSeccionRecomendaciones2 by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val healthConnectClient = remember { HealthConnectClient.getOrCreate(context) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // State to track if Health Connect permissions are granted
+    val hasHealthConnectPermissions = remember { MutableStateFlow(false) }
+
+    // Variable mutable para almacenar el ActivityResultLauncher
+    var requestPermissionLauncher by remember { mutableStateOf<ActivityResultLauncher<Array<String>>?>(null) }
+
+    // Inicializar el launcher
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[HealthPermission.getReadPermission(StepsRecord::class)] == true) {
+            // Permisos concedidos, puedes proceder con la lógica de HealthConnect
+            coroutineScope.launch {
+                hasHealthConnectPermissions.value = true
+                //checkPermissionsAndRun(healthConnectClient, requestPermissionLauncher!!) //No necesitas ejecutar aqui
+            }
+        } else {
+            // Permisos no concedidos, maneja el error
+            println("Permisos no concedidos")
+            hasHealthConnectPermissions.value = false //Actualiza el valor
+        }
+    }
+
+    // Asignar el launcher a la variable mutable
+    LaunchedEffect(launcher) {
+        requestPermissionLauncher = launcher
+    }
+
+    // Verificar la disponibilidad de HealthConnect y solicitar permisos
+    LaunchedEffect(Unit) {
+        vmHealthConnect.checkHealthConnectAvailability(context, healthConnectClient, requestPermissionLauncher!!, hasHealthConnectPermissions)
+    }
 
     // Obtener los datos del usuario
     LaunchedEffect(userId) {
@@ -130,7 +183,8 @@ fun NavBarScreenHome(authService: AuthService) {
                     // Mostrar la imagen de perfil
                     userId?.let {
                         ProfileScreen(
-                            userId = it
+                            userId = it,
+                            vmProfileImage = VMProfileImage()
                         )
                     }
                     Column(
@@ -201,7 +255,7 @@ fun NavBarScreenHome(authService: AuthService) {
                     )
                 }
 
-                if(showSeccionRecomendaciones2){
+                if (showSeccionRecomendaciones2) {
                     SeccionRecomendaciones2(
                         onDismiss = {
                             showSeccionRecomendaciones2 = false
@@ -210,7 +264,12 @@ fun NavBarScreenHome(authService: AuthService) {
                 }
             }
 
-            SeccionSeguimiento(authService = AuthService())
+            //Only show if permissions are granted
+            if (hasHealthConnectPermissions.collectAsState().value) {
+                SeccionSeguimiento(authService = AuthService(), hasPermissions = true)
+            } else {
+                SeccionSeguimiento(authService = AuthService(), hasPermissions = false)
+            }
         }
     }
 }
@@ -335,7 +394,7 @@ fun SeccionRecomendaciones(
 }
 
 @Composable
-fun SeccionSeguimiento(authService: AuthService) {
+fun SeccionSeguimiento(authService: AuthService, hasPermissions: Boolean) {
     val userId = remember { authService.getUserId() }
     var userFirstName by remember { mutableStateOf("Usuario") }
 
@@ -515,13 +574,19 @@ fun SeccionSeguimiento(authService: AuthService) {
                             .weight(0.7f)
                             .padding(vertical = 10.dp)
                     ) {
-
-                        val context = LocalContext.current
-                        MedicionPasos(
-                            authService = AuthService(),
-                            context = context
-                        )
-
+                        if (hasPermissions) {
+                            val context = LocalContext.current
+                            MedicionPasos(
+                                authService = AuthService(),
+                                context = context
+                            )
+                        } else {
+                            Text(
+                                "Es necesario conceder permisos para ver este apartado",
+                                fontSize = 12.sp,
+                                color = Color.Black,
+                            )
+                        }
                     }
                 }
             }
@@ -740,10 +805,17 @@ fun MedicionPasos(
 
     // Obtener pasos del día
     LaunchedEffect(Unit) {
-        val healthClient = HealthConnectClient.getOrCreate(context)
-        val today = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
-        val steps = vmHealthConnect.readStepsForDate(healthClient, today)
-        stepsCount = steps.toInt()
+        try {
+            val healthClient = HealthConnectClient.getOrCreate(context)
+            val today = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
+            val steps = vmHealthConnect.readStepsForDate(healthClient, today)
+            stepsCount = steps.toInt()
+        }catch (e: SecurityException){
+            // Handle the security exception, possibly by logging or showing a message to the user.
+            Log.e("MedicionPasos", "Security exception: ${e.message}")
+            // Optionally, you could set stepsCount to a default value or show an error message.
+            stepsCount = 0
+        }
     }
 
     Text(
@@ -753,25 +825,17 @@ fun MedicionPasos(
     )
 }
 
-enum class ImageUploadState {
-    IDLE,
-    UPLOADING,
-    SUCCESS,
-    ERROR,
-    SIZE_EXCEEDED // Nuevo estado
-}
-
 @Composable
-fun ProfileScreen(userId: String) {
+fun ProfileScreen(userId: String, vmProfileImage: VMProfileImage) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var base64Image by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
-    var uploadState by remember { mutableStateOf(ImageUploadState.IDLE) }
+    var uploadState by remember { mutableStateOf(VMProfileImage.ImageUploadState.IDLE) }
     var errorMessage by remember { mutableStateOf("") } // Mensaje de error específico
 
     LaunchedEffect(userId) {
-        loadProfileImageFromFirestore(userId) { image ->
+        vmProfileImage.loadProfileImageFromFirestore(userId) { image ->
             base64Image = image
         }
     }
@@ -781,25 +845,26 @@ fun ProfileScreen(userId: String) {
     ) { uri: Uri? ->
         uri?.let { selectedUri ->
             imageUri = selectedUri
-            val fileSizeInBytes = getFileSize(selectedUri, context)
+            val fileSizeInBytes = vmProfileImage.getFileSize(selectedUri, context)
             val maxFileSizeInBytes = 500 * 1024 // 500KB (ajusta según tus necesidades)
 
             if (fileSizeInBytes > maxFileSizeInBytes) {
-                uploadState = ImageUploadState.SIZE_EXCEEDED
-                errorMessage = "La imagen excede el tamaño máximo permitido (500KB)." // Cambia el mensaje si es necesario
+                uploadState = VMProfileImage.ImageUploadState.SIZE_EXCEEDED
+                errorMessage =
+                    "La imagen excede el tamaño máximo permitido (500KB)." // Cambia el mensaje si es necesario
             } else {
-                uploadState = ImageUploadState.UPLOADING
+                uploadState = VMProfileImage.ImageUploadState.UPLOADING
                 errorMessage = "" // Limpiar el mensaje de error
                 CoroutineScope(Dispatchers.IO).launch {
-                    val base64 = convertImageToBase64(selectedUri, context) // Convertir y comprimir
+                    val base64 = vmProfileImage.convertImageToBase64(selectedUri, context) // Convertir y comprimir
                     withContext(Dispatchers.Main) { // Volver al hilo principal para actualizar la UI
-                        saveImageToFirestore(userId, base64,
+                        vmProfileImage.saveImageToFirestore(userId, base64,
                             onSuccess = {
                                 base64Image = base64
-                                uploadState = ImageUploadState.SUCCESS
+                                uploadState = VMProfileImage.ImageUploadState.SUCCESS
                             },
                             onFailure = {
-                                uploadState = ImageUploadState.ERROR
+                                uploadState = VMProfileImage.ImageUploadState.ERROR
                                 errorMessage = "Error al guardar la imagen. Intenta de nuevo."
                             }
                         )
@@ -836,24 +901,28 @@ fun ProfileScreen(userId: String) {
 
         // Mostrar mensaje de estado
         when (uploadState) {
-            ImageUploadState.IDLE -> {}
-            ImageUploadState.UPLOADING -> {
+            VMProfileImage.ImageUploadState.IDLE -> {}
+            VMProfileImage.ImageUploadState.UPLOADING -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-            ImageUploadState.SUCCESS -> {
+
+            VMProfileImage.ImageUploadState.SUCCESS -> {
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = "Imagen actualizada",
                     tint = Color.Black,
-                    modifier = Modifier.size(24.dp).align(Alignment.BottomEnd)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .align(Alignment.BottomEnd)
                 )
                 LaunchedEffect(Unit) {
                     delay(2000)
-                    uploadState = ImageUploadState.IDLE
+                    uploadState = VMProfileImage.ImageUploadState.IDLE
                 }
             }
-            ImageUploadState.SIZE_EXCEEDED,
-            ImageUploadState.ERROR -> {
+
+            VMProfileImage.ImageUploadState.SIZE_EXCEEDED,
+            VMProfileImage.ImageUploadState.ERROR -> {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         imageVector = Icons.Filled.Close,
@@ -864,70 +933,10 @@ fun ProfileScreen(userId: String) {
                 }
                 LaunchedEffect(Unit) {
                     delay(3000)
-                    uploadState = ImageUploadState.IDLE
+                    uploadState = VMProfileImage.ImageUploadState.IDLE
                 }
             }
         }
     }
 }
 
-fun getFileSize(uri: Uri, context: Context): Long {
-    val contentResolver = context.contentResolver
-    var fileSize = 3L
-    contentResolver.openInputStream(uri)?.use { inputStream ->
-        fileSize = inputStream.available().toLong()
-    }
-    return fileSize
-}
-
-fun convertImageToBase64(imageUri: Uri, context: Context): String {
-    val inputStream: InputStream? = context.contentResolver.openInputStream(imageUri)
-    val bitmap = BitmapFactory.decodeStream(inputStream)
-
-    val byteArrayOutputStream = ByteArrayOutputStream()
-    // Comprime la imagen (ajusta la calidad según tus necesidades)
-    bitmap?.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)  // Reduce la calidad a 70%
-    val byteArray = byteArrayOutputStream.toByteArray()
-    return Base64.encodeToString(byteArray, Base64.DEFAULT)
-}
-
-fun saveImageToFirestore(
-    userId: String,
-    base64Image: String,
-    onSuccess: () -> Unit,
-    onFailure: () -> Unit
-) {
-    val db: FirebaseFirestore = Firebase.firestore
-
-    db.collection("users")
-        .document(userId)
-        .update("profileImage", base64Image)
-        .addOnSuccessListener {
-            println("Imagen actualizada correctamente en Firestore")
-            onSuccess() // Ejecutar el callback después de guardar
-        }
-        .addOnFailureListener { e ->
-            println("Error al actualizar la imagen: ${e.message}")
-            onFailure()
-        }
-}
-
-fun loadProfileImageFromFirestore(userId: String, onImageLoaded: (String?) -> Unit) {
-    val db: FirebaseFirestore = Firebase.firestore
-
-    db.collection("users")
-        .document(userId)
-        .get()
-        .addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                val image = document.getString("profileImage")
-                onImageLoaded(image) // Pasar la imagen al callback
-            } else {
-                onImageLoaded(null) // No hay imagen
-            }
-        }
-        .addOnFailureListener { e ->
-            println("Error al recuperar la imagen: ${e.message}")
-            onImageLoaded(null) // Manejar el error
-        }
-}
