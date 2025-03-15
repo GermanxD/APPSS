@@ -963,7 +963,7 @@ fun ProfileScreen(
                     .padding(16.dp)
             ) {
                 Card(
-                    backgroundColor = Color.White,
+                    backgroundColor = Colors.SecondaryRose,
                     contentColor = Color.Black,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
