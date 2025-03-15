@@ -34,7 +34,7 @@ import app.cui.ro.ui.screens.NavBarScreenForo
 import app.cui.ro.ui.screens.NavBarScreenMessage
 import app.cui.ro.ui.screens.NavBarScreenHome
 import app.cui.ro.ui.screens.NavBarScreenProfile
-import app.cui.ro.ui.theme.Colors
+import app.cui.ro.ui.theme.CuiroColors
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -106,7 +106,7 @@ fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     BottomNavigation(
-        backgroundColor = Colors.ObjectsPink, // Cambiado a blanco
+        backgroundColor = CuiroColors.ObjectsPink, // Cambiado a blanco
         modifier = Modifier.fillMaxWidth()
     ) {
         items.forEach { item ->

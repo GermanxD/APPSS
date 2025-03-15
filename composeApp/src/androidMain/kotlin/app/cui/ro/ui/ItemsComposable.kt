@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cui.ro.R
-import app.cui.ro.ui.theme.Colors
+import app.cui.ro.ui.theme.CuiroColors
 
 @Composable
 fun DataColumn(imageResId: Int, text: String) {
@@ -46,7 +44,7 @@ fun DataColumn(imageResId: Int, text: String) {
             contentDescription = text,
             modifier = Modifier
                 .size(100.dp)
-                .background(color = Colors.SecondaryRose) // Optional: If you want the image to be a circle
+                .background(color = CuiroColors.SecondaryRose) // Optional: If you want the image to be a circle
         )
         Spacer(modifier = Modifier.height(4.dp)) // Add some space between image and text
         Text(
@@ -106,7 +104,7 @@ fun CustomTopAppBar(
                 )
             }
         },
-        backgroundColor = Colors.ObjectsPink,
+        backgroundColor = CuiroColors.ObjectsPink,
         contentColor = Color.Black,
         navigationIcon = null,
         actions = {}

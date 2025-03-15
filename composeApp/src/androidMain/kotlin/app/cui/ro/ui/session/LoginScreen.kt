@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -54,7 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.R
 import app.cui.ro.models.LoginViewModel
-import app.cui.ro.ui.theme.Colors
+import app.cui.ro.ui.theme.CuiroColors
 
 @Composable
 fun keyboardAwarePadding(): Dp {
@@ -104,7 +103,7 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Colors.PrimaryPink) // Aplica el color rosa a todo el fondo
+                .background(CuiroColors.PrimaryPink) // Aplica el color rosa a todo el fondo
         )
 
         // Parte superior con el logo
@@ -145,7 +144,7 @@ fun LoginScreen(
                 text = "INICIO",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp),
-                color = Colors.FontBrown,
+                color = CuiroColors.FontBrown,
                 fontSize = 30.sp
             )
 
@@ -153,7 +152,7 @@ fun LoginScreen(
                 text = "Inicie sesión para continuar",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp),
-                color = Colors.FontBrown,
+                color = CuiroColors.FontBrown,
                 fontSize = 16.sp
             )
 
@@ -163,11 +162,11 @@ fun LoginScreen(
                 label = { Text("Usuario") },
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Colors.PinkFields,
+                    backgroundColor = CuiroColors.PinkFields,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Colors.FontBrown,
-                    focusedLabelColor = Colors.FontBrown,
+                    cursorColor = CuiroColors.FontBrown,
+                    focusedLabelColor = CuiroColors.FontBrown,
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -180,18 +179,18 @@ fun LoginScreen(
                 label = { Text("Contraseña") },
                 shape = RoundedCornerShape(12.dp),
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Colors.PinkFields,
+                    backgroundColor = CuiroColors.PinkFields,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Colors.FontBrown,
-                    focusedLabelColor = Colors.FontBrown,
+                    cursorColor = CuiroColors.FontBrown,
+                    focusedLabelColor = CuiroColors.FontBrown,
                 ),
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     val iconText = if (showPassword) "Ocultar" else "Mostrar"
                     TextButton(onClick = { showPassword = !showPassword }) {
-                        Text(iconText, fontSize = 12.sp, color = Colors.FontBrown)
+                        Text(iconText, fontSize = 12.sp, color = CuiroColors.FontBrown)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -205,7 +204,7 @@ fun LoginScreen(
                     viewModel.loginWithUsername(username, password, context, onLoginSuccess, { loginError = true })
                 },
                 shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Colors.ObjectsPink),
+                colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(45.dp),
@@ -217,7 +216,7 @@ fun LoginScreen(
                     Text(
                         text = "Iniciar sesión",
                         fontSize = 16.sp,
-                        color = Colors.FontBrown,
+                        color = CuiroColors.FontBrown,
                     )
                 }
             }
@@ -239,7 +238,7 @@ fun LoginScreen(
                 style = TextStyle(),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp),
-                color = Colors.FontBrown,
+                color = CuiroColors.FontBrown,
                 fontSize = 16.sp
             )
 
@@ -254,7 +253,7 @@ fun LoginScreen(
                     Text(
                         text = "Regístrate ahora",
                         style = TextStyle(),
-                        color = Colors.FontBrown,
+                        color = CuiroColors.FontBrown,
                         fontSize = 16.sp
                     )
                 }

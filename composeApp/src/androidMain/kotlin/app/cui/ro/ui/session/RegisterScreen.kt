@@ -83,7 +83,7 @@ fun RegisterScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.35f)
-                .background(app.cui.ro.ui.theme.Colors.PrimaryPink),
+                .background(app.cui.ro.ui.theme.CuiroColors.PrimaryPink),
             contentAlignment = Alignment.TopCenter
         ) {
             Image(
@@ -222,7 +222,7 @@ fun RegisterScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         TextButton(onClick = { viewModel.onEvent(RegisterEvent.TogglePasswordVisibility) }) {
-                            Text(if (state.showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp,  color = app.cui.ro.ui.theme.Colors.FontBrown)
+                            Text(if (state.showPassword) "Ocultar" else "Mostrar", fontSize = 12.sp,  color = app.cui.ro.ui.theme.CuiroColors.FontBrown)
 
                         }
                     },
@@ -257,7 +257,7 @@ fun RegisterScreen(
                         .fillMaxWidth()
                         .height(45.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = app.cui.ro.ui.theme.Colors.ObjectsPink),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = app.cui.ro.ui.theme.CuiroColors.ObjectsPink),
                     enabled = !state.isLoading
                 ) {
                     if (state.isLoading) {
@@ -265,7 +265,7 @@ fun RegisterScreen(
                     } else {
                         Text("Registrarse",
                             fontSize = 16.sp,
-                            color = app.cui.ro.ui.theme.Colors.FontBrown
+                            color = app.cui.ro.ui.theme.CuiroColors.FontBrown
                         )
                     }
                 }
@@ -279,7 +279,7 @@ fun GenderButton(gender: String, isSelected: Boolean, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) app.cui.ro.ui.theme.Colors.ObjectsPink else Color.White,
+            backgroundColor = if (isSelected) app.cui.ro.ui.theme.CuiroColors.ObjectsPink else Color.White,
             contentColor = if (isSelected) Color.White else Color.Gray // Cambiar color del texto.
         ),
         border = if (!isSelected) BorderStroke(
@@ -316,11 +316,11 @@ fun CustomTextField(
             label = { Text(label) },
             shape = RoundedCornerShape(12.dp),
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = app.cui.ro.ui.theme.Colors.PinkFields,
+                backgroundColor = app.cui.ro.ui.theme.CuiroColors.PinkFields,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = app.cui.ro.ui.theme.Colors.FontBrown,
-                focusedLabelColor = app.cui.ro.ui.theme.Colors.FontBrown,
+                cursorColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
+                focusedLabelColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
             ),
             readOnly = readOnly,
             visualTransformation = visualTransformation,

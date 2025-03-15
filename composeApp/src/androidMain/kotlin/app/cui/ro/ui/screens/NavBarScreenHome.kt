@@ -29,8 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -78,7 +76,7 @@ import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.models.VMProfileImage
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
-import app.cui.ro.ui.theme.Colors
+import app.cui.ro.ui.theme.CuiroColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -206,7 +204,7 @@ fun NavBarScreenHome(
                 }
                 Row(
                     modifier = Modifier
-                        .background(color = Colors.SecondaryRose)
+                        .background(color = CuiroColors.SecondaryRose)
                         .fillMaxWidth()
                         .padding(4.dp),
                     horizontalArrangement = Arrangement.Start,
@@ -429,7 +427,7 @@ fun SeccionSeguimiento(authService: AuthService, hasPermissions: Boolean) {
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .background(Colors.SectionsPink), // importante mantener el mismo background
+                .background(CuiroColors.SectionsPink), // importante mantener el mismo background
             horizontalAlignment = Alignment.Start,
         ) {
             Column( // Agregado un Column interno para el padding
@@ -538,7 +536,7 @@ fun SeccionSeguimiento(authService: AuthService, hasPermissions: Boolean) {
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
-                .background(Colors.SectionsPink)
+                .background(CuiroColors.SectionsPink)
                 .padding(5.dp), // importante mantener el mismo background
             horizontalAlignment = Alignment.Start,
         ) {
@@ -963,7 +961,7 @@ fun ProfileScreen(
                     .padding(16.dp)
             ) {
                 Card(
-                    backgroundColor = Colors.SecondaryRose,
+                    backgroundColor = CuiroColors.SecondaryRose,
                     contentColor = Color.Black,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
