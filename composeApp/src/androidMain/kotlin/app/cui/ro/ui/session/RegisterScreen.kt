@@ -41,6 +41,8 @@ import androidx.navigation.NavController
 import app.cui.ro.R
 import app.cui.ro.models.RegisterEvent
 import app.cui.ro.models.VMRegister
+import app.cui.ro.ui.CustomTextField
+import app.cui.ro.ui.GenderButton
 import java.util.Calendar
 
 @Composable
@@ -272,81 +274,4 @@ fun RegisterScreen(
             }
         }
     }
-}
-
-@Composable
-fun GenderButton(gender: String, isSelected: Boolean, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isSelected) app.cui.ro.ui.theme.CuiroColors.ObjectsPink else Color.White,
-            contentColor = if (isSelected) Color.White else Color.Gray // Cambiar color del texto.
-        ),
-        border = if (!isSelected) BorderStroke(
-            1.dp,
-            Color.Gray
-        ) else null // Opcional: agregar un borde para resaltar.
-    ) {
-        Text(text = gender)
-    }
-}
-
-
-@Composable
-fun CustomTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier,
-    readOnly: Boolean = false,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    maxLength: Int? = null // Nuevo parámetro para definir el límite de caracteres.
-) {
-    Column(modifier = modifier) {
-        TextField(
-            value = value,
-            onValueChange = {
-                if (maxLength == null || it.length <= maxLength) {
-                    onValueChange(it)
-                }
-            },
-            label = { Text(label) },
-            shape = RoundedCornerShape(12.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = app.cui.ro.ui.theme.CuiroColors.PinkFields,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
-                focusedLabelColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
-            ),
-            readOnly = readOnly,
-            visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            trailingIcon = trailingIcon,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        if (maxLength != null) {
-            Text(
-                text = "${value.length} / $maxLength", style =
-                MaterialTheme.typography.caption.copy(
-                    fontSize =
-                    12.sp
-                ), color =
-                if (value.length > maxLength) Color.Red else Color.White, modifier =
-                Modifier.align(Alignment.End)
-            )
-        }
-    }
-}
-
-
-fun navigateBack(navController: NavController) {
-    navController.popBackStack()
 }

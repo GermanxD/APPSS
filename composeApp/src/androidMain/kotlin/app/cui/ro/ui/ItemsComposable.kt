@@ -1,5 +1,6 @@
 package app.cui.ro.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,10 +13,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -26,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -119,5 +129,77 @@ fun CenteredText(text: String) {
             modifier = Modifier.fillMaxSize(),
             color = Color.Black
         )
+    }
+}
+
+@Composable
+fun GenderButton(gender: String, isSelected: Boolean, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = if (isSelected) app.cui.ro.ui.theme.CuiroColors.ObjectsPink else Color.White,
+            contentColor = if (isSelected) Color.White else Color.Gray // Cambiar color del texto.
+        ),
+        border = if (!isSelected) BorderStroke(
+            1.dp,
+            Color.Gray
+        ) else null // Opcional: agregar un borde para resaltar.
+    ) {
+        Text(text = gender)
+    }
+}
+
+
+@Composable
+fun CustomTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    maxLength: Int? = null // Nuevo parámetro para definir el límite de caracteres.
+) {
+    Column(modifier = modifier) {
+        TextField(
+            value = value,
+            onValueChange = {
+                if (maxLength == null || it.length <= maxLength) {
+                    onValueChange(it)
+                }
+            },
+            label = { Text(label) },
+            shape = RoundedCornerShape(12.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = app.cui.ro.ui.theme.CuiroColors.PinkFields,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
+                focusedLabelColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
+            ),
+            readOnly = readOnly,
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            trailingIcon = trailingIcon,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        if (maxLength != null) {
+            Text(
+                text = "${value.length} / $maxLength", style =
+                MaterialTheme.typography.caption.copy(
+                    fontSize =
+                    12.sp
+                ), color =
+                if (value.length > maxLength) Color.Red else Color.White, modifier =
+                Modifier.align(Alignment.End)
+            )
+        }
     }
 }
