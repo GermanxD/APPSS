@@ -265,9 +265,9 @@ fun NavBarScreenHome(
 
             //Only show if permissions are granted
             if (hasHealthConnectPermissions.collectAsState().value) {
-                SeccionSeguimiento(authService = AuthService(), hasPermissions = true)
+                SeccionRegistroDiario(authService = AuthService(), hasPermissions = true)
             } else {
-                SeccionSeguimiento(authService = AuthService(), hasPermissions = false)
+                SeccionRegistroDiario(authService = AuthService(), hasPermissions = false)
             }
         }
         SnackbarHost(
@@ -402,7 +402,7 @@ fun SeccionRecomendaciones(
 }
 
 @Composable
-fun SeccionSeguimiento(authService: AuthService, hasPermissions: Boolean) {
+fun SeccionRegistroDiario(authService: AuthService, hasPermissions: Boolean) {
     val userId = remember { authService.getUserId() }
     var userFirstName by remember { mutableStateOf("Usuario") }
 
@@ -420,257 +420,211 @@ fun SeccionSeguimiento(authService: AuthService, hasPermissions: Boolean) {
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.Black)
-            .height(IntrinsicSize.Min) // Añadido para igualar la altura
+            .height(IntrinsicSize.Min)
     ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-                .background(CuiroColors.SectionsPink), // importante mantener el mismo background
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Column( // Agregado un Column interno para el padding
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp) // Mover el padding aquí
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
-                ) {
-                    // Texto
-                    Text(
-                        text = "Medicamentos",
-                        fontSize = 18.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .weight(1f) // Ocupa el espacio restante
-                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
-                    )
-
-                    // Imagen
-                    Image(
-                        painter = painterResource(R.drawable.ic_medicamentos),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .align(Alignment.CenterVertically) // Alinea la imagen verticalmente
-                    )
-                }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp)
-                ) {
-                    Text(
-                        text = "$userFirstName, el siguiente medicamento es:",
-                        fontSize = 12.sp,
-                        color = Color.Black,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    Text(
-                        "Tamoxifeno (Nolvadex):",
-                        fontSize = 12.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        "Hora: 12:00 hrs",
-                        fontSize = 12.sp,
-                        color = Color.Black,
-                    )
-                    Text(
-                        "Recordarme: Si",
-                        fontSize = 12.sp,
-                        color = Color.Black,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
-                ) {
-                    // Texto
-                    Text(
-                        text = "Informacion del medicamento aqui",
-                        fontSize = 14.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .weight(1f) // Ocupa el espacio restante
-                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
-                    )
-
-                    // Imagen
-                    Column(
-                        modifier = Modifier.padding(horizontal = 10.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_add),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(30.dp)// Alinea la imagen verticalmente
-                        )
-                    }
-
-                }
-            }
-        }
-
-        VerticalDivider(
-            color = Color.Black, // el mismo color del background de las columnas
-            thickness = 1.dp,
-            modifier = Modifier
-                .fillMaxHeight()
-        )
-
-        Column(
+        SeccionMedicamentos(
+            userFirstName = userFirstName,
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f)
                 .background(CuiroColors.SectionsPink)
-                .padding(5.dp), // importante mantener el mismo background
-            horizontalAlignment = Alignment.Start,
+                .padding(5.dp)
+        )
+
+        VerticalDivider(
+            color = Color.Black,
+            thickness = 1.dp,
+            modifier = Modifier.fillMaxHeight()
+        )
+
+        SeccionPasosEHidratacion(
+            userFirstName = userFirstName,
+            hasPermissions = hasPermissions,
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .background(CuiroColors.SectionsPink)
+                .padding(5.dp)
+        )
+    }
+}
+
+@Composable
+fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.Start
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Sección de Pasos
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
+            Text(
+                text = "Medicamentos",
+                fontSize = 18.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Image(
+                painter = painterResource(R.drawable.ic_medicamentos),
+                contentDescription = "",
+                modifier = Modifier.size(50.dp)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
+        ) {
+            Text(
+                text = "$userFirstName, el siguiente medicamento es:",
+                fontSize = 12.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                "Tamoxifeno (Nolvadex):",
+                fontSize = 12.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                "Hora: 12:00 hrs",
+                fontSize = 12.sp,
+                color = Color.Black
+            )
+            Text(
+                "Recordarme: Si",
+                fontSize = 12.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Informacion del medicamento aqui",
+                fontSize = 14.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Image(
+                painter = painterResource(R.drawable.ic_add),
+                contentDescription = "",
+                modifier = Modifier.size(30.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun SeccionPasosEHidratacion(userFirstName: String, hasPermissions: Boolean, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.Start
+    ) {
+        // Sección de Pasos
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
-                ) {
-                    // Texto
-                    Text(
-                        text = "Pasos",
-                        fontSize = 18.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .weight(1f) // Ocupa el espacio restante
-                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
-                    )
-
-                    // Imagen
-                    Image(
-                        painter = painterResource(R.drawable.ic_pasos),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .align(Alignment.CenterVertically) // Alinea la imagen verticalmente
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
+                Text(
+                    text = "Pasos",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
-                {
-                    Column(
-                        modifier = Modifier
-                            .weight(0.7f)
-                            .padding(vertical = 10.dp)
-                    ) {
-                        if (hasPermissions) {
-                            val context = LocalContext.current
-                            MedicionPasos(
-                                authService = AuthService(),
-                                context = context
-                            )
-                        } else {
-                            Text(
-                                "Es necesario conceder permisos para ver este apartado",
-                                fontSize = 12.sp,
-                                color = Color.Black,
-                            )
-                        }
-                    }
-                }
+                Image(
+                    painter = painterResource(R.drawable.ic_pasos),
+                    contentDescription = "",
+                    modifier = Modifier.size(50.dp)
+                )
             }
 
-            // Divider entre Pasos e Hidratacion
-            Divider(
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
             )
-
-            // Sección de Hidratación
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Row(
+            {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
+                        .weight(0.7f)
+                        .padding(vertical = 10.dp)
                 ) {
-                    // Texto
-                    Text(
-                        text = "Hidratacion",
-                        fontSize = 18.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .weight(1f) // Ocupa el espacio restante
-                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
-                    )
-
-                    // Imagen
-                    Image(
-                        painter = painterResource(R.drawable.ic_persona_agua),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .align(Alignment.CenterVertically)// Alinea la imagen verticalmente
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically, // Centra verticalmente los hijos de la Row
-                ) {
-                    // Texto
-                    Text(
-                        text = "$userFirstName, hoy no has registrado tu consumo de agua, registralo.",
-                        fontSize = 12.sp,
-                        color = Color.Black,
-                        modifier = Modifier
-                            .weight(1f) // Ocupa el espacio restante
-                            .align(Alignment.CenterVertically) // Alinea el texto verticalmente
-                    )
-
-                    // Imagen
-                    Column(
-                        modifier = Modifier.padding(horizontal = 10.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_add),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(30.dp)// Alinea la imagen verticalmente
+                    if (hasPermissions) {
+                        val context = LocalContext.current
+                        MedicionPasos(
+                            authService = AuthService(),
+                            context = context
+                        )
+                    } else {
+                        Text(
+                            "Es necesario conceder permisos para ver este apartado",
+                            fontSize = 12.sp,
+                            color = Color.Black,
                         )
                     }
-
                 }
             }
         }
 
+        Divider(
+            color = Color.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+        )
+
+        // Sección de Hidratación
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Hidratacion",
+                    fontSize = 18.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_persona_agua),
+                    contentDescription = "",
+                    modifier = Modifier.size(50.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "$userFirstName, hoy no has registrado tu consumo de agua, registralo.",
+                    fontSize = 12.sp,
+                    color = Color.Black,
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_add),
+                    contentDescription = "",
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+        }
     }
 }
 
