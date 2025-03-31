@@ -37,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cui.ro.R
@@ -62,6 +63,7 @@ fun DataColumn(imageResId: Int, text: String) {
             textAlign = TextAlign.Center,
             fontSize = 14.sp,
             color = Color.Black,
+            maxLines = 2,
         )
     }
 }
@@ -104,7 +106,8 @@ fun CustomTopAppBar(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f),
-                    maxLines = 2
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Image(
                     painter = painterResource(R.drawable.img_logo_login),

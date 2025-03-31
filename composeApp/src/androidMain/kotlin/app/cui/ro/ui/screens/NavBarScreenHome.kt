@@ -68,6 +68,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -150,7 +151,7 @@ fun NavBarScreenHome(
             CustomTopAppBar(
                 onMenuClick = { /* Lógica para el clic del menú */ },
                 onNotificationsClick = { /* Lógica para el clic de notificaciones */ },
-                title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\""
+                title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\"",
             )
         }
         Column(
@@ -498,7 +499,9 @@ fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
                 fontSize = 18.sp,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Image(
                 painter = painterResource(R.drawable.ic_medicamentos),
@@ -582,7 +585,9 @@ fun SeccionPasosEHidratacion(
                     fontSize = 18.sp,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_pasos),
@@ -637,7 +642,9 @@ fun SeccionPasosEHidratacion(
                     fontSize = 18.sp,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_persona_agua),
@@ -683,6 +690,8 @@ fun SeccionInformacion2(
             textAlign = TextAlign.Start,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -743,6 +752,8 @@ fun SeccionRecomendaciones2(
             textAlign = TextAlign.Start,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
