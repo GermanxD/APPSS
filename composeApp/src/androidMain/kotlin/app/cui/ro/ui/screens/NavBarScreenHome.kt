@@ -84,7 +84,6 @@ import app.cui.ro.ui.theme.CuiroColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.ZonedDateTime
@@ -105,7 +104,6 @@ fun NavBarScreenHome(
     val context = LocalContext.current
     var hasHealthConnectPermissions by remember { mutableStateOf(false) }
     var showPermissionExplanationDialog by remember { mutableStateOf(false) }
-
 
     // Inicializar el launcher
     val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -147,21 +145,23 @@ fun NavBarScreenHome(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Column {
-            CustomTopAppBar(
-                onMenuClick = { /* Lógica para el clic del menú */ },
-                onNotificationsClick = { /* Lógica para el clic de notificaciones */ },
-                title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\"",
-            )
-        }
+        CustomTopAppBar(
+            onMenuClick = { /* Lógica para el clic del menú */ },
+            onNotificationsClick = { /* Lógica para el clic de notificaciones */ },
+            title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\"",
+        )
+
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .fillMaxWidth() // Ocupa todo el ancho
+                .weight(1f) // Ocupa todo el espacio vertical restante bajo el TopAppBar
         ) {
+
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .weight(0.7f)
+                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
             ) {
                 Row(
@@ -170,7 +170,6 @@ fun NavBarScreenHome(
                         .padding(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Mostrar la imagen de perfil
                     userId?.let {
                         ProfileScreen(
                             userId = it,
@@ -224,7 +223,7 @@ fun NavBarScreenHome(
                     SeccionInformacion(
                         onVerMasClick = {
                             showSeccionInformacion2 = true
-                        } // Pasar el callback al hacer clic en "Ver más"
+                        }
                     )
                 }
 
@@ -233,7 +232,7 @@ fun NavBarScreenHome(
                     SeccionInformacion2(
                         onDismiss = {
                             showSeccionInformacion2 = false
-                        } // Ocultar la sección al cerrar
+                        }
                     )
                 }
 
@@ -241,7 +240,7 @@ fun NavBarScreenHome(
                     SeccionRecomendaciones(
                         onVerMasClick = {
                             showSeccionRecomendaciones2 = true
-                        } // Pasar el callback al hacer clic en "Ver más"
+                        }
                     )
                 }
 
@@ -252,44 +251,48 @@ fun NavBarScreenHome(
                         }
                     )
                 }
-            }
 
-            if (showPermissionExplanationDialog) {
-                AlertDialog(
-                    modifier = Modifier.clip(RoundedCornerShape(10)),
-                    onDismissRequest = { showPermissionExplanationDialog = false },
-                    title = { Text("Permisos Requeridos") },
-                    text = { Text("Para acceder a tus datos de pasos, necesitamos permisos de Health Connect. Por favor, habilítalos en la configuración de la aplicación.") },
-                    buttons = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(12.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Button(
-                                onClick = {
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", context.packageName, null)
+                // Lógica del diálogo de permisos (no afecta el layout visible)
+                if (showPermissionExplanationDialog) {
+                    AlertDialog(
+                        modifier = Modifier.clip(RoundedCornerShape(10)),
+                        onDismissRequest = { showPermissionExplanationDialog = false },
+                        title = { Text("Permisos Requeridos") },
+                        text = { Text("Para acceder a tus datos de pasos, necesitamos permisos de Health Connect. Por favor, habilítalos en la configuración de la aplicación.") },
+                        buttons = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Button(
+                                    onClick = {
+                                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data = Uri.fromParts("package", context.packageName, null)
+                                        }
+                                        ContextCompat.startActivity(context, intent, null)
+                                        showPermissionExplanationDialog = false
+                                    },
+                                    colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink)
+                                ) {
+                                    Text("Ir a Configuración")
                                 }
-                                ContextCompat.startActivity(context, intent, null)
-                                showPermissionExplanationDialog = false
-                            },
-                                colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink)
-                            ) {
-                                Text("Ir a Configuración")
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(
-                                onClick = { showPermissionExplanationDialog = false },
-                                colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink)
-                            ) {
-                                Text("Cancelar")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = { showPermissionExplanationDialog = false },
+                                    colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink)
+                                ) {
+                                    Text("Cancelar")
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
 
             SeccionRegistroDiario(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.3f),
                 authService = authService,
                 hasPermissions = hasHealthConnectPermissions,
                 requestPermissionLauncher = requestPermissionLauncher,
@@ -297,20 +300,76 @@ fun NavBarScreenHome(
             )
 
         }
+
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center)
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.BottomCenter)
         ) { snackbarData ->
             Snackbar(snackbarData)
         }
-
     }
 }
+
+@Composable
+fun SeccionRegistroDiario(
+    modifier: Modifier = Modifier,
+    authService: AuthService,
+    hasPermissions: Boolean,
+    requestPermissionLauncher: ActivityResultLauncher<Array<String>>,
+    vmHealthConnect: VMHealthConnect
+) {
+    val userId = remember { authService.getUserId() }
+    var userFirstName by remember { mutableStateOf("Usuario") }
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            authService.getUserFirstName(userId) { name ->
+                if (name != null) {
+                    userFirstName = name
+                }
+            }
+        }
+    }
+
+    Row(
+        modifier = modifier
+            .background(color = Color.Black)
+            .height(IntrinsicSize.Min)
+    ) {
+        SeccionMedicamentos(
+            userFirstName = userFirstName,
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .background(CuiroColors.SectionsPink)
+                .padding(5.dp)
+        )
+
+        VerticalDivider(
+            color = Color.Black,
+            thickness = 1.dp,
+            modifier = Modifier.fillMaxHeight()
+        )
+
+        SeccionPasosEHidratacion(
+            userFirstName = userFirstName,
+            hasPermissions = hasPermissions,
+            requestPermissionLauncher = requestPermissionLauncher,
+            vmHealthConnect = vmHealthConnect,
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .background(CuiroColors.SectionsPink)
+                .padding(5.dp)
+        )
+    }
+}
+
 @Composable
 fun SeccionInformacion(
-    onVerMasClick: () -> Unit // Callback para manejar el clic en "Ver más"
+    onVerMasClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -370,7 +429,7 @@ fun SeccionInformacion(
 
 @Composable
 fun SeccionRecomendaciones(
-    onVerMasClick: () -> Unit // Callback para manejar el clic en "Ver más"
+    onVerMasClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -423,62 +482,6 @@ fun SeccionRecomendaciones(
         DataColumn(
             imageResId = R.drawable.ic_nutricion,
             text = "Nutricion"
-        )
-    }
-}
-
-@Composable
-fun SeccionRegistroDiario(
-    authService: AuthService,
-    hasPermissions: Boolean,
-    requestPermissionLauncher: ActivityResultLauncher<Array<String>>,
-    vmHealthConnect: VMHealthConnect
-) {
-    val userId = remember { authService.getUserId() }
-    var userFirstName by remember { mutableStateOf("Usuario") }
-    val context = LocalContext.current
-
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            authService.getUserFirstName(userId) { name ->
-                if (name != null) {
-                    userFirstName = name
-                }
-            }
-        }
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Color.Black)
-            .height(IntrinsicSize.Min)
-    ) {
-        SeccionMedicamentos(
-            userFirstName = userFirstName,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-                .background(CuiroColors.SectionsPink)
-                .padding(5.dp)
-        )
-
-        VerticalDivider(
-            color = Color.Black,
-            thickness = 1.dp,
-            modifier = Modifier.fillMaxHeight()
-        )
-
-        SeccionPasosEHidratacion(
-            userFirstName = userFirstName,
-            hasPermissions = hasPermissions, // Usa el valor booleano
-            requestPermissionLauncher = requestPermissionLauncher,
-            vmHealthConnect = vmHealthConnect,
-            modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
-                .background(CuiroColors.SectionsPink)
-                .padding(5.dp)
         )
     }
 }
@@ -676,7 +679,7 @@ fun SeccionPasosEHidratacion(
 
 @Composable
 fun SeccionInformacion2(
-    onDismiss: () -> Unit // Callback para cerrar la sección
+    onDismiss: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -738,7 +741,7 @@ fun SeccionInformacion2(
 
 @Composable
 fun SeccionRecomendaciones2(
-    onDismiss: () -> Unit // Callback para cerrar la sección
+    onDismiss: () -> Unit
 ) {
     Row(
         modifier = Modifier
