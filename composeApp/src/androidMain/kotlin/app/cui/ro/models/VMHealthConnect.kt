@@ -119,7 +119,6 @@ class VMHealthConnect : ViewModel() {
         }
     }
 
-
     suspend fun readStepsForDate(client: HealthConnectClient, date: ZonedDateTime): Long {
         val startTime = date.toInstant()
         val endTime = date.plusDays(1).toInstant()

@@ -1,4 +1,4 @@
-rootProject.name = "AppSSTest"
+rootProject.name = "CuiRo"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
