@@ -10,11 +10,15 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
@@ -33,102 +37,119 @@ class VMHealthConnect : ViewModel() {
 
     fun checkHealthConnectAvailability(context: Context) {
         viewModelScope.launch {
-            _healthConnectAvailability.value = HealthConnectAvailability.NOT_CHECKED // Reset
-            val providerPackageName = "com.google.android.apps.healthdata"
             try {
-                val availabilityStatus = HealthConnectClient.getSdkStatus(context, providerPackageName)
-
-                when (availabilityStatus) {
-                    HealthConnectClient.SDK_UNAVAILABLE -> {
-                        _healthConnectAvailability.value = HealthConnectAvailability.NOT_INSTALLED
-                    }
-                    HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> {
-                        _healthConnectAvailability.value = HealthConnectAvailability.UPDATE_REQUIRED
-                    }
-                    else -> {
-                        _healthConnectAvailability.value = HealthConnectAvailability.AVAILABLE
-                    }
+                val availabilityStatus = HealthConnectClient.getSdkStatus(context)
+                _healthConnectAvailability.value = when (availabilityStatus) {
+                    HealthConnectClient.SDK_AVAILABLE -> HealthConnectAvailability.AVAILABLE
+                    HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> HealthConnectAvailability.UPDATE_REQUIRED
+                    HealthConnectClient.SDK_UNAVAILABLE -> HealthConnectAvailability.NOT_INSTALLED
+                    else -> HealthConnectAvailability.NOT_INSTALLED // Default a no instalado
+                }
+                // Si está disponible, verifica el estado actual de los permisos
+                if (_healthConnectAvailability.value == HealthConnectAvailability.AVAILABLE) {
+                    updatePermissionsState(context)
+                } else {
+                    _hasHealthConnectPermissions.value = false // No puede tener permisos si no está disponible/instalado
                 }
             } catch (e: Exception) {
-                Log.e("VMHealthConnect", "Error checking Health Connect availability: ${e.message}")
-                _healthConnectAvailability.value = HealthConnectAvailability.NOT_INSTALLED  // or handle differently
+                Log.e("VMHealthConnect", "Error checking HC availability: ${e.message}", e)
+                _healthConnectAvailability.value = HealthConnectAvailability.NOT_INSTALLED
+                _hasHealthConnectPermissions.value = false
             }
         }
     }
 
     fun openHealthConnectSettings(context: Context) {
         val providerPackageName = "com.google.android.apps.healthdata"
-        val uriString = "market://details?id=$providerPackageName&url=healthconnect%3A%2F%2Fonboarding"
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setPackage("com.android.vending")
-            data = Uri.parse(uriString)
-            putExtra("overlay", true)
-            putExtra("callerId", context.packageName)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Añade esta línea
-        }
-
-        try {
+        // Intenta abrir la app directamente primero si está instalada
+        val intent = context.packageManager.getLaunchIntentForPackage(providerPackageName)
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
-        } catch (e: Exception) {
-            Log.e("VMHealthConnect", "Error opening Play Store: ${e.message}")
-            // Handle the error, e.g., show a message to the user
+        } else {
+            // Si no, intenta abrir la Play Store
+            val uriString = "market://details?id=$providerPackageName"
+            val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(uriString)
+                setPackage("com.android.vending") // Especifica la Play Store
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            try {
+                context.startActivity(playStoreIntent)
+            } catch (e: Exception) {
+                Log.e("VMHealthConnect", "Error opening Play Store or Health Connect: ${e.message}")
+                // Opcional: Mostrar un mensaje al usuario indicando que no se pudo abrir
+            }
         }
     }
 
-
     fun requestPermissions(
         context: Context,
-        requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+        requestPermissionLauncher: ActivityResultLauncher<Set<String>> // Cambiado a Set<String>
     ) {
         viewModelScope.launch {
-            // Solo solicita permisos si Health Connect está disponible
-            if (healthConnectAvailability.value == HealthConnectAvailability.AVAILABLE) {
-                try {
+            try {
+                if (HealthConnectClient.getSdkStatus(context) == HealthConnectClient.SDK_AVAILABLE) {
                     val healthConnectClient = HealthConnectClient.getOrCreate(context)
                     val granted = healthConnectClient.permissionController.getGrantedPermissions()
-                    _hasHealthConnectPermissions.value = granted.containsAll(PERMISSIONS)
 
-                    if (!_hasHealthConnectPermissions.value) {
-                        requestPermissionLauncher.launch(PERMISSIONS.toTypedArray())
+                    // Solicitar solo si los permisos necesarios NO están ya concedidos
+                    if (!granted.containsAll(PERMISSIONS)) {
+                        withContext(Dispatchers.Main) {
+                            requestPermissionLauncher.launch(PERMISSIONS) // Lanza con el Set
+                        }
+                    } else {
+                        // Si ya estaban concedidos (quizás por una comprobación anterior), actualiza el estado
+                        _hasHealthConnectPermissions.value = true
                     }
-                } catch (e: Exception) {
-                    Log.e("VMHealthConnect", "Error getting HealthConnectClient or requesting permissions: ${e.message}")
-                    _hasHealthConnectPermissions.value = false //  En caso de error, establece que no hay permisos.
                 }
-            } else {
-                _hasHealthConnectPermissions.value = false
+            } catch (e: Exception) {
+                Log.e("VMHealthConnect", "Error requesting permissions: ${e.message}", e)
+                // No reintenta automáticamente, el usuario puede volver a intentarlo desde la UI
             }
         }
     }
 
     fun updatePermissionsState(context: Context) {
+        // Solo intenta actualizar si sabemos que HC está disponible
+        if (healthConnectAvailability.value != HealthConnectAvailability.AVAILABLE) {
+            _hasHealthConnectPermissions.value = false
+            return
+        }
+
         viewModelScope.launch {
-            // Solo actualiza el estado si Health Connect está disponible
-            if (healthConnectAvailability.value == HealthConnectAvailability.AVAILABLE) {
-                try {
+            try {
+                // Volver a verificar la disponibilidad por si acaso cambió
+                if (HealthConnectClient.getSdkStatus(context) == HealthConnectClient.SDK_AVAILABLE) {
                     val healthConnectClient = HealthConnectClient.getOrCreate(context)
                     val granted = healthConnectClient.permissionController.getGrantedPermissions()
                     _hasHealthConnectPermissions.value = granted.containsAll(PERMISSIONS)
-                } catch (e: Exception) {
-                    Log.e("VMHealthConnect", "Error getting HealthConnectClient or updating permissions: ${e.message}")
-                    _hasHealthConnectPermissions.value = false // En caso de error, establece que no hay permisos.
+                } else {
+                    // Si ya no está disponible, no hay permisos
+                    _hasHealthConnectPermissions.value = false
+                    // Opcional: Podrías querer actualizar también _healthConnectAvailability aquí
                 }
-            } else {
-                _hasHealthConnectPermissions.value = false
+            } catch (e: Exception) {
+                Log.e("VMHealthConnect", "Error updating permissions state: ${e.message}")
+                _hasHealthConnectPermissions.value = false // Asume que no hay permisos si hay error
             }
         }
     }
 
     suspend fun readStepsForDate(client: HealthConnectClient, date: ZonedDateTime): Long {
-        val startTime = date.toInstant()
-        val endTime = date.plusDays(1).toInstant()
-        val response = client.readRecords(
-            androidx.health.connect.client.request.ReadRecordsRequest(
+        return try {
+            val startTime = date.truncatedTo(ChronoUnit.DAYS).toInstant() // Inicio del día
+            val endTime = startTime.plus(1, ChronoUnit.DAYS) // Fin del día
+            val request = androidx.health.connect.client.request.ReadRecordsRequest(
                 recordType = StepsRecord::class,
-                timeRangeFilter = androidx.health.connect.client.time.TimeRangeFilter.between(startTime, endTime)
+                timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
             )
-        )
-        return response.records.sumOf { it.count }
+            val response = client.readRecords(request)
+            response.records.sumOf { it.count }
+        } catch (e: Exception) {
+            Log.e("VMHealthConnect", "Error reading steps: ${e.message}", e)
+            0L // Retorna 0 si hay error (ej. permisos revocados entre chequeo y lectura)
+        }
     }
 
     enum class HealthConnectAvailability {

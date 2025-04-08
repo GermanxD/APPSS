@@ -1,7 +1,6 @@
 package app.cui.ro.ui.screens
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.Settings
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -33,7 +33,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -53,7 +52,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -72,8 +70,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.VMHealthConnect
@@ -87,13 +85,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @Composable
 fun NavBarScreenHome(
     authService: AuthService,
-    vmHealthConnect: VMHealthConnect
+    vmHealthConnect: VMHealthConnect = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val userId = remember { authService.getUserId() }
     var userFullNameDB by remember { mutableStateOf("Usuario") }
@@ -102,35 +99,30 @@ fun NavBarScreenHome(
     var showSeccionRecomendaciones2 by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
-    var hasHealthConnectPermissions by remember { mutableStateOf(false) }
     var showPermissionExplanationDialog by remember { mutableStateOf(false) }
 
-    // Inicializar el launcher
+    // Launcher para solicitar permisos de Health Connect (usa Set<String>)
     val requestPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
+        contract = PermissionController.createRequestPermissionResultContract()
+    ) { grantedPermissions ->
+        // Después de que el usuario responde, actualizamos el estado en el ViewModel
+        vmHealthConnect.updatePermissionsState(context)
 
-        val allPermissionsGranted = permissions.all { it.value }
-        hasHealthConnectPermissions = allPermissionsGranted
+        // Comprobar si *todos* los permisos necesarios fueron concedidos
+        val allRequiredPermissionsGranted =
+            vmHealthConnect.PERMISSIONS.all { it in grantedPermissions }
 
-        if (!allPermissionsGranted) {
-            // Verificar si el usuario ha denegado permanentemente los permisos
-            val allPermissionsPreviouslyGranted = vmHealthConnect.PERMISSIONS.all { permission ->
-                ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-            }
-
-            if (!allPermissionsPreviouslyGranted) {
-                showPermissionExplanationDialog = true
-            }
+        if (!allRequiredPermissionsGranted) {
+            showPermissionExplanationDialog = true
         }
     }
 
-    LaunchedEffect(context) {
+    // Efecto inicial para comprobar disponibilidad y estado de permisos al entrar
+    LaunchedEffect(Unit) {
         vmHealthConnect.checkHealthConnectAvailability(context)
-        vmHealthConnect.requestPermissions(context, requestPermissionLauncher)
-
     }
 
+    // Efecto para cargar datos del usuario
     LaunchedEffect(userId) {
         if (userId != null) {
             authService.getAllData(userId) { userFullName, username ->
@@ -255,31 +247,49 @@ fun NavBarScreenHome(
                 // Lógica del diálogo de permisos (no afecta el layout visible)
                 if (showPermissionExplanationDialog) {
                     AlertDialog(
-                        modifier = Modifier.clip(RoundedCornerShape(10)),
+                        modifier = Modifier.clip(RoundedCornerShape(10.dp)), // Asegúrate que RoundedCornerShape recibe Dp
                         onDismissRequest = { showPermissionExplanationDialog = false },
                         title = { Text("Permisos Requeridos") },
                         text = { Text("Para acceder a tus datos de pasos, necesitamos permisos de Health Connect. Por favor, habilítalos en la configuración de la aplicación.") },
                         buttons = {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Button(
                                     onClick = {
-                                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                            data = Uri.fromParts("package", context.packageName, null)
+                                        // Intenta abrir los ajustes de la app
+                                        val intent =
+                                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                                data = Uri.fromParts(
+                                                    "package",
+                                                    context.packageName,
+                                                    null
+                                                )
+                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            }
+                                        try {
+                                            context.startActivity(intent)
+                                        } catch (e: Exception) {
+                                            Log.e(
+                                                "NavBarScreenHome",
+                                                "Could not open app settings",
+                                                e
+                                            )
+                                            // Fallback o mensaje al usuario
                                         }
-                                        ContextCompat.startActivity(context, intent, null)
                                         showPermissionExplanationDialog = false
                                     },
-                                    colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink)
+                                    // colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
                                 ) {
                                     Text("Ir a Configuración")
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Button(
                                     onClick = { showPermissionExplanationDialog = false },
-                                    colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink)
+                                    //colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
                                 ) {
                                     Text("Cancelar")
                                 }
@@ -289,12 +299,12 @@ fun NavBarScreenHome(
                 }
             }
 
+            // Sección Registro Diario (Pasos y Medicamentos)
             SeccionRegistroDiario(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.3f),
                 authService = authService,
-                hasPermissions = hasHealthConnectPermissions,
                 requestPermissionLauncher = requestPermissionLauncher,
                 vmHealthConnect = vmHealthConnect
             )
@@ -316,8 +326,7 @@ fun NavBarScreenHome(
 fun SeccionRegistroDiario(
     modifier: Modifier = Modifier,
     authService: AuthService,
-    hasPermissions: Boolean,
-    requestPermissionLauncher: ActivityResultLauncher<Array<String>>,
+    requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
     vmHealthConnect: VMHealthConnect
 ) {
     val userId = remember { authService.getUserId() }
@@ -355,7 +364,6 @@ fun SeccionRegistroDiario(
 
         SeccionPasosEHidratacion(
             userFirstName = userFirstName,
-            hasPermissions = hasPermissions,
             requestPermissionLauncher = requestPermissionLauncher,
             vmHealthConnect = vmHealthConnect,
             modifier = Modifier
@@ -567,11 +575,11 @@ fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
 @Composable
 fun SeccionPasosEHidratacion(
     userFirstName: String,
-    hasPermissions: Boolean,
     modifier: Modifier = Modifier,
-    requestPermissionLauncher: ActivityResultLauncher<Array<String>>,
+    requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
     vmHealthConnect: VMHealthConnect
 ) {
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.Start
@@ -599,30 +607,19 @@ fun SeccionPasosEHidratacion(
                 )
             }
 
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            )
-            {
-                Column(
-                    modifier = Modifier
-                        .weight(0.7f)
-                        .padding(vertical = 10.dp)
-                ) {
-                    if (hasPermissions && vmHealthConnect.healthConnectAvailability.collectAsState().value == VMHealthConnect.HealthConnectAvailability.AVAILABLE) {
-                        MedicionPasos(
-                            authService = AuthService(),
-                            requestPermissionLauncher = requestPermissionLauncher,
-                            vmHealthConnect = vmHealthConnect
-                        )
-                    } else {
-                        Text(
-                            "Es necesario conceder permisos para ver este apartado",
-                            fontSize = 12.sp,
-                            color = Color.Black,
-                        )
-                    }
-                }
+            // Contenedor para MedicionPasos y lógica relacionada
+            Box( // Usar Box permite centrar o alinear contenido más fácilmente si es necesario
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.CenterStart // O el que prefieras
+            ) {
+                // El Composable MedicionPasos ahora maneja toda la lógica de UI de HC
+                MedicionPasos(
+                    userFirstName = userFirstName,
+                    requestPermissionLauncher = requestPermissionLauncher,
+                    vmHealthConnect = vmHealthConnect
+                )
             }
         }
 
@@ -633,7 +630,7 @@ fun SeccionPasosEHidratacion(
                 .height(1.dp)
         )
 
-        // Sección de Hidratación
+        // Sección de Hidratación (se mantiene igual)
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -799,91 +796,147 @@ fun SeccionRecomendaciones2(
 
 @Composable
 fun MedicionPasos(
-    authService: AuthService,
-    requestPermissionLauncher: ActivityResultLauncher<Array<String>>,
-    vmHealthConnect: VMHealthConnect = androidx.lifecycle.viewmodel.compose.viewModel()
+    userFirstName: String, // Recibe el nombre si lo necesita para los textos
+    requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
+    vmHealthConnect: VMHealthConnect // Recibe el ViewModel directamente
 ) {
     val context = LocalContext.current
-    val userId = remember { authService.getUserId() }
-    var userFirstName by remember { mutableStateOf("Usuario") }
-    var stepsCount by remember { mutableIntStateOf(0) }
+    var stepsCount by remember { mutableStateOf<Long?>(null) } // Usar Long? para estado inicial nulo
     val healthConnectAvailability by vmHealthConnect.healthConnectAvailability.collectAsState()
-    val hasHealthConnectPermissions by vmHealthConnect.hasHealthConnectPermissions.collectAsState()
+    val hasPermissions by vmHealthConnect.hasHealthConnectPermissions.collectAsState()
+    var showInstallDialog by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) } // Para mostrar un indicador de carga
 
-    LaunchedEffect(healthConnectAvailability) {
-        if (healthConnectAvailability == VMHealthConnect.HealthConnectAvailability.AVAILABLE) {
-            vmHealthConnect.requestPermissions(
-                context,
-                requestPermissionLauncher
-            )
-        }
-    }
-
-    LaunchedEffect(hasHealthConnectPermissions) {
-        if (hasHealthConnectPermissions && healthConnectAvailability == VMHealthConnect.HealthConnectAvailability.AVAILABLE) {
-            try {
-                val healthClient = HealthConnectClient.getOrCreate(context)
-                val today = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
-                val steps = vmHealthConnect.readStepsForDate(healthClient, today)
-                stepsCount = steps.toInt()
-            } catch (e: SecurityException) {
-                Log.e("MedicionPasos", "Security exception: ${e.message}")
-                stepsCount = 0
-            } catch (e: IllegalStateException) {
-                Log.e("MedicionPasos", "Service not available: ${e.message}")
-                stepsCount = 0
-            }
-        }
-    }
-
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            authService.getUserFirstName(userId) { name ->
-                if (name != null) {
-                    userFirstName = name
+    // Diálogo para instalar/actualizar Health Connect
+    if (showInstallDialog) {
+        AlertDialog(
+            onDismissRequest = { showInstallDialog = false },
+            title = { Text("Health Connect Requerido") },
+            text = { Text("Para medir tus pasos necesitas instalar o actualizar Health Connect. ¿Quieres ir a la tienda?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showInstallDialog = false
+                        vmHealthConnect.openHealthConnectSettings(context)
+                    },
+                    // colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
+                ) {
+                    Text("Ir a Tienda")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showInstallDialog = false },
+                    // colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
+                ) {
+                    Text("Cancelar")
                 }
             }
+        )
+    }
+
+    // Efecto para leer los pasos cuando los permisos están concedidos y HC está disponible
+    LaunchedEffect(hasPermissions, healthConnectAvailability) {
+        if (hasPermissions && healthConnectAvailability == VMHealthConnect.HealthConnectAvailability.AVAILABLE) {
+            isLoading = true
+            try {
+                val healthClient = HealthConnectClient.getOrCreate(context)
+                val today = ZonedDateTime.now()
+                stepsCount = vmHealthConnect.readStepsForDate(healthClient, today)
+            } catch (e: Exception) {
+                Log.e("MedicionPasos", "Failed to get HealthConnectClient or read steps", e)
+                stepsCount = null // O manejar el error de otra forma
+            } finally {
+                isLoading = false
+            }
+        } else {
+            // Si cambian los permisos o disponibilidad y ya no se cumplen, resetea los pasos
+            stepsCount = null
+            isLoading = false
         }
     }
 
+    // --- Lógica de UI basada en estados ---
     when (healthConnectAvailability) {
         VMHealthConnect.HealthConnectAvailability.NOT_CHECKED -> {
-            Text("Checking Health Connect availability...", color = Color.Black, fontSize = 12.sp)
+            Text("Verificando Health Connect...", color = Color.Gray, fontSize = 12.sp)
         }
 
         VMHealthConnect.HealthConnectAvailability.NOT_INSTALLED -> {
-            Text(
-                text = "Health Connect is not installed. Please install it to view your steps.",
-                color = Color.Black,
-                fontSize = 12.sp
-            )
+            Column(horizontalAlignment = Alignment.Start) {
+                Text(
+                    text = "Instala Health Connect para ver tus pasos.",
+                    color = Color.Black,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Button(
+                    onClick = { vmHealthConnect.openHealthConnectSettings(context) }, // Intenta abrir directamente
+                    // colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink), // Tu color
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text("Instalar", fontSize = 12.sp)
+                }
+            }
         }
 
         VMHealthConnect.HealthConnectAvailability.UPDATE_REQUIRED -> {
-            Text(
-                text = "Health Connect requires an update. Please update it to view your steps.",
-                color = Color.Black,
-                fontSize = 12.sp
-            )
+            Column(horizontalAlignment = Alignment.Start) {
+                Text(
+                    text = "Health Connect necesita actualizarse.",
+                    color = Color.Black,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Button(
+                    onClick = { vmHealthConnect.openHealthConnectSettings(context) },
+                    // colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink), // Tu color
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text("Actualizar", fontSize = 12.sp)
+                }
+            }
         }
 
         VMHealthConnect.HealthConnectAvailability.AVAILABLE -> {
-            if (hasHealthConnectPermissions) {
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            } else if (hasPermissions) {
+                // Permisos concedidos -> Mostrar pasos
+                val stepsText = stepsCount?.let { count ->
+                    "$userFirstName, hoy has dado $count pasos. ¡Sigue así!"
+                }
+                    ?: "$userFirstName, no pudimos leer tus pasos hoy." // Mensaje si stepsCount es null
                 Text(
-                    "$userFirstName, hoy has dado $stepsCount pasos. ¡Ánimo, tú puedes dar algunos más!",
+                    text = stepsText,
                     fontSize = 12.sp,
                     color = Color.Black,
                 )
             } else {
-                Text(
-                    text = "Please grant Health Connect permissions to view your steps.",
-                    color = Color.Black,
-                    fontSize = 12.sp
-                )
+                // Disponible pero sin permisos -> Mostrar botón para solicitarlos
+                Column(horizontalAlignment = Alignment.Start) {
+                    Text(
+                        text = "Concede permisos para ver tus pasos.",
+                        color = Color.Black,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                    Button(
+                        onClick = {
+                            // Llamar a la función del ViewModel para iniciar la solicitud
+                            vmHealthConnect.requestPermissions(context, requestPermissionLauncher)
+                        },
+                        // colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink), // Tu color
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text("Conceder Permiso", fontSize = 12.sp)
+                    }
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun ProfileScreen(
@@ -1048,4 +1101,5 @@ fun ProfileScreen(
         }
     }
 }
+
 
