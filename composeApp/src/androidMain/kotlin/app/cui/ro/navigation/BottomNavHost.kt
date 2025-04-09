@@ -1,7 +1,6 @@
 package app.cui.ro.navigation
 
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -38,7 +38,7 @@ import app.cui.ro.ui.theme.CuiroColors
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun NavBarScreenStart(context: Context) {
+fun NavBarScreenStart() {
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -46,25 +46,27 @@ fun NavBarScreenStart(context: Context) {
             BottomNavigationBar(navController = bottomNavController)
         },
         content = { paddingValues ->
-            // Aplicar el paddingValues al contenido para evitar superposiciones
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues) // Asegura que el contenido no se superponga con el BottomNavigationBar
+                    .padding(paddingValues)
             ) {
-                BottomNavHost(navController = bottomNavController, context = context)
+                BottomNavHost(navController = bottomNavController)
             }
         }
     )
 }
 
 @Composable
-fun BottomNavHost(navController: NavHostController, context: Context) {
+fun BottomNavHost(navController: NavHostController) {
     NavHost(navController, startDestination = "home_route") {
-        composable("home_route") { NavBarScreenHome(
-            authService = AuthService(),
-            vmHealthConnect = VMHealthConnect()
-        ) }
+        composable("home_route") {
+            val vmHealthConnect: VMHealthConnect = viewModel()
+            NavBarScreenHome(
+                authService = AuthService(),
+                vmHealthConnect = vmHealthConnect
+            )
+        }
         composable("profile_route") { NavBarScreenProfile() }
         composable("contacts_route") { NavBarScreenContact() }
         composable("foro_route") { NavBarScreenForo() }

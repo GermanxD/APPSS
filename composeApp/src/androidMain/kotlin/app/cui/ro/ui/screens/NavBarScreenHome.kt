@@ -145,8 +145,8 @@ fun NavBarScreenHome(
 
         Column(
             modifier = Modifier
-                .fillMaxWidth() // Ocupa todo el ancho
-                .weight(1f) // Ocupa todo el espacio vertical restante bajo el TopAppBar
+                .fillMaxWidth()
+                .weight(1f)
         ) {
 
             Column(
@@ -278,18 +278,16 @@ fun NavBarScreenHome(
                                                 "Could not open app settings",
                                                 e
                                             )
-                                            // Fallback o mensaje al usuario
+
                                         }
                                         showPermissionExplanationDialog = false
                                     },
-                                    // colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
                                 ) {
                                     Text("Ir a Configuración")
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Button(
                                     onClick = { showPermissionExplanationDialog = false },
-                                    //colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
                                 ) {
                                     Text("Cancelar")
                                 }
@@ -394,7 +392,7 @@ fun SeccionInformacion(
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { onVerMasClick() } // Manejar el clic en "Ver más"
+            modifier = Modifier.clickable { onVerMasClick() }
         ) {
             Text(
                 text = "Ver más...",
@@ -413,12 +411,11 @@ fun SeccionInformacion(
         }
     }
 
-    // Modified section to prevent text from pushing images up.
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         DataColumn(
             imageResId = R.drawable.ic_datos_clinicos,
@@ -454,7 +451,7 @@ fun SeccionRecomendaciones(
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { onVerMasClick() } // Manejar el clic en "Ver más"
+            modifier = Modifier.clickable { onVerMasClick() }
         ) {
             Text(
                 text = "Ver más...",
@@ -463,7 +460,7 @@ fun SeccionRecomendaciones(
                 fontSize = 14.sp,
                 color = Color.Gray,
             )
-            Spacer(modifier = Modifier.width(4.dp)) // Añade un pequeño espacio entre el texto y la imagen
+            Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 painter = painterResource(R.drawable.ic_arrow_right),
                 contentDescription = "",
@@ -477,7 +474,7 @@ fun SeccionRecomendaciones(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         DataColumn(
             imageResId = R.drawable.ic_informacion,
@@ -608,7 +605,7 @@ fun SeccionPasosEHidratacion(
             }
 
             // Contenedor para MedicionPasos y lógica relacionada
-            Box( // Usar Box permite centrar o alinear contenido más fácilmente si es necesario
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 10.dp),
@@ -630,7 +627,7 @@ fun SeccionPasosEHidratacion(
                 .height(1.dp)
         )
 
-        // Sección de Hidratación (se mantiene igual)
+        // Sección de Hidratación
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -719,7 +716,7 @@ fun SeccionInformacion2(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         DataColumn(
             imageResId = R.drawable.ic_hidratacion,
@@ -781,7 +778,7 @@ fun SeccionRecomendaciones2(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround // This is crucial!
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         DataColumn(
             imageResId = R.drawable.ic_ejercicio_fisico,
@@ -796,18 +793,21 @@ fun SeccionRecomendaciones2(
 
 @Composable
 fun MedicionPasos(
-    userFirstName: String, // Recibe el nombre si lo necesita para los textos
+    userFirstName: String,
     requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
-    vmHealthConnect: VMHealthConnect // Recibe el ViewModel directamente
+    vmHealthConnect: VMHealthConnect
 ) {
     val context = LocalContext.current
-    var stepsCount by remember { mutableStateOf<Long?>(null) } // Usar Long? para estado inicial nulo
+    var stepsCount by remember { mutableStateOf<Long?>(null) }
     val healthConnectAvailability by vmHealthConnect.healthConnectAvailability.collectAsState()
     val hasPermissions by vmHealthConnect.hasHealthConnectPermissions.collectAsState()
     var showInstallDialog by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) } // Para mostrar un indicador de carga
+    var isLoading by remember { mutableStateOf(false) }
 
-    // Diálogo para instalar/actualizar Health Connect
+    LaunchedEffect(Unit) {
+        vmHealthConnect.checkHealthConnectAvailability(context)
+    }
+
     if (showInstallDialog) {
         AlertDialog(
             onDismissRequest = { showInstallDialog = false },
@@ -819,7 +819,6 @@ fun MedicionPasos(
                         showInstallDialog = false
                         vmHealthConnect.openHealthConnectSettings(context)
                     },
-                    // colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
                 ) {
                     Text("Ir a Tienda")
                 }
@@ -827,7 +826,6 @@ fun MedicionPasos(
             dismissButton = {
                 Button(
                     onClick = { showInstallDialog = false },
-                    // colors = ButtonDefaults.buttonColors(CuiroColors.ObjectsPink) // Tu color
                 ) {
                     Text("Cancelar")
                 }
@@ -845,7 +843,7 @@ fun MedicionPasos(
                 stepsCount = vmHealthConnect.readStepsForDate(healthClient, today)
             } catch (e: Exception) {
                 Log.e("MedicionPasos", "Failed to get HealthConnectClient or read steps", e)
-                stepsCount = null // O manejar el error de otra forma
+                stepsCount = null
             } finally {
                 isLoading = false
             }
@@ -856,7 +854,6 @@ fun MedicionPasos(
         }
     }
 
-    // --- Lógica de UI basada en estados ---
     when (healthConnectAvailability) {
         VMHealthConnect.HealthConnectAvailability.NOT_CHECKED -> {
             Text("Verificando Health Connect...", color = Color.Gray, fontSize = 12.sp)
@@ -871,8 +868,7 @@ fun MedicionPasos(
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Button(
-                    onClick = { vmHealthConnect.openHealthConnectSettings(context) }, // Intenta abrir directamente
-                    // colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink), // Tu color
+                    onClick = { vmHealthConnect.openHealthConnectSettings(context) },
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text("Instalar", fontSize = 12.sp)
@@ -890,7 +886,6 @@ fun MedicionPasos(
                 )
                 Button(
                     onClick = { vmHealthConnect.openHealthConnectSettings(context) },
-                    // colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink), // Tu color
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text("Actualizar", fontSize = 12.sp)
@@ -906,7 +901,7 @@ fun MedicionPasos(
                 val stepsText = stepsCount?.let { count ->
                     "$userFirstName, hoy has dado $count pasos. ¡Sigue así!"
                 }
-                    ?: "$userFirstName, no pudimos leer tus pasos hoy." // Mensaje si stepsCount es null
+                    ?: "$userFirstName, no pudimos leer tus pasos hoy."
                 Text(
                     text = stepsText,
                     fontSize = 12.sp,
@@ -926,7 +921,6 @@ fun MedicionPasos(
                             // Llamar a la función del ViewModel para iniciar la solicitud
                             vmHealthConnect.requestPermissions(context, requestPermissionLauncher)
                         },
-                        // colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink), // Tu color
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text("Conceder Permiso", fontSize = 12.sp)
@@ -936,7 +930,6 @@ fun MedicionPasos(
         }
     }
 }
-
 
 @Composable
 fun ProfileScreen(
@@ -967,7 +960,7 @@ fun ProfileScreen(
         uri?.let { selectedUri ->
             imageUri = selectedUri
             val fileSizeInBytes = vmProfileImage.getFileSize(selectedUri, context)
-            val maxFileSizeInBytes = 3000 * 1024 // 1MB
+            val maxFileSizeInBytes = 3000 * 1024
 
             if (fileSizeInBytes > maxFileSizeInBytes) {
                 uploadState = VMProfileImage.ImageUploadState.SIZE_EXCEEDED

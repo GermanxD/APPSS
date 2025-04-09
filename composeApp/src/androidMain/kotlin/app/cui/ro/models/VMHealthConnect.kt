@@ -30,7 +30,6 @@ class VMHealthConnect : ViewModel() {
     private val _hasHealthConnectPermissions = MutableStateFlow(false)
     val hasHealthConnectPermissions: StateFlow<Boolean> = _hasHealthConnectPermissions
 
-    // Lista de permisos requeridos
     val PERMISSIONS = setOf(
         HealthPermission.getReadPermission(StepsRecord::class),
     )
@@ -43,13 +42,13 @@ class VMHealthConnect : ViewModel() {
                     HealthConnectClient.SDK_AVAILABLE -> HealthConnectAvailability.AVAILABLE
                     HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> HealthConnectAvailability.UPDATE_REQUIRED
                     HealthConnectClient.SDK_UNAVAILABLE -> HealthConnectAvailability.NOT_INSTALLED
-                    else -> HealthConnectAvailability.NOT_INSTALLED // Default a no instalado
+                    else -> HealthConnectAvailability.NOT_INSTALLED
                 }
                 // Si está disponible, verifica el estado actual de los permisos
                 if (_healthConnectAvailability.value == HealthConnectAvailability.AVAILABLE) {
                     updatePermissionsState(context)
                 } else {
-                    _hasHealthConnectPermissions.value = false // No puede tener permisos si no está disponible/instalado
+                    _hasHealthConnectPermissions.value = false
                 }
             } catch (e: Exception) {
                 Log.e("VMHealthConnect", "Error checking HC availability: ${e.message}", e)
@@ -71,14 +70,13 @@ class VMHealthConnect : ViewModel() {
             val uriString = "market://details?id=$providerPackageName"
             val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(uriString)
-                setPackage("com.android.vending") // Especifica la Play Store
+                setPackage("com.android.vending")
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             try {
                 context.startActivity(playStoreIntent)
             } catch (e: Exception) {
                 Log.e("VMHealthConnect", "Error opening Play Store or Health Connect: ${e.message}")
-                // Opcional: Mostrar un mensaje al usuario indicando que no se pudo abrir
             }
         }
     }
@@ -96,7 +94,7 @@ class VMHealthConnect : ViewModel() {
                     // Solicitar solo si los permisos necesarios NO están ya concedidos
                     if (!granted.containsAll(PERMISSIONS)) {
                         withContext(Dispatchers.Main) {
-                            requestPermissionLauncher.launch(PERMISSIONS) // Lanza con el Set
+                            requestPermissionLauncher.launch(PERMISSIONS)
                         }
                     } else {
                         // Si ya estaban concedidos (quizás por una comprobación anterior), actualiza el estado
@@ -105,7 +103,6 @@ class VMHealthConnect : ViewModel() {
                 }
             } catch (e: Exception) {
                 Log.e("VMHealthConnect", "Error requesting permissions: ${e.message}", e)
-                // No reintenta automáticamente, el usuario puede volver a intentarlo desde la UI
             }
         }
     }
@@ -127,11 +124,10 @@ class VMHealthConnect : ViewModel() {
                 } else {
                     // Si ya no está disponible, no hay permisos
                     _hasHealthConnectPermissions.value = false
-                    // Opcional: Podrías querer actualizar también _healthConnectAvailability aquí
                 }
             } catch (e: Exception) {
                 Log.e("VMHealthConnect", "Error updating permissions state: ${e.message}")
-                _hasHealthConnectPermissions.value = false // Asume que no hay permisos si hay error
+                _hasHealthConnectPermissions.value = false
             }
         }
     }
@@ -148,7 +144,7 @@ class VMHealthConnect : ViewModel() {
             response.records.sumOf { it.count }
         } catch (e: Exception) {
             Log.e("VMHealthConnect", "Error reading steps: ${e.message}", e)
-            0L // Retorna 0 si hay error (ej. permisos revocados entre chequeo y lectura)
+            0L
         }
     }
 

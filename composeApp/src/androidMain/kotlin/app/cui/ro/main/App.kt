@@ -50,9 +50,7 @@ fun App(
             )
         }
         composable(Screen.Home.route) {
-            NavBarScreenStart(
-                context = context
-            )
+            NavBarScreenStart()
         }
     }
 }
