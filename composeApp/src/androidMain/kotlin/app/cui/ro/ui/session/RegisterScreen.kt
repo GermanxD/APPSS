@@ -80,7 +80,6 @@ fun RegisterScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Fondo rosa con el logo y el botón de retroceso
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -111,7 +110,6 @@ fun RegisterScreen(
             )
         }
 
-        // Contenedor blanco con scroll
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -203,6 +201,7 @@ fun RegisterScreen(
                         viewModel.onEvent(RegisterEvent.GenderChanged("Femenino"))
                     }
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 CustomTextField(
@@ -213,6 +212,7 @@ fun RegisterScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 CustomTextField(
@@ -241,6 +241,7 @@ fun RegisterScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (state.errorMessage != null) {

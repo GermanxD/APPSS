@@ -164,7 +164,7 @@ fun CustomTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     trailingIcon: @Composable (() -> Unit)? = null,
-    maxLength: Int? = null // Nuevo parámetro para definir el límite de caracteres.
+    maxLength: Int? = null
 ) {
     Column(modifier = modifier) {
         TextField(
@@ -177,11 +177,11 @@ fun CustomTextField(
             label = { Text(label) },
             shape = RoundedCornerShape(12.dp),
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = app.cui.ro.ui.theme.CuiroColors.PinkFields,
+                backgroundColor = CuiroColors.PinkFields,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
-                focusedLabelColor = app.cui.ro.ui.theme.CuiroColors.FontBrown,
+                cursorColor = CuiroColors.FontBrown,
+                focusedLabelColor = CuiroColors.FontBrown,
             ),
             readOnly = readOnly,
             visualTransformation = visualTransformation,
