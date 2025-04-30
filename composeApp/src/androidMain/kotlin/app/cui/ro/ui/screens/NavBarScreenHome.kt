@@ -9,6 +9,12 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -664,6 +670,7 @@ fun SeccionPasos(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SeccionHidratacion(
     userFirstName: String,
@@ -701,14 +708,35 @@ fun SeccionHidratacion(
             )
         }
 
-        LinearProgressIndicator(
-            progress = { (cantidadMl / 1800f).coerceIn(0f, 1f) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp),
-            color = Color(0xFF4FC3F7),
-            trackColor = Color(0xFFE0E0E0)
-        )
+        AnimatedContent(
+            targetState = cantidadMl >= 1800,
+            transitionSpec = {
+                fadeIn(tween(500)) with fadeOut(tween(500))
+            },
+            label = "HidratacionContent"
+        ) { completo ->
+            if (completo) {
+                Text(
+                    text = "¡Felicidades!, has completado tu día",
+                    fontSize = 14.sp,
+                    color = Color(0xFF388E3C),
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                LinearProgressIndicator(
+                    progress = { (cantidadMl / 1800f).coerceIn(0f, 1f) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(12.dp),
+                    color = Color(0xFF4FC3F7),
+                    trackColor = Color(0xFFE0E0E0)
+                )
+            }
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
