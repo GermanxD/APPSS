@@ -987,7 +987,10 @@ fun MedicionPasos(
                 )
             } else {
                 // Disponible pero sin permisos -> Mostrar botón para solicitarlos
-                Column(horizontalAlignment = Alignment.Start) {
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.padding(vertical = 20.dp)
+                ) {
                     Text(
                         text = "Concede permisos para ver tus pasos.",
                         color = Color.Black,
@@ -1000,7 +1003,7 @@ fun MedicionPasos(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(30.dp),
+                            .height(40.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = CuiroColors.ObjectsPink,
                             contentColor = CuiroColors.FontBrown
@@ -1008,9 +1011,10 @@ fun MedicionPasos(
                     ) {
                         Text(
                             "Conceder Permiso",
-                            fontSize = 14.sp,
+                            fontSize = 12.sp,
                             color = CuiroColors.FontBrown,
-                            fontFamily = FontFamily.Default
+                            fontFamily = FontFamily.Default,
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
