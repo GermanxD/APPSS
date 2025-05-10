@@ -112,28 +112,21 @@ fun NavBarScreenHome(
     val context = LocalContext.current
     var showPermissionExplanationDialog by remember { mutableStateOf(false) }
 
-    // Launcher para solicitar permisos de Health Connect (usa Set<String>)
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = PermissionController.createRequestPermissionResultContract()
     ) { grantedPermissions ->
-        // Después de que el usuario responde, actualizamos el estado en el ViewModel
         vmHealthConnect.updatePermissionsState(context)
-
-        // Comprobar si *todos* los permisos necesarios fueron concedidos
         val allRequiredPermissionsGranted =
             vmHealthConnect.PERMISSIONS.all { it in grantedPermissions }
-
         if (!allRequiredPermissionsGranted) {
             showPermissionExplanationDialog = true
         }
     }
 
-    // Efecto inicial para comprobar disponibilidad y estado de permisos al entrar
     LaunchedEffect(Unit) {
         vmHealthConnect.checkHealthConnectAvailability(context)
     }
 
-    // Efecto para cargar datos del usuario
     LaunchedEffect(userId) {
         if (userId != null) {
             authService.getAllData(userId) { userFullName, username ->
@@ -158,13 +151,11 @@ fun NavBarScreenHome(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.7f)
-                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
             ) {
                 Row(
@@ -221,7 +212,6 @@ fun NavBarScreenHome(
                     )
                 }
 
-                // Mostrar RegistroInformacion solo si showSeccionInformacion2 es false
                 if (!showSeccionInformacion2) {
                     SeccionInformacion(
                         onVerMasClick = {
@@ -230,7 +220,6 @@ fun NavBarScreenHome(
                     )
                 }
 
-                // Mostrar SeccionInformacion2 solo si showSeccionInformacion2 es true
                 if (showSeccionInformacion2) {
                     SeccionInformacion2(
                         onDismiss = {
@@ -255,10 +244,9 @@ fun NavBarScreenHome(
                     )
                 }
 
-                // Lógica del diálogo de permisos (no afecta el layout visible)
                 if (showPermissionExplanationDialog) {
                     AlertDialog(
-                        modifier = Modifier.clip(RoundedCornerShape(10.dp)), // Asegúrate que RoundedCornerShape recibe Dp
+                        modifier = Modifier.clip(RoundedCornerShape(10.dp)),
                         onDismissRequest = { showPermissionExplanationDialog = false },
                         title = { Text("Permisos Requeridos") },
                         text = { Text("Para acceder a tus datos de pasos, necesitamos permisos de Health Connect. Por favor, habilítalos en la configuración de la aplicación.") },
@@ -271,7 +259,6 @@ fun NavBarScreenHome(
                             ) {
                                 Button(
                                     onClick = {
-                                        // Intenta abrir los ajustes de la app
                                         val intent =
                                             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                                                 data = Uri.fromParts(
@@ -289,7 +276,6 @@ fun NavBarScreenHome(
                                                 "Could not open app settings",
                                                 e
                                             )
-
                                         }
                                         showPermissionExplanationDialog = false
                                     },
@@ -308,11 +294,10 @@ fun NavBarScreenHome(
                 }
             }
 
-            // Sección Registro Diario (Pasos y Medicamentos)
             SeccionRegistroDiario(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.3f),
+                    .weight(1f),
                 authService = authService,
                 requestPermissionLauncher = requestPermissionLauncher,
                 vmHealthConnect = vmHealthConnect
@@ -354,7 +339,7 @@ fun SeccionRegistroDiario(
     Row(
         modifier = modifier
             .background(color = Color.Black)
-            .height(IntrinsicSize.Min)
+            .fillMaxHeight()
     ) {
         SeccionMedicamentos(
             userFirstName = userFirstName,
