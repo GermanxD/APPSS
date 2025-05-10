@@ -39,6 +39,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -71,6 +72,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -89,7 +91,6 @@ import app.cui.ro.models.VMProfileImage
 import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
 import app.cui.ro.ui.theme.CuiroColors
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -296,8 +297,7 @@ fun NavBarScreenHome(
 
             SeccionRegistroDiario(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .fillMaxWidth(),
                 authService = authService,
                 requestPermissionLauncher = requestPermissionLauncher,
                 vmHealthConnect = vmHealthConnect
@@ -318,14 +318,13 @@ fun NavBarScreenHome(
 
 @Composable
 fun SeccionRegistroDiario(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier, // Ahora solo recibe .fillMaxWidth() desde el padre
     authService: AuthService,
     requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
     vmHealthConnect: VMHealthConnect
 ) {
     val userId = remember { authService.getUserId() }
     var userFirstName by remember { mutableStateOf("Usuario") }
-
     LaunchedEffect(userId) {
         if (userId != null) {
             authService.getUserFirstName(userId) { name ->
@@ -337,32 +336,30 @@ fun SeccionRegistroDiario(
     }
 
     Row(
-        modifier = modifier
+        modifier = modifier // Este modifier ya tiene fillMaxWidth()
             .background(color = Color.Black)
-            .fillMaxHeight()
+            .height(IntrinsicSize.Min) // La Row será tan alta como su hijo más alto.
     ) {
         SeccionMedicamentos(
             userFirstName = userFirstName,
             modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
+                .fillMaxHeight() // Se expandirá a la altura de la Row (IntrinsicSize.Min).
+                .weight(1f)      // Para la distribución del ancho.
                 .background(CuiroColors.SectionsPink)
                 .padding(5.dp)
         )
-
         VerticalDivider(
             color = Color.Black,
             thickness = 1.dp,
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier.fillMaxHeight() // El divisor llenará la altura de la Row.
         )
-
         SeccionPasosEHidratacion(
             userFirstName = userFirstName,
             requestPermissionLauncher = requestPermissionLauncher,
             vmHealthConnect = vmHealthConnect,
             modifier = Modifier
-                .fillMaxHeight()
-                .weight(1f)
+                .fillMaxHeight() // Se expandirá a la altura de la Row.
+                .weight(1f)      // Para la distribución del ancho.
                 .background(CuiroColors.SectionsPink)
                 .padding(5.dp)
         )
@@ -570,10 +567,9 @@ fun SeccionPasosEHidratacion(
     userFirstName: String,
     requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
     vmHealthConnect: VMHealthConnect,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier, // Este modifier incluye .fillMaxHeight() y .weight(1f para ancho)
 ) {
     val context = LocalContext.current
-
     val db = remember {
         Room.databaseBuilder(
             context,
@@ -583,29 +579,25 @@ fun SeccionPasosEHidratacion(
     }
 
     Column(
-        modifier = modifier,
+        modifier = modifier, // Aplica el .fillMaxHeight() y .weight(1f para ancho)
         horizontalAlignment = Alignment.Start
     ) {
-
-        SeccionPasos(
+        SeccionPasos( // Tomará la altura que necesite su contenido.
             userFirstName = userFirstName,
             requestPermissionLauncher = requestPermissionLauncher,
             vmHealthConnect = vmHealthConnect
         )
-
         Divider(
             color = Color.Black,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
         )
-
-        SeccionHidratacion(
+        SeccionHidratacion( // Tomará la altura que necesite su contenido.
             userFirstName = userFirstName,
-            database = db
+            database = db,
+            modifier = Modifier.fillMaxWidth() // Sin weight vertical.
         )
-
-
     }
 }
 
@@ -659,7 +651,8 @@ fun SeccionPasos(
 @Composable
 fun SeccionHidratacion(
     userFirstName: String,
-    database: AppDatabase
+    database: AppDatabase,
+    modifier: Modifier = Modifier
 ) {
     val dao = database.hidratacionDao()
     val scope = rememberCoroutineScope()
@@ -671,7 +664,9 @@ fun SeccionHidratacion(
         cantidadMl = progreso?.cantidadMl ?: 0
     }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -698,7 +693,8 @@ fun SeccionHidratacion(
             transitionSpec = {
                 fadeIn(tween(500)) with fadeOut(tween(500))
             },
-            label = "HidratacionContent"
+            label = "HidratacionContent",
+            modifier = Modifier.padding(vertical = 8.dp) // Padding para el contenido animado
         ) { completo ->
             if (completo) {
                 Text(
@@ -707,8 +703,7 @@ fun SeccionHidratacion(
                     color = Color(0xFF388E3C),
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
             } else {
@@ -724,7 +719,9 @@ fun SeccionHidratacion(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp), // Espacio antes de esta fila
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -732,11 +729,11 @@ fun SeccionHidratacion(
                 text = "$userFirstName, has tomado ${cantidadMl}ml de agua.",
                 fontSize = 12.sp,
                 color = Color.Black,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f) // Para que el texto ocupe el espacio y empuje el botón
             )
             Image(
                 painter = painterResource(R.drawable.ic_add),
-                contentDescription = "",
+                contentDescription = "Añadir agua", // Buena práctica: añadir contentDescription
                 modifier = Modifier
                     .size(30.dp)
                     .clickable {
@@ -999,12 +996,22 @@ fun MedicionPasos(
                     )
                     Button(
                         onClick = {
-                            // Llamar a la función del ViewModel para iniciar la solicitud
                             vmHealthConnect.requestPermissions(context, requestPermissionLauncher)
                         },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = CuiroColors.ObjectsPink,
+                            contentColor = CuiroColors.FontBrown
+                        ),
                     ) {
-                        Text("Conceder Permiso", fontSize = 12.sp)
+                        Text(
+                            "Conceder Permiso",
+                            fontSize = 14.sp,
+                            color = CuiroColors.FontBrown,
+                            fontFamily = FontFamily.Default
+                        )
                     }
                 }
             }
