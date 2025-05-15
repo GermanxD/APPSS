@@ -31,7 +31,7 @@ fun App(
                 onLoginSuccess = {
                     authService.saveLoginState(context, true)
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                        popUpTo(0)
                     }
                 },
                 onRegisterClicked = {
@@ -43,7 +43,7 @@ fun App(
             RegisterScreen(
                 onRegisterSuccess = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Register.route) { inclusive = true }
+                        popUpTo(0)
                     }
                 },
                 onBackClicked = { navController.popBackStack() }
