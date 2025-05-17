@@ -131,12 +131,8 @@ class AuthService {
     }
 
     // Verificar si el usuario está logueado
-    fun isUserLoggedIn(context: Context): Boolean {
-        val sharedPreferences: SharedPreferences =
-            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val isLoggedIn = sharedPreferences.getBoolean(KEY_LOGGED_IN, false) && firebaseAuth.currentUser != null
-        Log.d(TAG, "Usuario logueado: $isLoggedIn")
-        return isLoggedIn
+    fun isUserLoggedIn(): Boolean {
+        return FirebaseAuth.getInstance().currentUser != null
     }
 
     // Cerrar sesión

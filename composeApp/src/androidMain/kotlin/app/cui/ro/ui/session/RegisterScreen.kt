@@ -38,11 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import app.cui.ro.R
 import app.cui.ro.models.RegisterEvent
 import app.cui.ro.models.VMRegister
 import app.cui.ro.ui.CustomTextField
 import app.cui.ro.ui.GenderButton
+import app.cui.ro.ui.theme.CuiroColors
 import java.util.Calendar
 
 @Composable
@@ -57,6 +59,7 @@ fun RegisterScreen(
     val scrollState = rememberScrollState()
     val keyboardController = LocalSoftwareKeyboardController.current
     var selectedGender by remember { mutableStateOf<String?>(null) }
+    val navController = rememberNavController()
 
     val datePickerDialog = remember {
         DatePickerDialog(
@@ -255,20 +258,21 @@ fun RegisterScreen(
                 }
 
                 Button(
-                    onClick = { viewModel.onEvent(RegisterEvent.Register) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp),
+                    onClick = {
+                        viewModel.onEvent(RegisterEvent.Register)
+                    },
+                    enabled = !state.isLoading,
+                    modifier = Modifier.fillMaxWidth().height(45.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = app.cui.ro.ui.theme.CuiroColors.ObjectsPink),
-                    enabled = !state.isLoading
+                    colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink)
                 ) {
                     if (state.isLoading) {
                         CircularProgressIndicator(color = Color.White)
                     } else {
-                        Text("Registrarse",
+                        Text(
+                            text = "Registrarse",
                             fontSize = 16.sp,
-                            color = app.cui.ro.ui.theme.CuiroColors.FontBrown
+                            color = CuiroColors.FontBrown
                         )
                     }
                 }

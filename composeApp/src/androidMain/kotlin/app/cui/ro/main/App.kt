@@ -19,7 +19,7 @@ fun App(
     val navController: NavHostController = rememberNavController()
 
     val authService = AuthService()
-    val startDestination = if (authService.isUserLoggedIn(context)) {
+    val startDestination = if (authService.isUserLoggedIn()) {
         Screen.Home.route
     } else {
         Screen.Login.route
@@ -42,6 +42,7 @@ fun App(
         composable(Screen.Register.route) {
             RegisterScreen(
                 onRegisterSuccess = {
+                    authService.saveLoginState(context, true)
                     navController.navigate(Screen.Home.route) {
                         popUpTo(0)
                     }
