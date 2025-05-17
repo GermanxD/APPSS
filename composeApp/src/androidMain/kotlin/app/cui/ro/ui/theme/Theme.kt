@@ -16,25 +16,11 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = CuiroColors.PrimaryPink,
-    secondary = CuiroColors.SecondaryRose,
-    background = CuiroColors.SectionsPink,
-    surface = CuiroColors.PinkFields,
-    onPrimary = CuiroColors.FontBrown,
-    onSecondary = CuiroColors.FontBrown,
-    onBackground = CuiroColors.FontBrown,
-    onSurface = CuiroColors.FontBrown,
+    background = Color.White,
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = CuiroColors.SecondaryRose,
-    secondary = CuiroColors.PrimaryPink,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onBackground = Color.White,
-    onSurface = Color.White,
+    background = Color.Black,
 )
 
 @Composable
@@ -49,8 +35,8 @@ fun CuiroTheme(
         SideEffect {
             val window = (view.context as Activity).window
 
-            window.statusBarColor = Color.Black.toArgb()
-            window.navigationBarColor = if (useDarkTheme) Color.Black.toArgb() else CuiroColors.PinkFields.toArgb()
+            window.statusBarColor = if (useDarkTheme) Color.Black.toArgb() else Color.White.toArgb()
+            window.navigationBarColor = if (useDarkTheme) Color.Black.toArgb() else Color.White.toArgb()
 
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !useDarkTheme
             WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !useDarkTheme
