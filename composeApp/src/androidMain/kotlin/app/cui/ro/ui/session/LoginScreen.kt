@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.R
-import app.cui.ro.models.LoginViewModel
+import app.cui.ro.models.VMLogin
 import app.cui.ro.ui.theme.CuiroColors
 
 @Composable
@@ -85,7 +85,7 @@ fun keyboardAwarePadding(): Dp {
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onRegisterClicked: () -> Unit,
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: VMLogin = viewModel(),
 ) {
     val state = viewModel.state.collectAsState().value
     var username by remember { mutableStateOf("") }
