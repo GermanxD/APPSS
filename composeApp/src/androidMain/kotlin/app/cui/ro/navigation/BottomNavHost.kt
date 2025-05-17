@@ -38,7 +38,9 @@ import app.cui.ro.ui.theme.CuiroColors
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun NavBarScreenStart() {
+fun NavBarScreenStart(
+    onMenuClick: () -> Unit
+) {
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -51,18 +53,19 @@ fun NavBarScreenStart() {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                BottomNavHost(navController = bottomNavController)
+                BottomNavHost(navController = bottomNavController, onMenuClick)
             }
         }
     )
 }
 
 @Composable
-fun BottomNavHost(navController: NavHostController) {
+fun BottomNavHost(navController: NavHostController, onMenuClick: () -> Unit) {
     NavHost(navController, startDestination = "home_route") {
         composable("home_route") {
             val vmHealthConnect: VMHealthConnect = viewModel()
             NavBarScreenHome(
+                onMenuClick = onMenuClick,
                 authService = AuthService(),
                 vmHealthConnect = vmHealthConnect
             )

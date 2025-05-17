@@ -101,6 +101,7 @@ import java.util.Locale
 
 @Composable
 fun NavBarScreenHome(
+    onMenuClick: () -> Unit,
     authService: AuthService,
     vmHealthConnect: VMHealthConnect = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -143,7 +144,7 @@ fun NavBarScreenHome(
         modifier = Modifier.fillMaxSize()
     ) {
         CustomTopAppBar(
-            onMenuClick = { /* Lógica para el clic del menú */ },
+            onMenuClick = onMenuClick,
             onNotificationsClick = { /* Lógica para el clic de notificaciones */ },
             title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\"",
         )
@@ -280,14 +281,24 @@ fun NavBarScreenHome(
                                         }
                                         showPermissionExplanationDialog = false
                                     },
+                                    colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
                                 ) {
-                                    Text("Ir a Configuración")
+                                    Text(
+                                        "Ir a Configuración",
+                                        fontSize = 16.sp,
+                                        color = CuiroColors.FontBrown,
+                                    )
                                 }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Button(
                                     onClick = { showPermissionExplanationDialog = false },
+                                    colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
                                 ) {
-                                    Text("Cancelar")
+                                    Text(
+                                        "Cancelar",
+                                        fontSize = 16.sp,
+                                        color = CuiroColors.FontBrown
+                                    )
                                 }
                             }
                         }

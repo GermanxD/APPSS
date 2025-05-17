@@ -139,8 +139,9 @@ class AuthService {
     fun logout(context: Context) {
         Log.d(TAG, "Cerrando sesión")
         firebaseAuth.signOut()
+
         val sharedPreferences: SharedPreferences =
             context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        sharedPreferences.edit().remove(KEY_LOGGED_IN).apply()
+        sharedPreferences.edit().clear().apply()
     }
 }
