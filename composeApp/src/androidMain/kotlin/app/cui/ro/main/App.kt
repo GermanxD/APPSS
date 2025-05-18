@@ -21,12 +21,14 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.Screen
@@ -47,6 +50,7 @@ import app.cui.ro.ui.screens.SettingsScreen
 import app.cui.ro.ui.session.LoginScreen
 import app.cui.ro.ui.session.RegisterScreen
 import app.cui.ro.ui.theme.CuiroTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,126 +67,148 @@ fun App(context: Context) {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth(0.6F)
-                        .fillMaxHeight()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(Color(0xFFFCE4EC), Color(0xFFF8BBD0)) // fondo rosa suave
-                            )
-                        )
-                        .padding(vertical = 40.dp, horizontal = 16.dp)
-                ) {
-                    // Encabezado del Drawer
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Perfil",
-                            tint = Color.DarkGray,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = "Bienvenida",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
-                        )
-                    }
+        // Detectar la ruta actual
+        val currentBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = currentBackStackEntry?.destination?.route
 
-                    Divider(color = Color.Gray.copy(alpha = 0.3f))
+        // Determinar si se debe mostrar el drawer
+        val showDrawer = currentRoute != Screen.Login.route && currentRoute != Screen.Register.route
 
-                    // Opción: Inicio
-                    DrawerItem(
-                        icon = Icons.Default.Home,
-                        label = "Inicio"
-                    ) {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(Screen.Home.route)
-                    }
-
-                    // Opción: Cerrar sesión
-                    DrawerItem(
-                        icon = Icons.Default.ExitToApp,
-                        label = "Cerrar sesión"
-                    ) {
-                        authService.logout(context)
-                        scope.launch { drawerState.close() }
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
-
-                    // Opción: Configuraciones
-                    DrawerItem(
-                        icon = Icons.Default.Settings,
-                        label = "Configuraciones"
-                    ) {
-                        scope.launch { drawerState.close() }
-                        navController.navigate(Screen.Settings.route)
-                    }
+        if (showDrawer) {
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    DrawerContent(navController, drawerState, scope, context, authService)
                 }
+            ) {
+                MainScaffold(navController, drawerState, scope, startDestination, context, authService)
             }
+        } else {
+            // Mostrar solo el contenido sin Drawer
+            MainScaffold(navController, drawerState, scope, startDestination, context, authService)
+        }
+    }
+}
+
+@Composable
+fun MainScaffold(
+    navController: NavHostController,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    startDestination: String,
+    context: Context,
+    authService: AuthService
+) {
+    Scaffold(
+        contentWindowInsets = WindowInsets.systemBars
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier.padding(innerPadding)
         ) {
-            Scaffold(
-                contentWindowInsets = WindowInsets.systemBars
-            ) { innerPadding ->
-                Box(
-                    modifier = Modifier.padding(innerPadding)
-                ) {
-                    NavHost(navController = navController, startDestination = startDestination) {
-                        composable(Screen.Login.route) {
-                            LoginScreen(
-                                onLoginSuccess = {
-                                    authService.saveLoginState(context, true)
-                                    navController.navigate(Screen.Home.route) {
-                                        popUpTo(0)
-                                    }
-                                },
-                                onRegisterClicked = {
-                                    navController.navigate(Screen.Register.route)
-                                }
-                            )
+            NavHost(navController = navController, startDestination = startDestination) {
+                composable(Screen.Login.route) {
+                    LoginScreen(
+                        onLoginSuccess = {
+                            authService.saveLoginState(context, true)
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(0)
+                            }
+                        },
+                        onRegisterClicked = {
+                            navController.navigate(Screen.Register.route)
                         }
-                        composable(Screen.Register.route) {
-                            RegisterScreen(
-                                onRegisterSuccess = {
-                                    authService.saveLoginState(context, true)
-                                    navController.navigate(Screen.Home.route) {
-                                        popUpTo(0)
-                                    }
-                                },
-                                onBackClicked = {
-                                    navController.popBackStack()
-                                }
-                            )
+                    )
+                }
+                composable(Screen.Register.route) {
+                    RegisterScreen(
+                        onRegisterSuccess = {
+                            authService.saveLoginState(context, true)
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(0)
+                            }
+                        },
+                        onBackClicked = {
+                            navController.popBackStack()
                         }
-                        composable(Screen.Home.route) {
-                            NavBarScreenStart(
-                                onMenuClick = {
-                                    scope.launch { drawerState.open() }
-                                }
-                            )
+                    )
+                }
+                composable(Screen.Home.route) {
+                    NavBarScreenStart(
+                        onMenuClick = {
+                            scope.launch { drawerState.open() }
                         }
-                        composable(Screen.Settings.route) {
-                            SettingsScreen(
-                                onMenuClick = {
-                                    scope.launch { drawerState.open() }
-                                }
-                            )
+                    )
+                }
+                composable(Screen.Settings.route) {
+                    SettingsScreen(
+                        onMenuClick = {
+                            scope.launch { drawerState.open() }
                         }
-                    }
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun DrawerContent(
+    navController: NavHostController,
+    drawerState: DrawerState,
+    scope: CoroutineScope,
+    context: Context,
+    authService: AuthService
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(0.6F)
+            .fillMaxHeight()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFFFCE4EC), Color(0xFFF8BBD0))
+                )
+            )
+            .padding(vertical = 40.dp, horizontal = 16.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Perfil",
+                tint = Color.DarkGray,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = "Bienvenida",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.DarkGray
+            )
+        }
+
+        Divider(color = Color.Gray.copy(alpha = 0.3f))
+
+        DrawerItem(icon = Icons.Default.Home, label = "Inicio") {
+            scope.launch { drawerState.close() }
+            navController.navigate(Screen.Home.route)
+        }
+
+        DrawerItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
+            authService.logout(context)
+            scope.launch { drawerState.close() }
+            navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+
+        DrawerItem(icon = Icons.Default.Settings, label = "Configuraciones") {
+            scope.launch { drawerState.close() }
+            navController.navigate(Screen.Settings.route)
         }
     }
 }
