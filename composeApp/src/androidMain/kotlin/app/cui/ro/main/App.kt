@@ -75,13 +75,28 @@ fun App(context: Context) {
         val showDrawer = currentRoute != Screen.Login.route && currentRoute != Screen.Register.route
 
         if (showDrawer) {
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    DrawerContent(navController, drawerState, scope, context, authService)
+            Scaffold(
+                contentWindowInsets = WindowInsets.systemBars
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    ModalNavigationDrawer(
+                        drawerState = drawerState,
+                        drawerContent = {
+                            DrawerContent(navController, drawerState, scope, context, authService)
+                        }
+                    ) {
+                        MainScaffold(
+                            navController,
+                            drawerState,
+                            scope,
+                            startDestination,
+                            context,
+                            authService
+                        )
+                    }
                 }
-            ) {
-                MainScaffold(navController, drawerState, scope, startDestination, context, authService)
             }
         } else {
             // Mostrar solo el contenido sin Drawer
@@ -99,57 +114,52 @@ fun MainScaffold(
     context: Context,
     authService: AuthService
 ) {
-    Scaffold(
-        contentWindowInsets = WindowInsets.systemBars
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            NavHost(navController = navController, startDestination = startDestination) {
-                composable(Screen.Login.route) {
-                    LoginScreen(
-                        onLoginSuccess = {
-                            authService.saveLoginState(context, true)
-                            navController.navigate(Screen.Home.route) {
-                                popUpTo(0)
-                            }
-                        },
-                        onRegisterClicked = {
-                            navController.navigate(Screen.Register.route)
-                        }
-                    )
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(Screen.Login.route) {
+            LoginScreen(
+                onLoginSuccess = {
+                    authService.saveLoginState(context, true)
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(0)
+                    }
+                },
+                onRegisterClicked = {
+                    navController.navigate(Screen.Register.route)
                 }
-                composable(Screen.Register.route) {
-                    RegisterScreen(
-                        onRegisterSuccess = {
-                            authService.saveLoginState(context, true)
-                            navController.navigate(Screen.Home.route) {
-                                popUpTo(0)
-                            }
-                        },
-                        onBackClicked = {
-                            navController.popBackStack()
-                        }
-                    )
+            )
+        }
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                onRegisterSuccess = {
+                    authService.saveLoginState(context, true)
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(0)
+                    }
+                },
+                onBackClicked = {
+                    navController.popBackStack()
                 }
-                composable(Screen.Home.route) {
-                    NavBarScreenStart(
-                        onMenuClick = {
-                            scope.launch { drawerState.open() }
-                        }
-                    )
+            )
+        }
+        composable(Screen.Home.route) {
+            NavBarScreenStart(
+                onMenuClick = {
+                    scope.launch { drawerState.open() }
                 }
-                composable(Screen.Settings.route) {
-                    SettingsScreen(
-                        onMenuClick = {
-                            scope.launch { drawerState.open() }
-                        }
-                    )
+            )
+        }
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                onMenuClick = {
+                    scope.launch { drawerState.open() }
                 }
-            }
+            )
         }
     }
+
 }
+
 
 @Composable
 fun DrawerContent(
