@@ -54,6 +54,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -67,6 +68,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -381,119 +383,153 @@ fun SeccionRegistroDiario(
 fun SeccionInformacion(
     onVerMasClick: () -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 8.dp, horizontal = 8.dp)
     ) {
-        Text(
-            text = "Registro de información",
-            textAlign = TextAlign.Start,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-        )
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { onVerMasClick() }
         ) {
             Text(
-                text = "Ver más...",
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Gray,
+                text = "Registro de información",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp,
+                color = CuiroColors.FontBrown
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_right),
-                contentDescription = "",
-                modifier = Modifier.size(20.dp),
-                tint = Color.Gray,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onVerMasClick() }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "Ver más",
+                    fontSize = 14.sp,
+                    color = CuiroColors.SecondaryRose,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_right),
+                    contentDescription = null,
+                    tint = CuiroColors.SecondaryRose,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(4.dp, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            elevation = 4.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DataColumn(
+                    imageResId = R.drawable.ic_datos_clinicos,
+                    text = "Datos clínicos"
+                )
+                DataColumn(
+                    imageResId = R.drawable.ic_efectos_del_tratamiento,
+                    text = "Efectos",
+                )
+                DataColumn(
+                    imageResId = R.drawable.ic_medicamentos,
+                    text = "Medicamentos"
+                )
+            }
         }
     }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        DataColumn(
-            imageResId = R.drawable.ic_datos_clinicos,
-            text = "Datos clinicos"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_efectos_del_tratamiento,
-            text = "Efectos del tratamiento"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_medicamentos,
-            text = "Medicamentos"
-        )
-    }
 }
+
 
 @Composable
 fun SeccionRecomendaciones(
     onVerMasClick: () -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 8.dp, horizontal = 8.dp)
     ) {
-        Text(
-            text = "Recomendaciones sobre...",
-            textAlign = TextAlign.Start,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-        )
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { onVerMasClick() }
         ) {
             Text(
-                text = "Ver más...",
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Gray,
+                text = "Recomendaciones sobre...",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp,
+                color = CuiroColors.FontBrown
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_right),
-                contentDescription = "",
-                modifier = Modifier.size(20.dp),
-                tint = Color.Gray,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onVerMasClick() }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "Ver más",
+                    fontSize = 14.sp,
+                    color = CuiroColors.SecondaryRose,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_right),
+                    contentDescription = null,
+                    tint = CuiroColors.SecondaryRose,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(4.dp, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            elevation = 4.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DataColumn(
+                    imageResId = R.drawable.ic_informacion,
+                    text = "Información"
+                )
+                DataColumn(
+                    imageResId = R.drawable.ic_quimioterapia,
+                    text = "Quimioterapia"
+                )
+                DataColumn(
+                    imageResId = R.drawable.ic_nutricion,
+                    text = "Nutrición"
+                )
+            }
         }
     }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        DataColumn(
-            imageResId = R.drawable.ic_informacion,
-            text = "Informacion"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_quimioterapia,
-            text = "Quimioterapia"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_nutricion,
-            text = "Nutricion"
-        )
-    }
 }
+
 
 @Composable
 fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
@@ -764,121 +800,153 @@ fun SeccionHidratacion(
 fun SeccionInformacion2(
     onDismiss: () -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 8.dp, horizontal = 8.dp)
     ) {
-        Text(
-            text = "Registro de información",
-            textAlign = TextAlign.Start,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Ver menos...",
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Gray,
+                text = "Registro de información",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp,
+                color = CuiroColors.FontBrown,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "",
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .size(20.dp)
-                    .clickable { onDismiss() },
-                tint = Color.Gray,
-            )
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onDismiss() }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "Ver menos",
+                    fontSize = 14.sp,
+                    color = CuiroColors.SecondaryRose
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null,
+                    tint = CuiroColors.SecondaryRose,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(4.dp, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            elevation = 4.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DataColumn(
+                    imageResId = R.drawable.ic_hidratacion,
+                    text = "Hidratación"
+                )
+                DataColumn(
+                    imageResId = R.drawable.ic_signos_vitales,
+                    text = "Signos vitales"
+                )
+                DataColumn(
+                    imageResId = R.drawable.ic_reporte_salud,
+                    text = "Reporte de salud"
+                )
+            }
         }
     }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        DataColumn(
-            imageResId = R.drawable.ic_hidratacion,
-            text = "Hidratación"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_signos_vitales,
-            text = "Signos vitales"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_reporte_salud,
-            text = "Reporte de salud"
-        )
-    }
 }
+
 
 @Composable
 fun SeccionRecomendaciones2(
     onDismiss: () -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 8.dp, horizontal = 8.dp)
     ) {
-        Text(
-            text = "Recomendaciones sobre...",
-            textAlign = TextAlign.Start,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
         Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Ver menos...",
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Gray,
+                text = "Recomendaciones sobre...",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 16.sp,
+                color = CuiroColors.FontBrown,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "",
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .size(20.dp)
-                    .clickable { onDismiss() },
-                tint = Color.Gray,
-            )
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onDismiss() }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "Ver menos",
+                    fontSize = 14.sp,
+                    color = CuiroColors.SecondaryRose
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null,
+                    tint = CuiroColors.SecondaryRose,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(4.dp, RoundedCornerShape(16.dp)),
+            shape = RoundedCornerShape(16.dp),
+            elevation = 4.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DataColumn(
+                    imageResId = R.drawable.ic_ejercicio_fisico,
+                    text = "Ejercicio físico"
+                )
+                DataColumn(
+                    imageResId = R.drawable.ic_sexualidad,
+                    text = "Sexualidad"
+                )
+            }
         }
     }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceAround
-    ) {
-        DataColumn(
-            imageResId = R.drawable.ic_ejercicio_fisico,
-            text = "Ejercicio fisico"
-        )
-        DataColumn(
-            imageResId = R.drawable.ic_sexualidad,
-            text = "Sexualidad"
-        )
-    }
 }
+
 
 @Composable
 fun MedicionPasos(

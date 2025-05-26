@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,7 +34,9 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
@@ -44,26 +48,37 @@ import app.cui.ro.R
 import app.cui.ro.ui.theme.CuiroColors
 
 @Composable
-fun DataColumn(imageResId: Int, text: String) {
+fun DataColumn(
+    imageResId: Int,
+    text: String
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center, // Center content vertically
-        modifier = Modifier.width(100.dp) // Fixed width for consistent layout
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
     ) {
-        Image(
-            painter = painterResource(id = imageResId),
-            contentDescription = text,
+        Box(
             modifier = Modifier
-                .size(100.dp)
-                .background(color = CuiroColors.SecondaryRose) // Optional: If you want the image to be a circle
-        )
-        Spacer(modifier = Modifier.height(4.dp)) // Add some space between image and text
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(CuiroColors.SecondaryRose.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = imageResId),
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+                colorFilter = ColorFilter.tint(CuiroColors.SecondaryRose)
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = text,
-            textAlign = TextAlign.Center,
-            fontSize = 14.sp,
-            color = Color.Black,
-            maxLines = 2,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = CuiroColors.FontBrown,
+            textAlign = TextAlign.Center
         )
     }
 }
