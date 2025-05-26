@@ -361,11 +361,6 @@ fun SeccionRegistroDiario(
                 .background(CuiroColors.SectionsPink)
                 .padding(5.dp)
         )
-        VerticalDivider(
-            color = Color.Black,
-            thickness = 1.dp,
-            modifier = Modifier.fillMaxHeight() // El divisor llenará la altura de la Row.
-        )
         SeccionPasosEHidratacion(
             userFirstName = userFirstName,
             requestPermissionLauncher = requestPermissionLauncher,
@@ -454,7 +449,6 @@ fun SeccionInformacion(
     }
 }
 
-
 @Composable
 fun SeccionRecomendaciones(
     onVerMasClick: () -> Unit
@@ -529,272 +523,6 @@ fun SeccionRecomendaciones(
         }
     }
 }
-
-
-@Composable
-fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.Start
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Medicamentos",
-                fontSize = 18.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_medicamentos),
-                contentDescription = "",
-                modifier = Modifier.size(50.dp)
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp)
-        ) {
-            Text(
-                text = "$userFirstName, el siguiente medicamento es:",
-                fontSize = 12.sp,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                "Tamoxifeno (Nolvadex):",
-                fontSize = 12.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                "Hora: 12:00 hrs",
-                fontSize = 12.sp,
-                color = Color.Black
-            )
-            Text(
-                "Recordarme: Si",
-                fontSize = 12.sp,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Informacion del medicamento aqui",
-                fontSize = 14.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_add),
-                contentDescription = "",
-                modifier = Modifier.size(30.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun SeccionPasosEHidratacion(
-    userFirstName: String,
-    requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
-    vmHealthConnect: VMHealthConnect,
-    modifier: Modifier = Modifier, // Este modifier incluye .fillMaxHeight() y .weight(1f para ancho)
-) {
-    val context = LocalContext.current
-    val db = remember {
-        Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "HidratacioDB"
-        ).build()
-    }
-
-    Column(
-        modifier = modifier, // Aplica el .fillMaxHeight() y .weight(1f para ancho)
-        horizontalAlignment = Alignment.Start
-    ) {
-        SeccionPasos( // Tomará la altura que necesite su contenido.
-            userFirstName = userFirstName,
-            requestPermissionLauncher = requestPermissionLauncher,
-            vmHealthConnect = vmHealthConnect
-        )
-        Divider(
-            color = Color.Black,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-        )
-        SeccionHidratacion( // Tomará la altura que necesite su contenido.
-            userFirstName = userFirstName,
-            database = db,
-            modifier = Modifier.fillMaxWidth() // Sin weight vertical.
-        )
-    }
-}
-
-@Composable
-fun SeccionPasos(
-    userFirstName: String,
-    requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
-    vmHealthConnect: VMHealthConnect
-){
-    // Sección de Pasos
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Pasos",
-                fontSize = 18.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_pasos),
-                contentDescription = "",
-                modifier = Modifier.size(50.dp)
-            )
-        }
-
-        // Contenedor para MedicionPasos y lógica relacionada
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            contentAlignment = Alignment.CenterStart // O el que prefieras
-        ) {
-            // El Composable MedicionPasos ahora maneja toda la lógica de UI de HC
-            MedicionPasos(
-                userFirstName = userFirstName,
-                requestPermissionLauncher = requestPermissionLauncher,
-                vmHealthConnect = vmHealthConnect
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun SeccionHidratacion(
-    userFirstName: String,
-    database: AppDatabase,
-    modifier: Modifier = Modifier
-) {
-    val dao = database.hidratacionDao()
-    val scope = rememberCoroutineScope()
-    var cantidadMl by remember { mutableStateOf(0) }
-
-    // Leer el progreso al arrancar
-    LaunchedEffect(Unit) {
-        val progreso = dao.getProgreso()
-        cantidadMl = progreso?.cantidadMl ?: 0
-    }
-
-    Column(
-        modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Hidratacion",
-                fontSize = 18.sp,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_persona_agua),
-                contentDescription = "",
-                modifier = Modifier.size(50.dp)
-            )
-        }
-
-        AnimatedContent(
-            targetState = cantidadMl >= 1800,
-            transitionSpec = {
-                fadeIn(tween(500)) with fadeOut(tween(500))
-            },
-            label = "HidratacionContent",
-            modifier = Modifier.padding(vertical = 8.dp) // Padding para el contenido animado
-        ) { completo ->
-            if (completo) {
-                Text(
-                    text = "¡Felicidades!, has completado tu día",
-                    fontSize = 14.sp,
-                    color = Color(0xFF388E3C),
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-            } else {
-                LinearProgressIndicator(
-                    progress = { (cantidadMl / 1800f).coerceIn(0f, 1f) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(12.dp),
-                    color = Color(0xFF4FC3F7),
-                    trackColor = Color(0xFFE0E0E0)
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp), // Espacio antes de esta fila
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "$userFirstName, has tomado ${cantidadMl}ml de agua.",
-                fontSize = 12.sp,
-                color = Color.Black,
-                modifier = Modifier.weight(1f) // Para que el texto ocupe el espacio y empuje el botón
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_add),
-                contentDescription = "Añadir agua", // Buena práctica: añadir contentDescription
-                modifier = Modifier
-                    .size(30.dp)
-                    .clickable {
-                        scope.launch {
-                            val nuevoProgreso = (cantidadMl + 200).coerceAtMost(1800)
-                            dao.insertarProgreso(HidratacionEntity(cantidadMl = nuevoProgreso))
-                            cantidadMl = nuevoProgreso
-                        }
-                    }
-            )
-        }
-    }
-}
-
 
 @Composable
 fun SeccionInformacion2(
@@ -873,7 +601,6 @@ fun SeccionInformacion2(
     }
 }
 
-
 @Composable
 fun SeccionRecomendaciones2(
     onDismiss: () -> Unit
@@ -941,6 +668,260 @@ fun SeccionRecomendaciones2(
                 DataColumn(
                     imageResId = R.drawable.ic_sexualidad,
                     text = "Sexualidad"
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = 4.dp,
+        backgroundColor = Color.White
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Medicamentos",
+                    fontSize = 20.sp,
+                    color = Color(0xFF333333),
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_medicamentos),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Column {
+                Text(
+                    text = "$userFirstName, el siguiente medicamento es:",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Tamoxifeno (Nolvadex)",
+                    fontSize = 14.sp,
+                    color = Color(0xFF222222),
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Hora: 12:00 hrs",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+                Text(
+                    text = "Recordarme: Sí",
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Divider(color = Color(0xFFE0E0E0))
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Información del medicamento aquí",
+                    fontSize = 14.sp,
+                    color = Color(0xFF555555),
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_add),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SeccionPasosEHidratacion(
+    userFirstName: String,
+    requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
+    vmHealthConnect: VMHealthConnect,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val db = remember {
+        Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            "HidratacioDB"
+        ).build()
+    }
+
+    Column(modifier = modifier) {
+        SeccionPasos(userFirstName, requestPermissionLauncher, vmHealthConnect)
+        Spacer(modifier = Modifier.height(8.dp))
+        SeccionHidratacion(userFirstName, db)
+    }
+}
+
+
+@Composable
+fun SeccionPasos(
+    userFirstName: String,
+    requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
+    vmHealthConnect: VMHealthConnect
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = 4.dp,
+        backgroundColor = Color.White
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Pasos",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF333333),
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_pasos),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            MedicionPasos(
+                userFirstName = userFirstName,
+                requestPermissionLauncher = requestPermissionLauncher,
+                vmHealthConnect = vmHealthConnect
+            )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun SeccionHidratacion(
+    userFirstName: String,
+    database: AppDatabase,
+    modifier: Modifier = Modifier
+) {
+    val dao = database.hidratacionDao()
+    val scope = rememberCoroutineScope()
+    var cantidadMl by remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        val progreso = dao.getProgreso()
+        cantidadMl = progreso?.cantidadMl ?: 0
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = 4.dp,
+        backgroundColor = Color.White
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Hidratación",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF333333),
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_persona_agua),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            AnimatedContent(
+                targetState = cantidadMl >= 1800,
+                transitionSpec = {
+                    fadeIn(tween(500)) with fadeOut(tween(500))
+                },
+                label = "HidratacionContent"
+            ) { completo ->
+                if (completo) {
+                    Text(
+                        text = "¡Felicidades! Has completado tu día.",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF388E3C),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    LinearProgressIndicator(
+                        progress = { (cantidadMl / 1800f).coerceIn(0f, 1f) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(12.dp),
+                        color = Color(0xFF4FC3F7),
+                        trackColor = Color(0xFFE0E0E0)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "$userFirstName, has tomado ${cantidadMl}ml de agua.",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.weight(1f)
+                )
+                Image(
+                    painter = painterResource(R.drawable.ic_add),
+                    contentDescription = "Añadir agua",
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clickable {
+                            scope.launch {
+                                val nuevoProgreso = (cantidadMl + 200).coerceAtMost(1800)
+                                dao.insertarProgreso(HidratacionEntity(cantidadMl = nuevoProgreso))
+                                cantidadMl = nuevoProgreso
+                            }
+                        }
                 )
             }
         }
