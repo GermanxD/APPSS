@@ -68,8 +68,8 @@ fun DataColumn(
             Image(
                 painter = painterResource(id = imageResId),
                 contentDescription = null,
-                modifier = Modifier.size(28.dp),
-                colorFilter = ColorFilter.tint(CuiroColors.SecondaryRose)
+                modifier = Modifier.size(40.dp),
+                colorFilter = ColorFilter.tint(Color.Black)
             )
         }
         Spacer(modifier = Modifier.height(6.dp))

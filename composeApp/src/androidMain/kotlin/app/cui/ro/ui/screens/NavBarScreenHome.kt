@@ -156,168 +156,164 @@ fun NavBarScreenHome(
                 .fillMaxWidth()
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
+                .background(Color.White)
         ) {
-            Column(
+            // Tarjeta de perfil
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+                elevation = 6.dp,
+                backgroundColor = Color.White
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(6.dp),
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     userId?.let {
                         ProfileScreen(
                             userId = it,
-                            vmProfileImage = VMProfileImage(),
+                            vmProfileImage = VMProfileImage()
                         )
                     }
+
                     Column(
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         Text(
                             text = userFullNameDB,
-                            textAlign = TextAlign.Left,
                             style = MaterialTheme.typography.body1
                         )
                         Text(
                             text = "@$usernameDB".lowercase(Locale.getDefault()),
-                            textAlign = TextAlign.Left,
-                            style = MaterialTheme.typography.body1,
-                            fontWeight = FontWeight.Light
+                            style = MaterialTheme.typography.body2
                         )
                     }
                 }
+            }
+
+            // Banner de ayuda
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                elevation = 4.dp,
+                backgroundColor = CuiroColors.SecondaryRose
+            ) {
                 Row(
                     modifier = Modifier
-                        .background(color = CuiroColors.SecondaryRose)
                         .fillMaxWidth()
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        Icons.Rounded.Search,
-                        contentDescription = "Icono de Busqueda",
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(36.dp),
-                        tint = Color.White,
+                        imageVector = Icons.Rounded.Search,
+                        contentDescription = "Icono de Búsqueda",
+                        tint = Color.Black,
+                        modifier = Modifier.size(28.dp)
                     )
 
                     Text(
                         text = "¿Necesitas ayuda?",
-                        textAlign = TextAlign.Left,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(start = 10.dp)
-                    )
-                }
-
-                if (!showSeccionInformacion2) {
-                    SeccionInformacion(
-                        onVerMasClick = {
-                            showSeccionInformacion2 = true
-                        }
-                    )
-                }
-
-                if (showSeccionInformacion2) {
-                    SeccionInformacion2(
-                        onDismiss = {
-                            showSeccionInformacion2 = false
-                        }
-                    )
-                }
-
-                if (!showSeccionRecomendaciones2) {
-                    SeccionRecomendaciones(
-                        onVerMasClick = {
-                            showSeccionRecomendaciones2 = true
-                        }
-                    )
-                }
-
-                if (showSeccionRecomendaciones2) {
-                    SeccionRecomendaciones2(
-                        onDismiss = {
-                            showSeccionRecomendaciones2 = false
-                        }
-                    )
-                }
-
-                if (showPermissionExplanationDialog) {
-                    AlertDialog(
-                        modifier = Modifier.clip(RoundedCornerShape(10.dp)),
-                        onDismissRequest = { showPermissionExplanationDialog = false },
-                        title = { Text("Permisos Requeridos") },
-                        text = { Text("Para acceder a tus datos de pasos, necesitamos permisos de Health Connect. Por favor, habilítalos en la configuración de la aplicación.") },
-                        buttons = {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Button(
-                                    onClick = {
-                                        val intent =
-                                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                                data = Uri.fromParts(
-                                                    "package",
-                                                    context.packageName,
-                                                    null
-                                                )
-                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                            }
-                                        try {
-                                            context.startActivity(intent)
-                                        } catch (e: Exception) {
-                                            Log.e(
-                                                "NavBarScreenHome",
-                                                "Could not open app settings",
-                                                e
-                                            )
-                                        }
-                                        showPermissionExplanationDialog = false
-                                    },
-                                    colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
-                                ) {
-                                    Text(
-                                        "Ir a Configuración",
-                                        fontSize = 16.sp,
-                                        color = CuiroColors.FontBrown,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Button(
-                                    onClick = { showPermissionExplanationDialog = false },
-                                    colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
-                                ) {
-                                    Text(
-                                        "Cancelar",
-                                        fontSize = 16.sp,
-                                        color = CuiroColors.FontBrown
-                                    )
-                                }
-                            }
-                        }
+                        fontSize = 18.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(start = 12.dp)
                     )
                 }
             }
 
+            // Secciones
+            if (!showSeccionInformacion2) {
+                SeccionInformacion(
+                    onVerMasClick = {
+                        showSeccionInformacion2 = true
+                    }
+                )
+            }
+
+            if (showSeccionInformacion2) {
+                SeccionInformacion2(
+                    onDismiss = {
+                        showSeccionInformacion2 = false
+                    }
+                )
+            }
+
+            if (!showSeccionRecomendaciones2) {
+                SeccionRecomendaciones(
+                    onVerMasClick = {
+                        showSeccionRecomendaciones2 = true
+                    }
+                )
+            }
+
+            if (showSeccionRecomendaciones2) {
+                SeccionRecomendaciones2(
+                    onDismiss = {
+                        showSeccionRecomendaciones2 = false
+                    }
+                )
+            }
+
+            if (showPermissionExplanationDialog) {
+                AlertDialog(
+                    modifier = Modifier.clip(RoundedCornerShape(10.dp)),
+                    onDismissRequest = { showPermissionExplanationDialog = false },
+                    title = { Text("Permisos Requeridos") },
+                    text = {
+                        Text("Para acceder a tus datos de pasos, necesitamos permisos de Health Connect. Por favor, habilítalos en la configuración de la aplicación.")
+                    },
+                    buttons = {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Button(
+                                onClick = {
+                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", context.packageName, null)
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    try {
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Log.e("NavBarScreenHome", "Could not open app settings", e)
+                                    }
+                                    showPermissionExplanationDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
+                            ) {
+                                Text("Ir a Configuración", fontSize = 16.sp, color = CuiroColors.FontBrown)
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = { showPermissionExplanationDialog = false },
+                                colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
+                            ) {
+                                Text("Cancelar", fontSize = 16.sp, color = CuiroColors.FontBrown)
+                            }
+                        }
+                    }
+                )
+            }
+
+            // Registro Diario
             SeccionRegistroDiario(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 authService = authService,
                 requestPermissionLauncher = requestPermissionLauncher,
                 vmHealthConnect = vmHealthConnect
             )
-
         }
 
+        // Snackbar
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
@@ -328,6 +324,8 @@ fun NavBarScreenHome(
         }
     }
 }
+
+
 
 @Composable
 fun SeccionRegistroDiario(
@@ -406,13 +404,13 @@ fun SeccionInformacion(
                 Text(
                     text = "Ver más",
                     fontSize = 14.sp,
-                    color = CuiroColors.SecondaryRose,
+                    color = Color.Black,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_right),
                     contentDescription = null,
-                    tint = CuiroColors.SecondaryRose,
+                    tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -481,13 +479,13 @@ fun SeccionRecomendaciones(
                 Text(
                     text = "Ver más",
                     fontSize = 14.sp,
-                    color = CuiroColors.SecondaryRose,
+                    color = Color.Black,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_right),
                     contentDescription = null,
-                    tint = CuiroColors.SecondaryRose,
+                    tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -558,13 +556,13 @@ fun SeccionInformacion2(
                 Text(
                     text = "Ver menos",
                     fontSize = 14.sp,
-                    color = CuiroColors.SecondaryRose
+                    color = Color.Black
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = null,
-                    tint = CuiroColors.SecondaryRose,
+                    tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -635,13 +633,13 @@ fun SeccionRecomendaciones2(
                 Text(
                     text = "Ver menos",
                     fontSize = 14.sp,
-                    color = CuiroColors.SecondaryRose
+                    color = Color.Black
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = null,
-                    tint = CuiroColors.SecondaryRose,
+                    tint = Color.Black,
                     modifier = Modifier.size(20.dp)
                 )
             }
