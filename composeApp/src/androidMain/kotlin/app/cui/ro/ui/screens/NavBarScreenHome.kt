@@ -689,10 +689,12 @@ fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
             ) {
                 Text(
                     text = "Medicamentos",
-                    fontSize = 20.sp,
+                    fontSize = 16.sp,
                     color = Color(0xFF333333),
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_medicamentos),
@@ -799,10 +801,12 @@ fun SeccionPasos(
             ) {
                 Text(
                     text = "Pasos",
-                    fontSize = 20.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF333333),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_pasos),
@@ -854,10 +858,12 @@ fun SeccionHidratacion(
             ) {
                 Text(
                     text = "Hidratación",
-                    fontSize = 20.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF333333),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Image(
                     painter = painterResource(R.drawable.ic_persona_agua),
