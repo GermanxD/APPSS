@@ -1067,18 +1067,19 @@ fun MedicionPasos(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(40.dp),
+                            .height(50.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = CuiroColors.ObjectsPink,
                             contentColor = CuiroColors.FontBrown
                         ),
                     ) {
                         Text(
-                            "Conceder Permiso",
+                            "Conceder Permisos",
                             fontSize = 12.sp,
                             color = CuiroColors.FontBrown,
                             fontFamily = FontFamily.Default,
                             textAlign = TextAlign.Center,
+                            maxLines = 2
                         )
                     }
                 }
