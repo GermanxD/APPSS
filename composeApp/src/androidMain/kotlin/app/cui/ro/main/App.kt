@@ -51,6 +51,7 @@ import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.screens.SettingsScreen
 import app.cui.ro.ui.session.LoginScreen
 import app.cui.ro.ui.session.RegisterScreen
+import app.cui.ro.ui.theme.CuiroColors
 import app.cui.ro.ui.theme.CuiroTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -183,11 +184,7 @@ fun DrawerContent(
         modifier = Modifier
             .fillMaxWidth(0.6F)
             .fillMaxHeight()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFFFCE4EC), Color(0xFFF8BBD0))
-                )
-            )
+            .background(Color.White)
             .padding(vertical = 40.dp, horizontal = 16.dp)
     ) {
         Row(
