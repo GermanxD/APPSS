@@ -70,7 +70,9 @@ fun BottomNavHost(navController: NavHostController, onMenuClick: () -> Unit) {
                 vmHealthConnect = vmHealthConnect
             )
         }
-        composable("profile_route") { NavBarScreenProfile() }
+        composable("profile_route") { NavBarScreenProfile(
+            authService = AuthService()
+        ) }
         composable("contacts_route") { NavBarScreenContact() }
         composable("foro_route") { NavBarScreenForo() }
         composable("messages_route") { NavBarScreenMessage() }

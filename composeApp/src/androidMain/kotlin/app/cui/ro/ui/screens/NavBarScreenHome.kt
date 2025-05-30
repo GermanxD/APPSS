@@ -158,42 +158,6 @@ fun NavBarScreenHome(
                 .verticalScroll(rememberScrollState())
                 .background(Color.White)
         ) {
-            // Tarjeta de perfil
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = 6.dp,
-                backgroundColor = Color.White
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    userId?.let {
-                        ProfileScreen(
-                            userId = it,
-                            vmProfileImage = VMProfileImage()
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier.padding(start = 16.dp)
-                    ) {
-                        Text(
-                            text = userFullNameDB,
-                            style = MaterialTheme.typography.body1
-                        )
-                        Text(
-                            text = "@$usernameDB".lowercase(Locale.getDefault()),
-                            style = MaterialTheme.typography.body2
-                        )
-                    }
-                }
-            }
 
             // Banner de ayuda
             Card(
