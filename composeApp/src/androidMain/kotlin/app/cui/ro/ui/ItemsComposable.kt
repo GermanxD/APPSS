@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
@@ -46,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cui.ro.R
 import app.cui.ro.ui.theme.CuiroColors
+import com.google.accompanist.insets.LocalWindowInsets
 
 @Composable
 fun DataColumn(
@@ -89,54 +94,65 @@ fun CustomTopAppBar(
     onNotificationsClick: () -> Unit,
     title: String
 ) {
-    TopAppBar(
-        title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+    // Obtener el padding de la status bar usando las APIs nativas
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // Spacer para la status bar
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(statusBarHeight)
+        )
+
+        // TopAppBar principal
+        TopAppBar(
+            modifier = Modifier.fillMaxWidth(),
+            title = {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(
-                            Icons.Filled.Menu,
-                            contentDescription = "Menu",
-                            modifier = Modifier.size(30.dp),
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = onMenuClick) {
+                            Icon(
+                                Icons.Filled.Menu,
+                                contentDescription = "Menu",
+                                modifier = Modifier.size(30.dp),
+                            )
+                        }
+                        IconButton(onClick = onNotificationsClick) {
+                            Icon(
+                                Icons.Filled.Notifications,
+                                contentDescription = "Notificaciones",
+                                modifier = Modifier.size(30.dp),
+                            )
+                        }
                     }
-                    IconButton(onClick = onNotificationsClick) {
-                        Icon(
-                            Icons.Filled.Notifications,
-                            contentDescription = "Notificaciones",
-                            modifier = Modifier.size(30.dp),
-                        )
-                    }
+                    Text(
+                        text = title,
+                        color = Color.Black,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Image(
+                        painter = painterResource(R.drawable.img_logo_login),
+                        contentDescription = "Logo",
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 }
-                Text(
-                    text = title,
-                    color = Color.Black,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Image(
-                    painter = painterResource(R.drawable.img_logo_login),
-                    contentDescription = "Logo",
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                )
-            }
-        },
-        backgroundColor = CuiroColors.ObjectsPink,
-        contentColor = Color.Black,
-        navigationIcon = null,
-        actions = {}
-    )
+            },
+            backgroundColor = CuiroColors.ObjectsPink,
+            contentColor = Color.Black,
+            navigationIcon = null,
+            actions = {}
+        )
+    }
 }
 
 @Composable

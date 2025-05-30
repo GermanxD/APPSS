@@ -145,12 +145,6 @@ fun NavBarScreenHome(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        CustomTopAppBar(
-            onMenuClick = onMenuClick,
-            onNotificationsClick = { /* Lógica para el clic de notificaciones */ },
-            title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\"",
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()

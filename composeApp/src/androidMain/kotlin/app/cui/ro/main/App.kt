@@ -45,7 +45,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.Screen
+import app.cui.ro.navigation.BottomNavigationBar
 import app.cui.ro.navigation.NavBarScreenStart
+import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.screens.SettingsScreen
 import app.cui.ro.ui.session.LoginScreen
 import app.cui.ro.ui.session.RegisterScreen
@@ -66,21 +68,29 @@ fun App(context: Context) {
 
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
-
-        // Detectar la ruta actual
         val currentBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = currentBackStackEntry?.destination?.route
 
-        // Determinar si se debe mostrar el drawer
-        val showDrawer = currentRoute != Screen.Login.route && currentRoute != Screen.Register.route
+        // Determinar si se debe mostrar el drawer y top bar
+        val showAppBars = currentRoute != Screen.Login.route && currentRoute != Screen.Register.route
 
-        if (showDrawer) {
+        if (showAppBars) {
             Scaffold(
-                contentWindowInsets = WindowInsets.systemBars
+                contentWindowInsets = WindowInsets.systemBars,
+                topBar = {
+                    CustomTopAppBar(
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                        onNotificationsClick = { /* Lógica para notificaciones */ },
+                        title =  "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\""
+                    )
+                },
+                bottomBar = {
+                    if (currentRoute?.startsWith("home_route") == true) {
+                        BottomNavigationBar(navController = navController)
+                    }
+                }
             ) { innerPadding ->
-                Box(
-                    modifier = Modifier.padding(innerPadding)
-                ) {
+                Box(modifier = Modifier.padding(innerPadding)) {
                     ModalNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
@@ -99,7 +109,7 @@ fun App(context: Context) {
                 }
             }
         } else {
-            // Mostrar solo el contenido sin Drawer
+            // Mostrar solo el contenido sin barras
             MainScaffold(navController, drawerState, scope, startDestination, context, authService)
         }
     }
