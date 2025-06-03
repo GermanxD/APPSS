@@ -18,9 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.VMProfileImage
-import app.cui.ro.ui.CenteredText
 import java.util.Locale
 
 @Composable
@@ -31,6 +31,8 @@ fun NavBarScreenProfile(
     var userFullNameDB by remember { mutableStateOf("Usuario") }
     var usernameDB by remember { mutableStateOf("Usuario") }
 
+    val vmProfileImage: VMProfileImage = viewModel()
+
     LaunchedEffect(userId) {
         if (userId != null) {
             authService.getAllData(userId) { userFullName, username ->
@@ -39,8 +41,11 @@ fun NavBarScreenProfile(
                     usernameDB = username
                 }
             }
+
+            vmProfileImage.loadProfileImageFromFirestore(userId)
         }
     }
+
     // Tarjeta de perfil
     Card(
         modifier = Modifier
@@ -59,7 +64,7 @@ fun NavBarScreenProfile(
             userId?.let {
                 ProfileScreen(
                     userId = it,
-                    vmProfileImage = VMProfileImage()
+                    vmProfileImage = vmProfileImage
                 )
             }
 

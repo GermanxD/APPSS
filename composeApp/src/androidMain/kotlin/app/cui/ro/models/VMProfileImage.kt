@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,12 +16,15 @@ import java.io.InputStream
 
 class VMProfileImage : ViewModel() {
 
+    private val _profileImage = mutableStateOf<String?>(null)
+    val profileImage: State<String?> = _profileImage
+
     enum class ImageUploadState {
         IDLE,
         UPLOADING,
         SUCCESS,
         ERROR,
-        SIZE_EXCEEDED // Nuevo estado
+        SIZE_EXCEEDED
     }
 
     fun getFileSize(uri: Uri, context: Context): Long {
@@ -59,6 +64,7 @@ class VMProfileImage : ViewModel() {
             .update("profileImage", base64Image)
             .addOnSuccessListener {
                 println("Imagen actualizada correctamente en Firestore")
+                _profileImage.value = base64Image
                 onSuccess() // Ejecutar el callback después de guardar
             }
             .addOnFailureListener { e ->
@@ -67,24 +73,14 @@ class VMProfileImage : ViewModel() {
             }
     }
 
-    fun loadProfileImageFromFirestore(userId: String, onImageLoaded: (String?) -> Unit) {
-        val db: FirebaseFirestore = Firebase.firestore
-
-        db.collection("users")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val image = document.getString("profileImage")
-                    onImageLoaded(image) // Pasar la imagen al callback
-                } else {
-                    onImageLoaded(null) // No hay imagen
-                }
+    fun loadProfileImageFromFirestore(userId: String) {
+        val db = Firebase.firestore
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { doc ->
+                _profileImage.value = if (doc.exists()) doc.getString("profileImage") else null
             }
-            .addOnFailureListener { e ->
-                println("Error al recuperar la imagen: ${e.message}")
-                onImageLoaded(null) // Manejar el error
+            .addOnFailureListener {
+                _profileImage.value = null
             }
     }
-
 }

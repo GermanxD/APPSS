@@ -54,9 +54,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -90,7 +88,6 @@ import app.cui.ro.db.AppDatabase
 import app.cui.ro.db.HidratacionEntity
 import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.models.VMProfileImage
-import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.DataColumn
 import app.cui.ro.ui.theme.CuiroColors
 import kotlinx.coroutines.CoroutineScope
@@ -99,7 +96,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.ZonedDateTime
-import java.util.Locale
 
 @Composable
 fun NavBarScreenHome(
@@ -283,11 +279,9 @@ fun NavBarScreenHome(
     }
 }
 
-
-
 @Composable
 fun SeccionRegistroDiario(
-    modifier: Modifier = Modifier, // Ahora solo recibe .fillMaxWidth() desde el padre
+    modifier: Modifier = Modifier,
     authService: AuthService,
     requestPermissionLauncher: ActivityResultLauncher<Set<String>>,
     vmHealthConnect: VMHealthConnect
@@ -305,15 +299,15 @@ fun SeccionRegistroDiario(
     }
 
     Row(
-        modifier = modifier // Este modifier ya tiene fillMaxWidth()
+        modifier = modifier
             .background(color = Color.Black)
-            .height(IntrinsicSize.Min) // La Row será tan alta como su hijo más alto.
+            .height(IntrinsicSize.Min)
     ) {
         SeccionMedicamentos(
             userFirstName = userFirstName,
             modifier = Modifier
-                .fillMaxHeight() // Se expandirá a la altura de la Row (IntrinsicSize.Min).
-                .weight(1f)      // Para la distribución del ancho.
+                .fillMaxHeight()
+                .weight(1f)
                 .background(CuiroColors.SectionsPink)
                 .padding(5.dp)
         )
@@ -322,8 +316,8 @@ fun SeccionRegistroDiario(
             requestPermissionLauncher = requestPermissionLauncher,
             vmHealthConnect = vmHealthConnect,
             modifier = Modifier
-                .fillMaxHeight() // Se expandirá a la altura de la Row.
-                .weight(1f)      // Para la distribución del ancho.
+                .fillMaxHeight()
+                .weight(1f)
                 .background(CuiroColors.SectionsPink)
                 .padding(5.dp)
         )
@@ -890,7 +884,6 @@ fun SeccionHidratacion(
     }
 }
 
-
 @Composable
 fun MedicionPasos(
     userFirstName: String,
@@ -1052,22 +1045,17 @@ fun ProfileScreen(
     vmProfileImage: VMProfileImage,
 ) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var base64Image by remember { mutableStateOf<String?>(null) }
-    val context = LocalContext.current
+    val base64Image by vmProfileImage.profileImage
 
+    val context = LocalContext.current
     var uploadState by remember { mutableStateOf(VMProfileImage.ImageUploadState.IDLE) }
     var errorMessage by remember { mutableStateOf("") }
+
     val scope = rememberCoroutineScope()
 
     var showDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     var isSuccess by remember { mutableStateOf(false) }
-
-    LaunchedEffect(userId) {
-        vmProfileImage.loadProfileImageFromFirestore(userId) { image ->
-            base64Image = image
-        }
-    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -1080,7 +1068,7 @@ fun ProfileScreen(
             if (fileSizeInBytes > maxFileSizeInBytes) {
                 uploadState = VMProfileImage.ImageUploadState.SIZE_EXCEEDED
                 errorMessage = "La imagen excede el tamaño máximo permitido (3MB)."
-                dialogMessage = "La imagen excede el tamaño máximo permitido (3MB)."
+                dialogMessage = errorMessage
                 isSuccess = false
                 showDialog = true
                 scope.launch {
@@ -1095,7 +1083,6 @@ fun ProfileScreen(
                     withContext(Dispatchers.Main) {
                         vmProfileImage.saveImageToFirestore(userId, base64,
                             onSuccess = {
-                                base64Image = base64
                                 uploadState = VMProfileImage.ImageUploadState.SUCCESS
                                 dialogMessage = "Imagen actualizada con éxito!"
                                 isSuccess = true
@@ -1108,7 +1095,7 @@ fun ProfileScreen(
                             onFailure = {
                                 uploadState = VMProfileImage.ImageUploadState.ERROR
                                 errorMessage = "Error al guardar la imagen. Intenta de nuevo."
-                                dialogMessage = "Error al guardar la imagen. Intenta de nuevo."
+                                dialogMessage = errorMessage
                                 isSuccess = false
                                 showDialog = true
                                 scope.launch {
@@ -1136,32 +1123,26 @@ fun ProfileScreen(
                     .clip(CircleShape)
                     .clickable { launcher.launch("image/*") }
             )
-
-            if (uploadState == VMProfileImage.ImageUploadState.UPLOADING) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(80.dp),
-                    strokeWidth = 4.dp,
-                    color = MaterialTheme.colors.primary
-                )
-            }
         } else {
-            if (uploadState == VMProfileImage.ImageUploadState.UPLOADING) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(80.dp),
-                    strokeWidth = 4.dp,
-                    color = MaterialTheme.colors.primary
-                )
-            } else {
-                Image(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Default Profile Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
-                        .clickable { launcher.launch("image/*") }
-                )
-            }
+            Image(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Default Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .clickable { launcher.launch("image/*") }
+            )
+        }
+
+        if (uploadState == VMProfileImage.ImageUploadState.UPLOADING) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.Center),
+                strokeWidth = 4.dp,
+                color = MaterialTheme.colors.primary
+            )
         }
     }
 
@@ -1209,5 +1190,8 @@ fun ProfileScreen(
         }
     }
 }
+
+
+
 
 
