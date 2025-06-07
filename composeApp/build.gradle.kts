@@ -127,5 +127,6 @@ dependencies {
     ksp("androidx.room:room-compiler:2.7.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    implementation("com.google.firebase:firebase-messaging:24.1.1")
 }
 
