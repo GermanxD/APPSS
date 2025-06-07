@@ -13,12 +13,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Obtener token FCM
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+        // Suscribirse a 'test'
+        FirebaseMessaging.getInstance().subscribeToTopic("test").addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val token = task.result
-                Log.d("FCMToken", "Token: $token")
+                Log.d("FCM", "Suscripción a topic 'test' exitosa")
             } else {
-                Log.e("FCMToken", "Error al obtener token", task.exception)
+                Log.e("FCM", "Error al suscribirse a 'test'", task.exception)
+            }
+        }
+
+        // Suscribirse a 'daily'
+        FirebaseMessaging.getInstance().subscribeToTopic("daily").addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("FCM", "Suscripción a topic 'daily' exitosa")
+            } else {
+                Log.e("FCM", "Error al suscribirse a 'daily'", task.exception)
             }
         }
 
