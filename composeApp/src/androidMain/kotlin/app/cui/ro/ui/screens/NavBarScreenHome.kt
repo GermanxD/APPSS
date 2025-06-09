@@ -129,14 +129,13 @@ fun NavBarScreenHome(
 
     LaunchedEffect(userId) {
         if (userId != null) {
-            authService.getAllData(userId) { userFullName, username ->
-                if (userFullName != null && username != null) {
-                    userFullNameDB = userFullName
-                    usernameDB = username
-                }
+            authService.getAllUserData(userId) { data ->
+                data["fullname"]?.let { userFullNameDB = it }
+                data["username"]?.let { usernameDB = it }
             }
         }
     }
+
 
     Column(
         modifier = Modifier.fillMaxSize()

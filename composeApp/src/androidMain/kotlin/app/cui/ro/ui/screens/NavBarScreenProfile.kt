@@ -28,25 +28,29 @@ fun NavBarScreenProfile(
     authService: AuthService,
 ) {
     val userId = remember { authService.getUserId() }
-    var userFullNameDB by remember { mutableStateOf("Usuario") }
-    var usernameDB by remember { mutableStateOf("Usuario") }
+    var userData by remember {
+        mutableStateOf<Map<String, String?>>(
+            mapOf(
+                "fullname" to "Usuario",
+                "username" to "usuario",
+                "email" to "",
+                "gender" to "",
+                "birthDate" to ""
+            )
+        )
+    }
 
     val vmProfileImage: VMProfileImage = viewModel()
 
     LaunchedEffect(userId) {
         if (userId != null) {
-            authService.getAllData(userId) { userFullName, username ->
-                if (userFullName != null && username != null) {
-                    userFullNameDB = userFullName
-                    usernameDB = username
-                }
+            authService.getAllUserData(userId) { data ->
+                userData = data
             }
-
             vmProfileImage.loadProfileImageFromFirestore(userId)
         }
     }
 
-    // Tarjeta de perfil
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -55,31 +59,41 @@ fun NavBarScreenProfile(
         elevation = 6.dp,
         backgroundColor = Color.White
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            userId?.let {
-                ProfileScreen(
-                    userId = it,
-                    vmProfileImage = vmProfileImage
-                )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                userId?.let {
+                    ProfileScreen(
+                        userId = it,
+                        vmProfileImage = vmProfileImage
+                    )
+                }
+
+                Column(modifier = Modifier.padding(start = 16.dp)) {
+                    Text(
+                        text = userData["fullname"] ?: "Usuario",
+                        style = MaterialTheme.typography.h6
+                    )
+                    Text(
+                        text = "@${userData["username"]?.lowercase() ?: ""}",
+                        style = MaterialTheme.typography.body2,
+                        color = Color.Gray
+                    )
+                }
             }
 
-            Column(
-                modifier = Modifier.padding(start = 16.dp)
-            ) {
-                Text(
-                    text = userFullNameDB,
-                    style = MaterialTheme.typography.body1
-                )
-                Text(
-                    text = "@$usernameDB".lowercase(Locale.getDefault()),
-                    style = MaterialTheme.typography.body2
-                )
+            // Información adicional
+            Column(modifier = Modifier.padding(top = 16.dp)) {
+                userData["email"]?.let {
+                    Text("Correo: $it", style = MaterialTheme.typography.body2)
+                }
+                userData["gender"]?.let {
+                    Text("Género: $it", style = MaterialTheme.typography.body2)
+                }
+                userData["birthDate"]?.let {
+                    Text("Nacimiento: $it", style = MaterialTheme.typography.body2)
+                }
             }
         }
     }
 }
+
