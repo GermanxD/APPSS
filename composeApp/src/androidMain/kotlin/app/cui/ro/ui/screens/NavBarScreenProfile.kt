@@ -1,13 +1,31 @@
 package app.cui.ro.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,10 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.VMProfileImage
+import app.cui.ro.ui.theme.CuiroColors
 import java.util.Locale
 
 @Composable
@@ -51,28 +73,51 @@ fun NavBarScreenProfile(
         }
     }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = 6.dp,
-        backgroundColor = Color.White
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                userId?.let {
-                    ProfileScreen(
-                        userId = it,
-                        vmProfileImage = vmProfileImage
-                    )
-                }
 
-                Column(modifier = Modifier.padding(start = 16.dp)) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp
+                )
+                .verticalScroll(rememberScrollState())
+                .background(Color.White),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        )
+        {
+            // Card principal con imagen y nombre
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                elevation = 6.dp,
+                backgroundColor = Color.White,
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    userId?.let {
+                        ProfileScreen(
+                            userId = it,
+                            vmProfileImage = vmProfileImage
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     Text(
                         text = userData["fullname"] ?: "Usuario",
-                        style = MaterialTheme.typography.h6
+                        style = MaterialTheme.typography.h6.copy(fontSize = 22.sp),
+                        fontWeight = FontWeight.Bold
                     )
+
                     Text(
                         text = "@${userData["username"]?.lowercase() ?: ""}",
                         style = MaterialTheme.typography.body2,
@@ -81,17 +126,140 @@ fun NavBarScreenProfile(
                 }
             }
 
-            // Información adicional
-            Column(modifier = Modifier.padding(top = 16.dp)) {
-                userData["email"]?.let {
-                    Text("Correo: $it", style = MaterialTheme.typography.body2)
+            // Card de información de contacto
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                elevation = 6.dp,
+                backgroundColor = Color.White,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        text = "Información de Contacto",
+                        style = MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF333333),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    ProfileInfoRow(
+                        icon = Icons.Default.Email,
+                        label = "Correo Electrónico",
+                        value = userData["email"]
+                    )
                 }
-                userData["gender"]?.let {
-                    Text("Género: $it", style = MaterialTheme.typography.body2)
+            }
+
+            // Card de información personal
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                elevation = 6.dp,
+                backgroundColor = Color.White,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        text = "Información Personal",
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF333333),
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    ProfileInfoRow(
+                        icon = Icons.Default.DateRange,
+                        label = "Fecha de Nacimiento",
+                        value = userData["birthDate"]
+                    )
+
+                    if (!userData["birthDate"].isNullOrEmpty() && !userData["gender"].isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    ProfileInfoRow(
+                        icon = Icons.Default.Person,
+                        label = "Género",
+                        value = userData["gender"]
+                    )
                 }
-                userData["birthDate"]?.let {
-                    Text("Nacimiento: $it", style = MaterialTheme.typography.body2)
+            }
+
+            // Card de acciones (opcional)
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                elevation = 6.dp,
+                backgroundColor = Color.White,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        text = "Acciones",
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF333333),
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Button(
+                        onClick = { /* Acción para editar perfil */ },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = CuiroColors.ObjectsPink
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Editar",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Editar Perfil",
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileInfoRow(icon: ImageVector, label: String, value: String?) {
+    if (!value.isNullOrEmpty()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = CuiroColors.ObjectsPink,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.caption,
+                    color = Color.Gray,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.body1,
+                    color = Color(0xFF333333)
+                )
             }
         }
     }
