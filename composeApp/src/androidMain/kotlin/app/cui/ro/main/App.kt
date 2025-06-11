@@ -98,13 +98,21 @@ fun App(context: Context) {
         // Aquí recoges el estado actual de la imagen
         val profileImage by vmProfileImage.profileImage
 
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DrawerContent(navController, drawerState, scope, context, authService, profileImage)
-            }
-        ) {
-            if (showAppBars) {
+        if (showAppBars) {
+
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    DrawerContent(
+                        navController,
+                        drawerState,
+                        scope,
+                        context,
+                        authService,
+                        profileImage
+                    )
+                }
+            ) {
                 Scaffold(
                     contentWindowInsets = WindowInsets.systemBars,
                     topBar = {
@@ -139,16 +147,17 @@ fun App(context: Context) {
                         )
                     }
                 }
-            } else {
-                MainScaffold(
-                    navController,
-                    drawerState,
-                    scope,
-                    startDestination,
-                    context,
-                    authService
-                )
+
             }
+        } else {
+            MainScaffold(
+                navController,
+                drawerState,
+                scope,
+                startDestination,
+                context,
+                authService
+            )
         }
     }
 }
