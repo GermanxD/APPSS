@@ -111,6 +111,8 @@ fun NavBarScreenHome(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     var showPermissionExplanationDialog by remember { mutableStateOf(false) }
+    val hasPermissions by vmHealthConnect.hasHealthConnectPermissions.collectAsState()
+    val availability by vmHealthConnect.healthConnectAvailability.collectAsState()
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = PermissionController.createRequestPermissionResultContract()
@@ -123,6 +125,12 @@ fun NavBarScreenHome(
         }
     }
 
+    LaunchedEffect(availability, hasPermissions) {
+        if (availability == VMHealthConnect.HealthConnectAvailability.AVAILABLE && !hasPermissions) {
+            vmHealthConnect.requestPermissions(context, requestPermissionLauncher)
+        }
+    }
+    
     LaunchedEffect(Unit) {
         vmHealthConnect.checkHealthConnectAvailability(context)
     }
