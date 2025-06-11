@@ -228,10 +228,14 @@ fun DrawerContent(
 ) {
     val userId = remember { authService.getUserId() }
     var userFirstName by remember { mutableStateOf("Usuario") }
+    var usernameDB by remember { mutableStateOf("Usuario") }
 
     LaunchedEffect(userId) {
-        userId?.let {
-            authService.getUserFirstName(it) { name ->
+        userId?.let { id ->
+            authService.getAllUserData(id) { data ->
+                data["username"]?.let { usernameDB = it }
+            }
+            authService.getUserFirstName(id) { name ->
                 name?.let { userFirstName = it }
             }
         }
@@ -256,8 +260,8 @@ fun DrawerContent(
                     .align(Alignment.CenterHorizontally)
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 10.dp)
@@ -292,7 +296,14 @@ fun DrawerContent(
                     text = userFirstName,
                     style = MaterialTheme.typography.body1,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+
+                Text(
+                    text = "@$usernameDB",
+                    style = MaterialTheme.typography.body1,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
         }
