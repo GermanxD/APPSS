@@ -137,7 +137,6 @@ fun SeccionRegistroDiario(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp)
     ) {
         SeccionMedicamentos(
             userFirstName = userFirstName,

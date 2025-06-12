@@ -58,64 +58,59 @@ fun NavBarScreenHome() {
     val snackbarHostState = remember { SnackbarHostState() }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .background(Color.White)
     ) {
-        Column(
+
+        // Banner de ayuda
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            shape = RoundedCornerShape(12.dp),
+            elevation = 4.dp,
+            backgroundColor = CuiroColors.SecondaryRose
         ) {
-
-            // Banner de ayuda
-            Card(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(12.dp),
-                elevation = 4.dp,
-                backgroundColor = CuiroColors.SecondaryRose
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Search,
-                        contentDescription = "Icono de Búsqueda",
-                        tint = Color.Black,
-                        modifier = Modifier.size(28.dp)
-                    )
+                Icon(
+                    imageVector = Icons.Rounded.Search,
+                    contentDescription = "Icono de Búsqueda",
+                    tint = Color.Black,
+                    modifier = Modifier.size(28.dp)
+                )
 
-                    Text(
-                        text = "¿Necesitas ayuda?",
-                        fontSize = 18.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(start = 12.dp)
-                    )
-                }
+                Text(
+                    text = "¿Necesitas ayuda?",
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(start = 12.dp)
+                )
             }
-
-            // Secciones
-            SeccionInformacion()
-
-            SeccionRecomendaciones()
-
         }
 
-        // Snackbar
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize(Alignment.BottomCenter)
-        ) { snackbarData ->
-            Snackbar(snackbarData)
-        }
+        // Secciones
+        SeccionInformacion()
+
+        SeccionRecomendaciones()
+
+    }
+
+    // Snackbar
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.BottomCenter)
+    ) { snackbarData ->
+        Snackbar(snackbarData)
     }
 }
 
@@ -159,15 +154,15 @@ fun SeccionInformacion() {
             fontWeight = FontWeight.SemiBold,
             fontSize = 16.sp,
             color = CuiroColors.FontBrown,
-            modifier = Modifier.padding(bottom = 4.dp)
+            modifier = Modifier.padding(vertical = 4.dp)
         )
 
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .shadow(4.dp, RoundedCornerShape(16.dp)),
+                .padding(8.dp),
             shape = RoundedCornerShape(16.dp),
-            elevation = 4.dp
+            elevation = 4.dp,
+            backgroundColor = Color.White
         ) {
             DataGrid(items)
         }
@@ -189,20 +184,14 @@ fun SeccionRecomendaciones() {
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Text(
-            text = "Recomendaciones sobre...",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
-            color = CuiroColors.FontBrown,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
+
 
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .shadow(4.dp, RoundedCornerShape(16.dp)),
+                .padding(8.dp),
             shape = RoundedCornerShape(16.dp),
-            elevation = 4.dp
+            elevation = 4.dp,
+            backgroundColor = Color.White
         ) {
             DataGrid(items)
         }
