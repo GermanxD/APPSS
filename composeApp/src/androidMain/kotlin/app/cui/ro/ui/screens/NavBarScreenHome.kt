@@ -184,7 +184,13 @@ fun SeccionRecomendaciones() {
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-
+        Text(
+            text = "Recomendaciones sobre...",
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            color = CuiroColors.FontBrown,
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
         Card(
             modifier = Modifier
