@@ -61,19 +61,19 @@ fun NavBarScreenStart(
 
 @Composable
 fun BottomNavHost(navController: NavHostController, onMenuClick: () -> Unit) {
+    val vmHealthConnect: VMHealthConnect = viewModel()
+
     NavHost(navController, startDestination = "home_route") {
         composable("home_route") {
-            val vmHealthConnect: VMHealthConnect = viewModel()
-            NavBarScreenHome(
-                onMenuClick = onMenuClick,
-                authService = AuthService(),
-                vmHealthConnect = vmHealthConnect
-            )
+            NavBarScreenHome()
         }
         composable("profile_route") { NavBarScreenProfile(
             authService = AuthService()
         ) }
-        composable("contacts_route") { NavBarScreenContact() }
+        composable("contacts_route") { NavBarScreenContact(
+            authService = AuthService(),
+            vmHealthConnect = vmHealthConnect
+        ) }
         composable("foro_route") { NavBarScreenForo() }
         composable("messages_route") { NavBarScreenMessage() }
     }

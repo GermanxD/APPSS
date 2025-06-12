@@ -62,7 +62,7 @@ fun DataColumn(
     ) {
         Box(
             modifier = Modifier
-                .size(56.dp)
+                .size(65.dp)
                 .clip(CircleShape)
                 .background(CuiroColors.SecondaryRose.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
@@ -70,7 +70,7 @@ fun DataColumn(
             Image(
                 painter = painterResource(id = imageResId),
                 contentDescription = null,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(45.dp),
                 colorFilter = ColorFilter.tint(Color.Black)
             )
         }
