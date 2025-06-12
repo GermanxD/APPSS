@@ -160,7 +160,7 @@ fun NavBarScreenProfile(
                         text = "Información de Contacto",
                         style = MaterialTheme.typography.h6,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333),
+                        color = Color.Black,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
@@ -185,7 +185,7 @@ fun NavBarScreenProfile(
                     Text(
                         text = "Información Personal",
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333),
+                        color = Color.Black,
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -221,7 +221,7 @@ fun NavBarScreenProfile(
                     Text(
                         text = "Acciones",
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333),
+                        color = Color.Black,
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )

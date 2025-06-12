@@ -77,7 +77,7 @@ fun DataColumn(
         Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = text,
-            fontSize = 13.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = CuiroColors.FontBrown,
             textAlign = TextAlign.Center

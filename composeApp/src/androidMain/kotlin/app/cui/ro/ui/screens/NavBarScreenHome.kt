@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
@@ -113,10 +114,10 @@ fun SeccionInformacion() {
     ) {
         Text(
             text = "Registro de información",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
             color = CuiroColors.FontBrown,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
         )
 
         Card(
@@ -148,10 +149,10 @@ fun SeccionRecomendaciones() {
     ) {
         Text(
             text = "Recomendaciones sobre...",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
             color = CuiroColors.FontBrown,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
         )
 
         Card(

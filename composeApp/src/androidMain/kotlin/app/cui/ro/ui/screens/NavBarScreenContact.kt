@@ -31,6 +31,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
@@ -146,7 +147,7 @@ fun SeccionRegistroDiario(
             userFirstName = userFirstName,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(8.dp)
         )
         SeccionPasos(
             userFirstName = userFirstName,
@@ -154,14 +155,14 @@ fun SeccionRegistroDiario(
             vmHealthConnect = vmHealthConnect,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(8.dp)
         )
         SeccionHidratacion(
             userFirstName = userFirstName,
             database = db,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
+                .padding(8.dp)
         )
     }
 }
@@ -182,10 +183,10 @@ fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
             ) {
                 Text(
                     text = "Medicamentos",
-                    fontSize = 16.sp,
-                    color = Color(0xFF333333),
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(bottom = 16.dp).weight(1f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -201,6 +202,7 @@ fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
             Column {
                 Text(
                     text = "$userFirstName, el siguiente medicamento es:",
+                    fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -208,7 +210,7 @@ fun SeccionMedicamentos(userFirstName: String, modifier: Modifier = Modifier) {
                 Text(
                     text = "Tamoxifeno (Nolvadex)",
                     fontSize = 14.sp,
-                    color = Color(0xFF222222),
+                    color = Color.Black,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
@@ -270,10 +272,10 @@ fun SeccionPasos(
             ) {
                 Text(
                     text = "Pasos",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF333333),
-                    modifier = Modifier.weight(1f),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(bottom = 16.dp).weight(1f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -324,10 +326,10 @@ fun SeccionHidratacion(
             ) {
                 Text(
                     text = "Hidratación",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF333333),
-                    modifier = Modifier.weight(1f),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(bottom = 16.dp).weight(1f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -352,7 +354,7 @@ fun SeccionHidratacion(
                         text = "¡Felicidades! Has completado tu día.",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF388E3C),
+                        color = CuiroColors.FontBrown,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -572,12 +574,12 @@ fun MedicionPasos(
                     // Disponible pero sin permisos -> Mostrar botón para solicitarlos
                     Column(
                         horizontalAlignment = Alignment.Start,
-                        modifier = Modifier.padding(vertical = 20.dp)
+                        modifier = Modifier.padding(12.dp)
                     ) {
                         Text(
                             text = "Concede permisos para ver tus pasos.",
                             color = Color.Black,
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                         Button(
@@ -586,8 +588,8 @@ fun MedicionPasos(
                                 showHealthConnectPermissionDialog = true
                             },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
+                                .fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = CuiroColors.ObjectsPink,
                                 contentColor = CuiroColors.FontBrown
