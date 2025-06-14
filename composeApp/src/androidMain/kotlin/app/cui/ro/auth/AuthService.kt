@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class AuthService {
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -143,6 +144,16 @@ class AuthService {
     // Cerrar sesión
     fun logout(context: Context) {
         Log.d(TAG, "Cerrando sesión")
+
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("daily")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Desuscripción del topic 'daily' exitosa")
+                } else {
+                    Log.e("FCM", "Error al desuscribirse de 'daily'", task.exception)
+                }
+            }
+
         firebaseAuth.signOut()
 
         val sharedPreferences: SharedPreferences =
