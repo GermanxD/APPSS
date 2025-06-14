@@ -111,7 +111,7 @@ fun RegisterScreen(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Image(
-                    painter = painterResource(R.drawable.img_logo_login),
+                    painter = painterResource(R.drawable.ic_general),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(120.dp)
