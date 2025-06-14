@@ -138,7 +138,7 @@ fun CustomTopAppBar(
                         overflow = TextOverflow.Ellipsis
                     )
                     Image(
-                        painter = painterResource(R.drawable.img_logo_login),
+                        painter = painterResource(R.drawable.ic_general),
                         contentDescription = "Logo",
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
