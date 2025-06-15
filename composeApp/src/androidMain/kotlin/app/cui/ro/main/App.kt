@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -26,8 +28,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -46,7 +52,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -244,7 +252,7 @@ fun DrawerContent(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth(0.6f)
+            .fillMaxWidth(0.75f)
             .fillMaxHeight()
             .padding(WindowInsets.systemBars.asPaddingValues())
             .shadow(4.dp)
@@ -256,6 +264,14 @@ fun DrawerContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF4A90E2),
+                            Color(0xFF357ABD)
+                        )
+                    )
+                )
                 .padding(16.dp)
         ) {
             // Logo
@@ -263,8 +279,9 @@ fun DrawerContent(
                 painter = painterResource(R.drawable.img_cuiro_letras),
                 contentDescription = "Logo CUIRO",
                 modifier = Modifier
-                    .size(100.dp)
-                    .padding(bottom = 16.dp)
+                    .size(80.dp)
+                    .padding(bottom = 12.dp),
+                colorFilter = ColorFilter.tint(Color.White)
             )
 
             // Foto de perfil
@@ -277,19 +294,20 @@ fun DrawerContent(
                         contentDescription = "Foto de perfil",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(80.dp)
+                            .size(70.dp)
                             .clip(CircleShape)
+                            .border(3.dp, Color.White, CircleShape)
                     )
                 }
             } else {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Imagen de perfil no disponible",
-                    tint = Color.Gray,
+                    tint = Color.White,
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(70.dp)
                         .clip(CircleShape)
-                        .border(2.dp, Color.Gray, CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f))
                         .padding(16.dp)
                 )
             }
@@ -298,60 +316,138 @@ fun DrawerContent(
             Text(
                 text = userFirstName,
                 style = MaterialTheme.typography.h6,
+                color = Color.White,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 8.dp)
             )
             Text(
                 text = "@$usernameDB",
                 style = MaterialTheme.typography.body2,
-                color = Color.Gray,
+                color = Color.White.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
 
-        Divider(
-            color = Color.Gray.copy(alpha = 0.3f),
-            thickness = 1.dp,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-
         // Navigation Section
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 8.dp)
+                .padding(vertical = 8.dp)
         ) {
-            DrawerItem(
-                icon = Icons.Default.Home,
-                label = "Inicio"
-            ) {
-                scope.launch { drawerState.close() }
-                navController.navigate(Screen.Home.route)
+            item {
+                // Navegación Principal
+                DrawerSectionHeader(title = "Principal")
+
+                DrawerItem(
+                    icon = Icons.Default.Home,
+                    label = "Inicio"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Home.route)
+                }
+
+                DrawerItem(
+                    icon = Icons.Default.Person,
+                    label = "Mi Perfil"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Profile.route)
+                }
+
+                DrawerItem(
+                    icon = Icons.Default.Notifications,
+                    label = "Notificaciones",
+                    hasNotification = true,
+                    notificationCount = 3
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Home.route)
+                }
             }
 
-            DrawerItem(
-                icon = Icons.Default.Settings,
-                label = "Configuraciones"
-            ) {
-                scope.launch { drawerState.close() }
-                navController.navigate(Screen.Settings.route)
+            item {
+                // Herramientas
+                DrawerSectionHeader(title = "Herramientas")
+
+                DrawerItem(
+                    icon = Icons.Default.Search,
+                    label = "Buscar"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Home.route)
+                }
+
+                DrawerItem(
+                    icon = Icons.Default.Info,
+                    label = "Historial"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Home.route)
+                }
+
+                DrawerItem(
+                    icon = Icons.Default.Favorite,
+                    label = "Guardados"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Home.route)
+                }
+            }
+
+            item {
+                // Configuración y Soporte
+                DrawerSectionHeader(title = "Configuración")
+
+                DrawerItem(
+                    icon = Icons.Default.Settings,
+                    label = "Configuración"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Settings.route)
+                }
+
+                DrawerItem(
+                    icon = Icons.Default.Info,
+                    label = "Ayuda y Soporte"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Home.route)
+                }
+
+                DrawerItem(
+                    icon = Icons.Default.Info,
+                    label = "Acerca de"
+                ) {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Screen.Home.route)
+                }
             }
         }
 
-        // Footer Section - Logout
+        // Footer Section - Version y Logout
         Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Divider(
                 color = Color.Gray.copy(alpha = 0.3f),
                 thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            // Version info
+            Text(
+                text = "Versión 1.0.0",
+                style = MaterialTheme.typography.caption,
+                color = Color.Gray,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 8.dp)
             )
 
             DrawerItem(
                 icon = Icons.Default.ExitToApp,
-                label = "Cerrar sesión",
+                label = "Cerrar Sesión",
                 isLogout = true
             ) {
                 authService.logout(context)
@@ -365,10 +461,25 @@ fun DrawerContent(
 }
 
 @Composable
+fun DrawerSectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.overline,
+        color = Color.Gray,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+
+@Composable
 fun DrawerItem(
     icon: ImageVector,
     label: String,
     isLogout: Boolean = false,
+    hasNotification: Boolean = false,
+    notificationCount: Int = 0,
     onClick: () -> Unit
 ) {
     Row(
@@ -376,22 +487,70 @@ fun DrawerItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (isLogout) Color.Red else Color.Black,
-            modifier = Modifier.size(24.dp)
-        )
+        Box {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = if (isLogout) Color.Red else Color(0xFF4A90E2),
+                modifier = Modifier.size(24.dp)
+            )
+
+            // Badge de notificación
+            if (hasNotification && notificationCount > 0) {
+                Badge(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 8.dp, y = (-8).dp)
+                ) {
+                    Text(
+                        text = if (notificationCount > 99) "99+" else notificationCount.toString(),
+                        style = MaterialTheme.typography.caption,
+                        color = Color.White,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.width(16.dp))
+
         Text(
             text = label,
             fontSize = 16.sp,
             color = if (isLogout) Color.Red else Color.Black,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.weight(1f)
         )
+
+        // Flecha indicadora
+        if (!isLogout) {
+            Icon(
+                imageVector = Icons.Default.ExitToApp,
+                contentDescription = null,
+                tint = Color.Gray.copy(alpha = 0.5f),
+                modifier = Modifier.size(16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun Badge(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .background(
+                color = Color.Red,
+                shape = CircleShape
+            )
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        content()
     }
 }
 
