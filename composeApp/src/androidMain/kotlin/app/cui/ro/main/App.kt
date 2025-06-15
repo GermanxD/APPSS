@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -249,111 +250,149 @@ fun DrawerContent(
             .shadow(4.dp)
             .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp))
             .background(Color.White)
-            .padding(vertical = 10.dp, horizontal = 16.dp)
     ) {
-        Column {
+        // Header Section - Logo y perfil de usuario
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // Logo
             Image(
                 painter = painterResource(R.drawable.img_cuiro_letras),
                 contentDescription = "Logo CUIRO",
                 modifier = Modifier
                     .size(100.dp)
-                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 16.dp)
             )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            ) {
-                // Mostrar imagen de perfil desde base64 o icono por defecto
-                if (profileImageBase64 != null) {
-                    val imageBytes = Base64.decode(profileImageBase64, Base64.DEFAULT)
-                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                    bitmap?.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = "Foto de perfil",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(CircleShape)
-                        )
-                    }
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Imagen de perfil no disponible",
-                        tint = Color.Gray,
+            // Foto de perfil
+            if (profileImageBase64 != null) {
+                val imageBytes = Base64.decode(profileImageBase64, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                bitmap?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "Foto de perfil",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .border(2.dp, Color.Gray, CircleShape)
                     )
                 }
-
-                Text(
-                    text = userFirstName,
-                    style = MaterialTheme.typography.body1,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 4.dp)
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Imagen de perfil no disponible",
+                    tint = Color.Gray,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.Gray, CircleShape)
+                        .padding(16.dp)
                 )
+            }
 
-                Text(
-                    text = "@$usernameDB",
-                    style = MaterialTheme.typography.body2,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
+            // Información del usuario
+            Text(
+                text = userFirstName,
+                style = MaterialTheme.typography.h6,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            Text(
+                text = "@$usernameDB",
+                style = MaterialTheme.typography.body2,
+                color = Color.Gray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+        }
+
+        Divider(
+            color = Color.Gray.copy(alpha = 0.3f),
+            thickness = 1.dp,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+
+        // Navigation Section
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp)
+        ) {
+            DrawerItem(
+                icon = Icons.Default.Home,
+                label = "Inicio"
+            ) {
+                scope.launch { drawerState.close() }
+                navController.navigate(Screen.Home.route)
+            }
+
+            DrawerItem(
+                icon = Icons.Default.Settings,
+                label = "Configuraciones"
+            ) {
+                scope.launch { drawerState.close() }
+                navController.navigate(Screen.Settings.route)
             }
         }
 
-        Divider(color = Color.Gray.copy(alpha = 0.3f), modifier = Modifier.padding(vertical = 8.dp))
+        // Footer Section - Logout
+        Column(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)
+        ) {
+            Divider(
+                color = Color.Gray.copy(alpha = 0.3f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+            )
 
-        DrawerItem(icon = Icons.Default.Home, label = "Inicio") {
-            scope.launch { drawerState.close() }
-            navController.navigate(Screen.Home.route)
-        }
-
-        DrawerItem(icon = Icons.Default.ExitToApp, label = "Cerrar sesión") {
-            authService.logout(context)
-            scope.launch { drawerState.close() }
-            navController.navigate(Screen.Login.route) {
-                popUpTo(0) { inclusive = true }
+            DrawerItem(
+                icon = Icons.Default.ExitToApp,
+                label = "Cerrar sesión",
+                isLogout = true
+            ) {
+                authService.logout(context)
+                scope.launch { drawerState.close() }
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
             }
-        }
-
-        DrawerItem(icon = Icons.Default.Settings, label = "Configuraciones") {
-            scope.launch { drawerState.close() }
-            navController.navigate(Screen.Settings.route)
         }
     }
 }
 
 @Composable
-fun DrawerItem(icon: ImageVector, label: String, onClick: () -> Unit) {
+fun DrawerItem(
+    icon: ImageVector,
+    label: String,
+    isLogout: Boolean = false,
+    onClick: () -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .clip(RoundedCornerShape(8.dp))
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = Color.Black,
+            tint = if (isLogout) Color.Red else Color.Black,
             modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = label,
             fontSize = 16.sp,
-            color = Color.Black
+            color = if (isLogout) Color.Red else Color.Black,
+            fontWeight = FontWeight.Medium
         )
     }
 }
-
 
 
