@@ -116,6 +116,8 @@ dependencies {
     implementation(libs.modernstorage.storage)
     implementation(libs.modernstorage.photopicker)
     implementation(libs.coil.compose)
+    implementation(libs.annotations)
+    implementation(libs.annotations)
     debugImplementation(compose.uiTooling)
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
