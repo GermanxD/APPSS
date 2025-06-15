@@ -296,14 +296,15 @@ fun DrawerContent(
                     text = userFirstName,
                     style = MaterialTheme.typography.body1,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(top = 4.dp)
                 )
 
                 Text(
                     text = "@$usernameDB",
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.body2,
+                    color = Color.Gray,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
         }
