@@ -78,6 +78,7 @@ import app.cui.ro.models.VMProfileImage
 import app.cui.ro.navigation.BottomNavigationBar
 import app.cui.ro.navigation.NavBarScreenStart
 import app.cui.ro.ui.CustomTopAppBar
+import app.cui.ro.ui.screens.NotificationsScreen
 import app.cui.ro.ui.screens.SettingsScreen
 import app.cui.ro.ui.session.LoginScreen
 import app.cui.ro.ui.session.RegisterScreen
@@ -138,7 +139,6 @@ fun App(context: Context) {
                                     }
                                 }
                             },
-                            onNotificationsClick = { /* Lógica para notificaciones */ },
                             title = "\"Cuidarte es luchar, resistir y vencer al cáncer de mama\""
                         )
                     },
@@ -219,10 +219,11 @@ fun MainScaffold(
             )
         }
         composable(Screen.Settings.route) {
-            SettingsScreen(
-                onMenuClick = {
-                    scope.launch { drawerState.open() }
-                }
+            SettingsScreen()
+        }
+        composable(Screen.Notifications.route) {
+            NotificationsScreen(
+                authService
             )
         }
     }
@@ -265,7 +266,6 @@ fun DrawerContent(
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .padding(vertical = 12.dp)
         ) {
             // Header Section - Perfil de usuario como primer item
             item {
@@ -366,7 +366,7 @@ fun DrawerContent(
                     notificationCount = 3
                 ) {
                     scope.launch { drawerState.close() }
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.Notifications.route)
                 }
             }
 

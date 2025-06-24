@@ -44,14 +44,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import app.cui.ro.auth.AuthService
 import app.cui.ro.ui.theme.CuiroColors
-import kotlinx.coroutines.Job
 
 @Composable
 fun SettingsScreen(
-    onMenuClick: () -> Unit,
-    authService: AuthService? = null,
     onSignOut: () -> Unit = {}
 ) {
     var showSignOutDialog by remember { mutableStateOf(false) }

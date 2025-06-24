@@ -88,7 +88,6 @@ fun DataColumn(
 @Composable
 fun CustomTopAppBar(
     onMenuClick: () -> Unit,
-    onNotificationsClick: () -> Unit,
     title: String
 ) {
     // Obtener el padding de la status bar usando las APIs nativas
@@ -116,13 +115,6 @@ fun CustomTopAppBar(
                             Icon(
                                 Icons.Filled.Menu,
                                 contentDescription = "Menu",
-                                modifier = Modifier.size(30.dp),
-                            )
-                        }
-                        IconButton(onClick = onNotificationsClick) {
-                            Icon(
-                                Icons.Filled.Notifications,
-                                contentDescription = "Notificaciones",
                                 modifier = Modifier.size(30.dp),
                             )
                         }
