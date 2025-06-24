@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -79,6 +81,7 @@ import app.cui.ro.ui.CustomTopAppBar
 import app.cui.ro.ui.screens.SettingsScreen
 import app.cui.ro.ui.session.LoginScreen
 import app.cui.ro.ui.session.RegisterScreen
+import app.cui.ro.ui.theme.CuiroColors
 import app.cui.ro.ui.theme.CuiroTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -255,86 +258,95 @@ fun DrawerContent(
             .fillMaxWidth(0.75f)
             .fillMaxHeight()
             .padding(WindowInsets.systemBars.asPaddingValues())
-            .shadow(4.dp)
+            .shadow(8.dp)
             .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp))
             .background(Color.White)
     ) {
-        // Header Section - Logo y perfil de usuario
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF4A90E2),
-                            Color(0xFF357ABD)
-                        )
-                    )
-                )
-                .padding(16.dp)
-        ) {
-            // Logo
-            Image(
-                painter = painterResource(R.drawable.img_cuiro_letras),
-                contentDescription = "Logo CUIRO",
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(bottom = 12.dp),
-                colorFilter = ColorFilter.tint(Color.White)
-            )
-
-            // Foto de perfil
-            if (profileImageBase64 != null) {
-                val imageBytes = Base64.decode(profileImageBase64, Base64.DEFAULT)
-                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                bitmap?.let {
-                    Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = "Foto de perfil",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(70.dp)
-                            .clip(CircleShape)
-                            .border(3.dp, Color.White, CircleShape)
-                    )
-                }
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Imagen de perfil no disponible",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.2f))
-                        .padding(16.dp)
-                )
-            }
-
-            // Información del usuario
-            Text(
-                text = userFirstName,
-                style = MaterialTheme.typography.h6,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            Text(
-                text = "@$usernameDB",
-                style = MaterialTheme.typography.body2,
-                color = Color.White.copy(alpha = 0.8f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
-
-        // Navigation Section
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .padding(vertical = 8.dp)
+                .padding(vertical = 12.dp)
         ) {
+            // Header Section - Perfil de usuario como primer item
+            item {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    CuiroColors.ObjectsPink.copy(alpha = 0.1f),
+                                    CuiroColors.SecondaryRose.copy(alpha = 0.05f),
+                                    Color.White
+                                )
+                            )
+                        )
+                        .padding(20.dp)
+                ) {
+                    // Logo
+                    Image(
+                        painter = painterResource(R.drawable.img_cuiro_letras),
+                        contentDescription = "Logo CUIRO",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .padding(bottom = 16.dp),
+                        colorFilter = ColorFilter.tint(CuiroColors.ObjectsPink)
+                    )
+
+                    // Foto de perfil con estilo mejorado
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .background(
+                                color = CuiroColors.SecondaryRose.copy(alpha = 0.2f),
+                                shape = CircleShape
+                            )
+                            .padding(4.dp)
+                    ) {
+                        if (profileImageBase64 != null) {
+                            val imageBytes = Base64.decode(profileImageBase64, Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                            bitmap?.let {
+                                Image(
+                                    bitmap = it.asImageBitmap(),
+                                    contentDescription = "Foto de perfil",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape)
+                                )
+                            }
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Imagen de perfil no disponible",
+                                tint = CuiroColors.ObjectsPink,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp)
+                            )
+                        }
+                    }
+
+                    // Información del usuario con estilo mejorado
+                    Text(
+                        text = userFirstName,
+                        style = MaterialTheme.typography.h6.copy(fontSize = 20.sp),
+                        color = Color(0xFF333333),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                    Text(
+                        text = "@$usernameDB",
+                        style = MaterialTheme.typography.body2,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+                    )
+                }
+            }
             item {
                 // Navegación Principal
                 DrawerSectionHeader(title = "Principal")
@@ -345,14 +357,6 @@ fun DrawerContent(
                 ) {
                     scope.launch { drawerState.close() }
                     navController.navigate(Screen.Home.route)
-                }
-
-                DrawerItem(
-                    icon = Icons.Default.Person,
-                    label = "Mi Perfil"
-                ) {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Screen.Profile.route)
                 }
 
                 DrawerItem(
@@ -423,37 +427,49 @@ fun DrawerContent(
                     navController.navigate(Screen.Home.route)
                 }
             }
-        }
+            // Footer Section - Version y Logout como último item
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.White,
+                                    CuiroColors.SecondaryRose.copy(alpha = 0.05f)
+                                )
+                            )
+                        )
+                        .padding(16.dp)
+                ) {
+                    Divider(
+                        color = CuiroColors.ObjectsPink.copy(alpha = 0.2f),
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
 
-        // Footer Section - Version y Logout
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Divider(
-                color = Color.Gray.copy(alpha = 0.3f),
-                thickness = 1.dp,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+                    // Version info
+                    Text(
+                        text = "Versión 1.0.0",
+                        style = MaterialTheme.typography.caption,
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        textAlign = TextAlign.Center
+                    )
 
-            // Version info
-            Text(
-                text = "Versión 1.0.0",
-                style = MaterialTheme.typography.caption,
-                color = Color.Gray,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 8.dp)
-            )
-
-            DrawerItem(
-                icon = Icons.Default.ExitToApp,
-                label = "Cerrar Sesión",
-                isLogout = true
-            ) {
-                authService.logout(context)
-                scope.launch { drawerState.close() }
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(0) { inclusive = true }
+                    DrawerItem(
+                        icon = Icons.Default.ExitToApp,
+                        label = "Cerrar Sesión",
+                        isLogout = true
+                    ) {
+                        authService.logout(context)
+                        scope.launch { drawerState.close() }
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
                 }
             }
         }
@@ -465,11 +481,11 @@ fun DrawerSectionHeader(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.overline,
-        color = Color.Gray,
+        color = CuiroColors.ObjectsPink,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 20.dp, vertical = 12.dp)
     )
 }
 
@@ -482,56 +498,71 @@ fun DrawerItem(
     notificationCount: Int = 0,
     onClick: () -> Unit
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = 0.dp,
+        backgroundColor = Color.Transparent,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Box {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = if (isLogout) Color.Red else Color(0xFF4A90E2),
-                modifier = Modifier.size(24.dp)
-            )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = if (isLogout) Color.Red.copy(alpha = 0.05f)
+                    else CuiroColors.SecondaryRose.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            Box {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = if (isLogout) Color.Red else CuiroColors.ObjectsPink,
+                    modifier = Modifier.size(24.dp)
+                )
 
-            // Badge de notificación
-            if (hasNotification && notificationCount > 0) {
-                Badge(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 8.dp, y = (-8).dp)
-                ) {
-                    Text(
-                        text = if (notificationCount > 99) "99+" else notificationCount.toString(),
-                        style = MaterialTheme.typography.caption,
-                        color = Color.White,
-                        fontSize = 10.sp
-                    )
+                // Badge de notificación mejorado
+                if (hasNotification && notificationCount > 0) {
+                    Badge(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = 8.dp, y = (-8).dp)
+                    ) {
+                        Text(
+                            text = if (notificationCount > 99) "99+" else notificationCount.toString(),
+                            style = MaterialTheme.typography.caption,
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-        Text(
-            text = label,
-            fontSize = 16.sp,
-            color = if (isLogout) Color.Red else Color.Black,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-
-        // Flecha indicadora
-        if (!isLogout) {
-            Icon(
-                imageVector = Icons.Default.ExitToApp,
-                contentDescription = null,
-                tint = Color.Gray.copy(alpha = 0.5f),
-                modifier = Modifier.size(16.dp)
+            Text(
+                text = label,
+                fontSize = 16.sp,
+                color = if (isLogout) Color.Red else Color(0xFF333333),
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f)
             )
+
+            // Flecha indicadora mejorada
+            if (!isLogout) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = CuiroColors.ObjectsPink.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }
@@ -544,14 +575,13 @@ fun Badge(
     Box(
         modifier = modifier
             .background(
-                color = Color.Red,
+                color = CuiroColors.ObjectsPink,
                 shape = CircleShape
             )
-            .padding(horizontal = 6.dp, vertical = 2.dp),
+            .padding(horizontal = 6.dp, vertical = 3.dp),
         contentAlignment = Alignment.Center
     ) {
         content()
     }
 }
-
 
