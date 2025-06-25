@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import app.cui.ro.R
+import app.cui.ro.models.NotificationCounter
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.HiltAndroidApp
@@ -15,24 +16,36 @@ import java.util.Random
 @HiltAndroidApp
 class MyApp : Application()
 
+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        remoteMessage.notification?.let {
-            showNotification(it.title, it.body)
-        }
+        val title = remoteMessage.data["title"] ?: "Cuiro"
+        val message = remoteMessage.data["body"] ?: "Tienes una nueva notificación"
+
+        NotificationCounter.increment(this)
+
+        showNotification(title, message)
     }
+
 
     private fun showNotification(title: String?, message: String?) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val channelId = "default_channel_id"
-        val channel = NotificationChannel(channelId, "Default", NotificationManager.IMPORTANCE_DEFAULT)
+
+        //  Crear canal si no existe (obligatorio en Android O+)
+        val channel = NotificationChannel(
+            channelId,
+            "Notificaciones Cuiro",
+            NotificationManager.IMPORTANCE_HIGH
+        )
         notificationManager.createNotificationChannel(channel)
 
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(title)
-            .setContentText(message)
+            .setContentTitle(title ?: "Cuiro")
+            .setContentText(message ?: "")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
 

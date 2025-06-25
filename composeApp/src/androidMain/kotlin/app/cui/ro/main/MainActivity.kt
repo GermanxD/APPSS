@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import app.cui.ro.models.NotificationCounter
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -40,6 +41,8 @@ class MainActivity : ComponentActivity() {
 
         // Solicitar permiso de notificaciones automáticamente
         requestNotificationPermissionOnStart()
+
+        NotificationCounter.initialize(this)
 
         setContent {
             App(context = this)

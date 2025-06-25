@@ -45,6 +45,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +75,7 @@ import androidx.navigation.compose.rememberNavController
 import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.Screen
+import app.cui.ro.models.VMNotifications
 import app.cui.ro.models.VMProfileImage
 import app.cui.ro.navigation.BottomNavigationBar
 import app.cui.ro.navigation.NavBarScreenStart
@@ -242,6 +244,8 @@ fun DrawerContent(
     val userId = remember { authService.getUserId() }
     var userFirstName by remember { mutableStateOf("Usuario") }
     var usernameDB by remember { mutableStateOf("Usuario") }
+    val notificationViewModel: VMNotifications = viewModel()
+    val notificationCount by notificationViewModel.notificationCount.collectAsState()
 
     LaunchedEffect(userId) {
         userId?.let { id ->
@@ -362,11 +366,12 @@ fun DrawerContent(
                 DrawerItem(
                     icon = Icons.Default.Notifications,
                     label = "Notificaciones",
-                    hasNotification = true,
-                    notificationCount = 3
+                    hasNotification = notificationCount > 0,
+                    notificationCount = notificationCount
                 ) {
                     scope.launch { drawerState.close() }
                     navController.navigate(Screen.Notifications.route)
+                    notificationViewModel.clearNotifications()
                 }
             }
 
