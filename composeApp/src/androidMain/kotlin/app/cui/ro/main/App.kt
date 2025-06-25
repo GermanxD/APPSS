@@ -183,7 +183,8 @@ fun MainScaffold(
     scope: CoroutineScope,
     startDestination: String,
     context: Context,
-    authService: AuthService
+    authService: AuthService,
+    notificationViewModel: VMNotifications = viewModel()
 ) {
 
     NavHost(navController = navController, startDestination = startDestination) {
@@ -225,7 +226,8 @@ fun MainScaffold(
         }
         composable(Screen.Notifications.route) {
             NotificationsScreen(
-                authService
+                authService,
+                notificationViewModel
             )
         }
     }
@@ -371,7 +373,7 @@ fun DrawerContent(
                 ) {
                     scope.launch { drawerState.close() }
                     navController.navigate(Screen.Notifications.route)
-                    notificationViewModel.clearNotifications()
+                    //notificationViewModel.clearNotifications()
                 }
             }
 

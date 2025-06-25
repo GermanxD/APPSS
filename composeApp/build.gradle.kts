@@ -118,6 +118,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.annotations)
     implementation(libs.annotations)
+    implementation(libs.gson)
     debugImplementation(compose.uiTooling)
 
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
