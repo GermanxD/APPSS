@@ -41,7 +41,6 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,22 +55,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cui.ro.auth.AuthService
-import app.cui.ro.models.StoredNotification
-import app.cui.ro.models.VMNotifications
 import app.cui.ro.ui.theme.CuiroColors
+
 @Composable
 fun NotificationsScreen(
     authService: AuthService,
-    notificationViewModel: VMNotifications // Agregar el ViewModel
 ) {
-    // Usar los datos del ViewModel
-    val notifications by notificationViewModel.notifications.collectAsState()
-    val isLoading by notificationViewModel.isLoading.collectAsState()
-    val unreadCount by notificationViewModel.notificationCount.collectAsState()
+    val userId = remember { authService.getUserId() }
+    var notifications by remember { mutableStateOf<List<Notification>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var unreadCount by remember { mutableStateOf(0) }
 
-    // Cargar notificaciones al abrir la pantalla
-    LaunchedEffect(Unit) {
-        notificationViewModel.loadNotifications()
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            loadNotifications(userId) { notificationsList ->
+                notifications = notificationsList
+                unreadCount = notificationsList.count { !it.isRead }
+                isLoading = false
+            }
+        }
     }
 
     Column(
@@ -109,6 +111,7 @@ fun NotificationsScreen(
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
+
                     if (unreadCount > 0) {
                         NotificationBadge(count = unreadCount)
                     }
@@ -132,14 +135,20 @@ fun NotificationsScreen(
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Button(
                             onClick = {
-                                // Marcar todas como leídas y limpiar el contador
-                                notificationViewModel.markAllAsRead()
+                                // Marcar todas como leídas
+                                userId?.let { id ->
+                                    markAllAsRead(id) {
+                                        notifications = notifications.map { it.copy(isRead = true) }
+                                        unreadCount = 0
+                                    }
+                                }
                             },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(
@@ -161,10 +170,16 @@ fun NotificationsScreen(
                                 fontSize = 12.sp
                             )
                         }
+
                         Button(
                             onClick = {
-                                // Limpiar notificaciones y contador
-                                notificationViewModel.clearAllNotifications()
+                                // Limpiar notificaciones
+                                userId?.let { id ->
+                                    clearAllNotifications(id) {
+                                        notifications = emptyList()
+                                        unreadCount = 0
+                                    }
+                                }
                             },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(
@@ -206,6 +221,7 @@ fun NotificationsScreen(
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
+
                     if (isLoading) {
                         Box(
                             modifier = Modifier
@@ -226,12 +242,25 @@ fun NotificationsScreen(
                         ) {
                             items(notifications) { notification ->
                                 NotificationItem(
-                                    notification = notification.toNotification(), // Convertir StoredNotification a Notification
+                                    notification = notification,
                                     onMarkAsRead = { notificationId ->
-                                        notificationViewModel.markAsRead(notificationId)
+                                        userId?.let { id ->
+                                            markNotificationAsRead(id, notificationId) {
+                                                notifications = notifications.map {
+                                                    if (it.id == notificationId) it.copy(isRead = true) else it
+                                                }
+                                                unreadCount = notifications.count { !it.isRead }
+                                            }
+                                        }
                                     },
                                     onDelete = { notificationId ->
-                                        notificationViewModel.deleteNotification(notificationId)
+                                        userId?.let { id ->
+                                            deleteNotification(id, notificationId) {
+                                                notifications =
+                                                    notifications.filter { it.id != notificationId }
+                                                unreadCount = notifications.count { !it.isRead }
+                                            }
+                                        }
                                     }
                                 )
                             }
@@ -257,12 +286,15 @@ fun NotificationsScreen(
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
+
                     NotificationSettingRow(
                         icon = Icons.Default.Notifications,
                         title = "Notificaciones Push",
                         subtitle = "Recibir notificaciones en tiempo real"
                     )
+
                     Spacer(modifier = Modifier.height(12.dp))
+
                     NotificationSettingRow(
                         icon = Icons.Default.Email,
                         title = "Notificaciones por Email",
@@ -331,6 +363,7 @@ fun NotificationItem(
                     modifier = Modifier.size(20.dp)
                 )
             }
+
             Spacer(modifier = Modifier.width(12.dp))
 
             // Contenido de la notificación
@@ -343,6 +376,7 @@ fun NotificationItem(
                     fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.Bold,
                     color = if (notification.isRead) Color.Gray else Color.Black
                 )
+
                 Text(
                     text = notification.message,
                     style = MaterialTheme.typography.body2,
@@ -351,6 +385,7 @@ fun NotificationItem(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp)
                 )
+
                 Text(
                     text = formatTimeAgo(notification.timestamp),
                     style = MaterialTheme.typography.caption,
@@ -373,7 +408,9 @@ fun NotificationItem(
                             )
                     )
                 }
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Row {
                     if (!notification.isRead) {
                         IconButton(
@@ -388,6 +425,7 @@ fun NotificationItem(
                             )
                         }
                     }
+
                     IconButton(
                         onClick = { onDelete(notification.id) },
                         modifier = Modifier.size(24.dp)
@@ -419,13 +457,16 @@ fun EmptyNotificationsView() {
             modifier = Modifier.size(64.dp),
             tint = Color.Gray
         )
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "No tienes notificaciones",
             style = MaterialTheme.typography.h6,
             color = Color.Gray,
             textAlign = TextAlign.Center
         )
+
         Text(
             text = "Las notificaciones aparecerán aquí cuando las recibas",
             style = MaterialTheme.typography.body2,
@@ -454,7 +495,9 @@ fun NotificationSettingRow(
             tint = CuiroColors.ObjectsPink,
             modifier = Modifier.size(24.dp)
         )
+
         Spacer(modifier = Modifier.width(16.dp))
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -470,6 +513,7 @@ fun NotificationSettingRow(
                 color = Color.Gray
             )
         }
+
         Switch(
             checked = isEnabled,
             onCheckedChange = { isEnabled = it },
@@ -519,6 +563,7 @@ fun getNotificationColor(type: NotificationType): Color {
 fun formatTimeAgo(timestamp: Long): String {
     val now = System.currentTimeMillis()
     val diff = now - timestamp
+
     return when {
         diff < 60000 -> "Ahora"
         diff < 3600000 -> "${diff / 60000}m"
@@ -528,14 +573,47 @@ fun formatTimeAgo(timestamp: Long): String {
     }
 }
 
-// Función de extensión para convertir StoredNotification a Notification
-fun StoredNotification.toNotification(): Notification {
-    return Notification(
-        id = this.id,
-        title = this.title,
-        message = this.message,
-        type = this.type,
-        timestamp = this.timestamp,
-        isRead = this.isRead
+// Funciones simuladas para interactuar con el backend
+fun loadNotifications(userId: String, onResult: (List<Notification>) -> Unit) {
+    // Aquí implementarías la lógica para cargar notificaciones desde Firestore
+    // Por ahora, datos de ejemplo:
+    val sampleNotifications = listOf(
+        Notification(
+            id = "1",
+            title = "¡Bienvenido!",
+            message = "Tu cuenta ha sido creada exitosamente",
+            type = NotificationType.SUCCESS,
+            timestamp = System.currentTimeMillis() - 3600000,
+            isRead = false
+        ),
+        Notification(
+            id = "2",
+            title = "Nuevo mensaje",
+            message = "Tienes un nuevo mensaje de un usuario",
+            type = NotificationType.MESSAGE,
+            timestamp = System.currentTimeMillis() - 7200000,
+            isRead = true
+        )
     )
+    onResult(sampleNotifications)
+}
+
+fun markAllAsRead(userId: String, onComplete: () -> Unit) {
+    // Implementar lógica para marcar todas como leídas
+    onComplete()
+}
+
+fun clearAllNotifications(userId: String, onComplete: () -> Unit) {
+    // Implementar lógica para limpiar todas las notificaciones
+    onComplete()
+}
+
+fun markNotificationAsRead(userId: String, notificationId: String, onComplete: () -> Unit) {
+    // Implementar lógica para marcar una notificación como leída
+    onComplete()
+}
+
+fun deleteNotification(userId: String, notificationId: String, onComplete: () -> Unit) {
+    // Implementar lógica para eliminar una notificación
+    onComplete()
 }
