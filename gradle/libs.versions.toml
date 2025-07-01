@@ -34,6 +34,7 @@ coilCompose = "3.1.0"
 comGoogleDaggerHiltAndroidGradlePlugin = "2.56.1"
 annotations = "15.0"
 gson = "2.13.1"
+uiDesktop = "1.7.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -68,6 +69,7 @@ coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref 
 com-google-dagger-hilt-android-gradle-plugin = { group = "com.google.dagger.hilt.android", name = "com.google.dagger.hilt.android.gradle.plugin", version.ref = "comGoogleDaggerHiltAndroidGradlePlugin" }
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

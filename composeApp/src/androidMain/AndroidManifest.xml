@@ -53,7 +53,7 @@
         </activity-alias>
         
         <service
-            android:name="app.cui.ro.push.MyFirebaseMessagingService"
+            android:name="app.cui.ro.models.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
