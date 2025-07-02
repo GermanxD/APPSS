@@ -225,7 +225,8 @@ fun MainScaffold(
         }
         composable(Screen.Notifications.route) {
             NotificationsScreen(
-                authService
+                authService = authService,
+                notificationsViewModel = viewModel()
             )
         }
     }

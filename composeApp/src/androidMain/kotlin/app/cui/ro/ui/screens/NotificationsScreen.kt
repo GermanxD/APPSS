@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.items // Importante: items para Long id
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,8 +25,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
+import androidx.compose.material.Switch // Mantén esto si lo usas
+import androidx.compose.material.SwitchDefaults // Mantén esto si lo usas
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -34,47 +34,41 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Notifications // Icono para Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf // Para settings si no están en VM
+import androidx.compose.runtime.remember // Para settings si no están en VM
+import androidx.compose.runtime.setValue // Para settings si no están en VM
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.auth.AuthService
+import app.cui.ro.db.Notification // Asegúrate que la ruta sea correcta
+import app.cui.ro.models.NotificationViewModel
 import app.cui.ro.ui.theme.CuiroColors
 
 @Composable
 fun NotificationsScreen(
     authService: AuthService,
+    notificationsViewModel: NotificationViewModel = viewModel()
 ) {
     val userId = remember { authService.getUserId() }
-    var notifications by remember { mutableStateOf<List<Notification>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var unreadCount by remember { mutableStateOf(0) }
-
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            loadNotifications(userId) { notificationsList ->
-                notifications = notificationsList
-                unreadCount = notificationsList.count { !it.isRead }
-                isLoading = false
-            }
-        }
-    }
+    var pushEnabled by remember { mutableStateOf(true) }
+    var emailEnabled by remember { mutableStateOf(false) }
+    val notifications by notificationsViewModel.notifications.collectAsState()
+    val isLoading by notificationsViewModel.isLoading.collectAsState()
+    val unreadCount by notificationsViewModel.unreadCount.collectAsState()
 
     Column(
         modifier = Modifier
@@ -109,7 +103,7 @@ fun NotificationsScreen(
                         text = "Notificaciones",
                         style = MaterialTheme.typography.h5,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = MaterialTheme.colors.onSurface
                     )
 
                     if (unreadCount > 0) {
@@ -142,20 +136,14 @@ fun NotificationsScreen(
                     ) {
                         Button(
                             onClick = {
-                                // Marcar todas como leídas
-                                userId?.let { id ->
-                                    markAllAsRead(id) {
-                                        notifications = notifications.map { it.copy(isRead = true) }
-                                        unreadCount = 0
-                                    }
-                                }
+                                notificationsViewModel.markAllAsRead()
                             },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = CuiroColors.ObjectsPink
                             ),
                             shape = RoundedCornerShape(12.dp),
-                            enabled = unreadCount > 0
+                            enabled = unreadCount > 0 // El ViewModel actualiza unreadCount
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Check,
@@ -173,13 +161,7 @@ fun NotificationsScreen(
 
                         Button(
                             onClick = {
-                                // Limpiar notificaciones
-                                userId?.let { id ->
-                                    clearAllNotifications(id) {
-                                        notifications = emptyList()
-                                        unreadCount = 0
-                                    }
-                                }
+                                notificationsViewModel.clearAllNotifications()
                             },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(
@@ -240,27 +222,14 @@ fun NotificationsScreen(
                             modifier = Modifier.height(400.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(notifications) { notification ->
+                            items(notifications, key = { it.id }) { notification ->
                                 NotificationItem(
                                     notification = notification,
                                     onMarkAsRead = { notificationId ->
-                                        userId?.let { id ->
-                                            markNotificationAsRead(id, notificationId) {
-                                                notifications = notifications.map {
-                                                    if (it.id == notificationId) it.copy(isRead = true) else it
-                                                }
-                                                unreadCount = notifications.count { !it.isRead }
-                                            }
-                                        }
+                                        notificationsViewModel.markNotificationAsRead(notificationId)
                                     },
                                     onDelete = { notificationId ->
-                                        userId?.let { id ->
-                                            deleteNotification(id, notificationId) {
-                                                notifications =
-                                                    notifications.filter { it.id != notificationId }
-                                                unreadCount = notifications.count { !it.isRead }
-                                            }
-                                        }
+                                        notificationsViewModel.deleteNotification(notificationId)
                                     }
                                 )
                             }
@@ -269,7 +238,6 @@ fun NotificationsScreen(
                 }
             }
 
-            // Card de configuración
             Card(
                 shape = RoundedCornerShape(16.dp),
                 elevation = 6.dp,
@@ -290,7 +258,16 @@ fun NotificationsScreen(
                     NotificationSettingRow(
                         icon = Icons.Default.Notifications,
                         title = "Notificaciones Push",
-                        subtitle = "Recibir notificaciones en tiempo real"
+                        subtitle = "Recibir notificaciones en tiempo real",
+                        isChecked = pushEnabled,
+                        onCheckedChange = {
+                            pushEnabled = it
+                            if (it) {
+                                notificationsViewModel.subscribeToTopic()
+                            } else {
+                                notificationsViewModel.unsubscribeFromTopic()
+                            }
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -298,7 +275,9 @@ fun NotificationsScreen(
                     NotificationSettingRow(
                         icon = Icons.Default.Email,
                         title = "Notificaciones por Email",
-                        subtitle = "Recibir resumen diario por correo"
+                        subtitle = "Recibir resumen diario por correo",
+                        isChecked = emailEnabled,
+                        onCheckedChange = { emailEnabled = it }
                     )
                 }
             }
@@ -331,8 +310,8 @@ fun NotificationBadge(count: Int) {
 @Composable
 fun NotificationItem(
     notification: Notification,
-    onMarkAsRead: (String) -> Unit,
-    onDelete: (String) -> Unit
+    onMarkAsRead: (Long) -> Unit,
+    onDelete: (Long) -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -346,18 +325,20 @@ fun NotificationItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.Top
         ) {
-            // Icono de notificación
+
+            val notificationType = notification.type ?: "generic"
+
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = getNotificationColor(notification.type),
+                        color = getNotificationColorByType(notificationType),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = getNotificationIcon(notification.type),
+                    imageVector = getNotificationIconByType(notificationType),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(20.dp)
@@ -370,110 +351,95 @@ fun NotificationItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = notification.title,
-                    style = MaterialTheme.typography.body1,
-                    fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.Bold,
-                    color = if (notification.isRead) Color.Gray else Color.Black
-                )
-
-                Text(
-                    text = notification.message,
-                    style = MaterialTheme.typography.body2,
-                    color = Color.Gray,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-
-                Text(
-                    text = formatTimeAgo(notification.timestamp),
-                    style = MaterialTheme.typography.caption,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            // Indicador de no leído y acciones
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                if (!notification.isRead) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                color = CuiroColors.ObjectsPink,
-                                shape = CircleShape
-                            )
+                notification.title?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.body1,
+                        fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.Bold,
+                        color = if (notification.isRead) Color.Gray else Color.Black,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+                Spacer(modifier = Modifier.height(4.dp))
+                notification.body?.let {
+                    Text(
+                        text = it, // Cambiado de 'message' a 'body' según tu entidad
+                        style = MaterialTheme.typography.body2,
+                        color = if (notification.isRead) Color.DarkGray else Color.Gray,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
-                Row {
-                    if (!notification.isRead) {
-                        IconButton(
-                            onClick = { onMarkAsRead(notification.id) },
-                            modifier = Modifier.size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = "Marcar como leída",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = { onDelete(notification.id) },
-                        modifier = Modifier.size(24.dp)
-                    ) {
+            // Acciones del item
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (!notification.isRead) {
+                    IconButton(onClick = { onMarkAsRead(notification.id.toLong()) }) {
                         Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Eliminar",
-                            tint = Color.Gray,
-                            modifier = Modifier.size(16.dp)
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Marcar como leída",
+                            tint = CuiroColors.ObjectsPink
                         )
                     }
+                }
+                IconButton(onClick = { onDelete(notification.id.toLong()) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Eliminar notificación",
+                        tint = Color.Gray
+                    )
                 }
             }
         }
     }
 }
 
+
+fun getNotificationColorByType(type: String): Color {
+    return when (type.toLowerCase()) {
+        "daily_hydration", "info" -> Color(0xFF4CAF50)
+        "warning" -> Color(0xFFFFC107)
+        "error" -> Color(0xFFF44336)
+        else -> Color.Gray
+    }
+}
+
+fun getNotificationIconByType(type: String): ImageVector {
+    return when (type.toLowerCase()) {
+        "daily_hydration", "info" -> Icons.Filled.Info
+        "warning" -> Icons.Filled.Warning
+        "error" -> Icons.Filled.Close
+        else -> Icons.Filled.Notifications
+    }
+}
+
+
 @Composable
 fun EmptyNotificationsView() {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(vertical = 32.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Notifications,
-            contentDescription = "Sin notificaciones",
-            modifier = Modifier.size(64.dp),
-            tint = Color.Gray
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "No tienes notificaciones",
-            style = MaterialTheme.typography.h6,
-            color = Color.Gray,
-            textAlign = TextAlign.Center
-        )
-
-        Text(
-            text = "Las notificaciones aparecerán aquí cuando las recibas",
-            style = MaterialTheme.typography.body2,
-            color = Color.Gray,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "No hay notificaciones",
+                modifier = Modifier.size(48.dp),
+                tint = Color.LightGray
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "No tienes notificaciones",
+                style = MaterialTheme.typography.subtitle1,
+                color = Color.Gray
+            )
+        }
     }
 }
 
@@ -481,139 +447,43 @@ fun EmptyNotificationsView() {
 fun NotificationSettingRow(
     icon: ImageVector,
     title: String,
-    subtitle: String
+    subtitle: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
 ) {
-    var isEnabled by remember { mutableStateOf(true) }
-
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = title,
+            contentDescription = null,
             tint = CuiroColors.ObjectsPink,
             modifier = Modifier.size(24.dp)
         )
-
         Spacer(modifier = Modifier.width(16.dp))
-
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black
             )
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.caption,
+                style = MaterialTheme.typography.body2,
                 color = Color.Gray
             )
         }
-
         Switch(
-            checked = isEnabled,
-            onCheckedChange = { isEnabled = it },
+            checked = isChecked,
+            onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = CuiroColors.ObjectsPink,
-                checkedTrackColor = CuiroColors.ObjectsPink.copy(alpha = 0.5f)
+                checkedTrackColor = CuiroColors.ObjectsPink.copy(alpha = 0.5f),
+                uncheckedThumbColor = Color.LightGray,
+                uncheckedTrackColor = Color.LightGray.copy(alpha = 0.5f)
             )
         )
     }
-}
-
-// Data class para las notificaciones
-data class Notification(
-    val id: String,
-    val title: String,
-    val message: String,
-    val type: NotificationType,
-    val timestamp: Long,
-    val isRead: Boolean = false
-)
-
-enum class NotificationType {
-    INFO, SUCCESS, WARNING, ERROR, MESSAGE
-}
-
-// Funciones auxiliares
-fun getNotificationIcon(type: NotificationType): ImageVector {
-    return when (type) {
-        NotificationType.INFO -> Icons.Default.Info
-        NotificationType.SUCCESS -> Icons.Default.CheckCircle
-        NotificationType.WARNING -> Icons.Default.Warning
-        NotificationType.ERROR -> Icons.Default.Close
-        NotificationType.MESSAGE -> Icons.Default.Email
-    }
-}
-
-fun getNotificationColor(type: NotificationType): Color {
-    return when (type) {
-        NotificationType.INFO -> Color.Blue
-        NotificationType.SUCCESS -> Color.Green
-        NotificationType.WARNING -> Color(0xFFFF9800)
-        NotificationType.ERROR -> Color.Red
-        NotificationType.MESSAGE -> CuiroColors.ObjectsPink
-    }
-}
-
-fun formatTimeAgo(timestamp: Long): String {
-    val now = System.currentTimeMillis()
-    val diff = now - timestamp
-
-    return when {
-        diff < 60000 -> "Ahora"
-        diff < 3600000 -> "${diff / 60000}m"
-        diff < 86400000 -> "${diff / 3600000}h"
-        diff < 604800000 -> "${diff / 86400000}d"
-        else -> "${diff / 604800000}sem"
-    }
-}
-
-// Funciones simuladas para interactuar con el backend
-fun loadNotifications(userId: String, onResult: (List<Notification>) -> Unit) {
-    // Aquí implementarías la lógica para cargar notificaciones desde Firestore
-    // Por ahora, datos de ejemplo:
-    val sampleNotifications = listOf(
-        Notification(
-            id = "1",
-            title = "¡Bienvenido!",
-            message = "Tu cuenta ha sido creada exitosamente",
-            type = NotificationType.SUCCESS,
-            timestamp = System.currentTimeMillis() - 3600000,
-            isRead = false
-        ),
-        Notification(
-            id = "2",
-            title = "Nuevo mensaje",
-            message = "Tienes un nuevo mensaje de un usuario",
-            type = NotificationType.MESSAGE,
-            timestamp = System.currentTimeMillis() - 7200000,
-            isRead = true
-        )
-    )
-    onResult(sampleNotifications)
-}
-
-fun markAllAsRead(userId: String, onComplete: () -> Unit) {
-    // Implementar lógica para marcar todas como leídas
-    onComplete()
-}
-
-fun clearAllNotifications(userId: String, onComplete: () -> Unit) {
-    // Implementar lógica para limpiar todas las notificaciones
-    onComplete()
-}
-
-fun markNotificationAsRead(userId: String, notificationId: String, onComplete: () -> Unit) {
-    // Implementar lógica para marcar una notificación como leída
-    onComplete()
-}
-
-fun deleteNotification(userId: String, notificationId: String, onComplete: () -> Unit) {
-    // Implementar lógica para eliminar una notificación
-    onComplete()
 }

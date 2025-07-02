@@ -16,16 +16,20 @@ import app.cui.ro.R
 import app.cui.ro.db.AppDatabase
 import app.cui.ro.db.Notification
 import app.cui.ro.main.MainActivity
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// Actualizar el FirebaseMessagingService
+// Clase para manejar las notificaciones push
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private val job = CoroutineScope(Dispatchers.IO)
@@ -74,9 +78,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         Log.d(TAG, "Refreshed token: $token")
     }
 
-    /**
-     * Crea y muestra una notificación simple.
-     */
     private fun sendNotification(title: String?, messageBody: String?) {
         if (title.isNullOrBlank() || messageBody.isNullOrBlank()) {
             Log.e(TAG, "Cannot send notification, title or messageBody is null/blank")
@@ -125,6 +126,87 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 class NotificationViewModel(application: Application) : AndroidViewModel(application) {
 
     private val notificationDao = AppDatabase.getDatabase(application).notificationDao()
+
+    private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
+    val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
+
+    private val _unreadCount = MutableStateFlow(0)
+    val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    init {
+        loadNotifications()
+    }
+
+    fun unsubscribeFromTopic() {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("daily")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Desuscripción del topic 'daily' exitosa")
+                } else {
+                    Log.e("FCM", "Error al desuscribirse de 'daily'", task.exception)
+                }
+            }
+    }
+
+    fun subscribeToTopic() {
+        FirebaseMessaging.getInstance().subscribeToTopic("daily")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Suscripción al topic 'daily' exitosa")
+                } else {
+                    Log.e("FCM", "Error al suscribirse a 'daily'", task.exception)
+                }
+            }
+    }
+
+    private fun loadNotifications() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            notificationDao.getAllNotificationsSortedByTimestamp().collectLatest { notifs ->
+                _notifications.value = notifs
+                _unreadCount.value = notifs.count { !it.isRead }
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun markNotificationAsRead(notificationId: Long) {
+        viewModelScope.launch {
+            val notification = _notifications.value.find { it.id == notificationId.toInt() }
+            if (notification != null && !notification.isRead) {
+                notificationDao.updateNotification(notification.copy(isRead = true))
+            }
+        }
+    }
+
+    fun markAllAsRead() {
+        viewModelScope.launch {
+            val unreadNotifications = _notifications.value.filter { !it.isRead }
+            if (unreadNotifications.isNotEmpty()) {
+                notificationDao.markAllAsRead()
+            }
+        }
+    }
+
+    fun deleteNotification(notificationId: Long) {
+        viewModelScope.launch {
+            val notification = _notifications.value.find { it.id == notificationId.toInt() }
+            if (notification != null) {
+                notificationDao.deleteNotificationById(notificationId)
+            }
+        }
+    }
+
+    fun clearAllNotifications() {
+        viewModelScope.launch {
+            if (_notifications.value.isNotEmpty()) {
+                notificationDao.deleteAllNotifications()
+            }
+        }
+    }
 
     val unreadNotificationCount: StateFlow<Int> = notificationDao.getUnreadNotificationCount()
         .stateIn(

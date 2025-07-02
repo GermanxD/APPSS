@@ -1,15 +1,16 @@
-package app.cui.ro.db;
+package app.cui.ro.db
 
 import android.content.Context
 import androidx.room.Dao
 import androidx.room.Database
-import androidx.room.Entity;
+import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.PrimaryKey;
+import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "hidratacion")
@@ -34,7 +35,8 @@ data class Notification(
     val title: String?,
     val body: String?,
     val timestamp: Long = System.currentTimeMillis(),
-    var isRead: Boolean = false
+    var isRead: Boolean = false,
+    val type: String? = null
 )
 
 @Dao
@@ -59,11 +61,20 @@ interface NotificationDao {
 
     @Query("DELETE FROM notifications")
     suspend fun deleteAllNotifications()
+
+    @Query("SELECT * FROM notifications ORDER BY timestamp DESC")
+    fun getAllNotificationsSortedByTimestamp(): Flow<List<Notification>>
+
+    @Update
+    suspend fun updateNotification(notification: Notification)
+
+    @Query("DELETE FROM notifications WHERE id = :notificationId")
+    suspend fun deleteNotificationById(notificationId: Long)
 }
 
 @Database(
     entities = [Notification::class, HidratacionEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
