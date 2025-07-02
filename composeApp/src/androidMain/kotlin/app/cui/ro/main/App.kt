@@ -371,9 +371,9 @@ fun DrawerContent(
                 ) {
                     scope.launch { drawerState.close() }
                     navController.navigate(Screen.Notifications.route)
-                    // scope.launch {
-                    //     notificationViewModel.markAllNotificationsAsRead()
-                    // }
+                     scope.launch {
+                         notificationViewModel.markAllNotificationsAsRead()
+                     }
                 }
             }
 

@@ -132,6 +132,12 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = 0
         )
+
+    fun markAllNotificationsAsRead() {
+        viewModelScope.launch {
+            notificationDao.markAllAsRead()
+        }
+    }
 }
 
 
