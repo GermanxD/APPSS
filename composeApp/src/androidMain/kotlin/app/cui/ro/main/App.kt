@@ -28,14 +28,12 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -272,8 +270,8 @@ fun DrawerContent(
             modifier = Modifier
                 .weight(1f)
         ) {
-            // Header Section - Perfil de usuario como primer item
             item {
+                // Logo e Información del Usuario
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -377,7 +375,6 @@ fun DrawerContent(
                      }
                 }
             }
-
             item {
                 // Configuración y Soporte
                 DrawerSectionHeader(title = "Configuración")
@@ -406,49 +403,46 @@ fun DrawerContent(
                     navController.navigate(Screen.Home.route)
                 }
             }
-            // Footer Section - Version y Logout como último item
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.White,
-                                    CuiroColors.SecondaryRose.copy(alpha = 0.05f)
-                                )
-                            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White,
+                            CuiroColors.SecondaryRose.copy(alpha = 0.05f)
                         )
-                        .padding(16.dp)
-                ) {
-                    Divider(
-                        color = CuiroColors.ObjectsPink.copy(alpha = 0.2f),
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(bottom = 12.dp)
                     )
+                )
+                .padding(16.dp)
+        ) {
+            Divider(
+                color = CuiroColors.ObjectsPink.copy(alpha = 0.2f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
 
-                    // Version info
-                    Text(
-                        text = "Versión 1.0.0",
-                        style = MaterialTheme.typography.caption,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        textAlign = TextAlign.Center
-                    )
+            Text(
+                text = "Versión 1.0.0",
+                style = MaterialTheme.typography.caption,
+                color = Color.Gray,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                textAlign = TextAlign.Center
+            )
 
-                    DrawerItem(
-                        icon = Icons.Default.ExitToApp,
-                        label = "Cerrar Sesión",
-                        isLogout = true
-                    ) {
-                        authService.logout(context)
-                        scope.launch { drawerState.close() }
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    }
+            DrawerItem(
+                icon = Icons.AutoMirrored.Filled.ExitToApp,
+                label = "Cerrar Sesión",
+                isLogout = true
+            ) {
+                authService.logout(context)
+                scope.launch { drawerState.close() }
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(0) { inclusive = true }
                 }
             }
         }
@@ -536,7 +530,7 @@ fun DrawerItem(
             // Flecha indicadora mejorada
             if (!isLogout) {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = CuiroColors.ObjectsPink.copy(alpha = 0.6f),
                     modifier = Modifier.size(20.dp)
