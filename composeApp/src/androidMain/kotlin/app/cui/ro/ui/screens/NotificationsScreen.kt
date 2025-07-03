@@ -60,6 +60,7 @@ import app.cui.ro.auth.AuthService
 import app.cui.ro.db.Notification
 import app.cui.ro.models.VMNotifications
 import app.cui.ro.ui.theme.CuiroColors
+import java.util.Locale
 
 @Composable
 fun NotificationsScreen(
@@ -68,7 +69,6 @@ fun NotificationsScreen(
 ) {
     val userId = remember { authService.getUserId() }
     val pushEnabledState = remember { mutableStateOf(notificationsViewModel.isPushEnabled()) }
-    var emailEnabled by remember { mutableStateOf(false) }
     val notifications by notificationsViewModel.notifications.collectAsState()
     val isLoading by notificationsViewModel.isLoading.collectAsState()
     val unreadCount by notificationsViewModel.unreadCount.collectAsState()
@@ -224,29 +224,6 @@ fun NotificationsScreen(
     }
 }
 
-
-@Composable
-fun NotificationBadge(count: Int) {
-    Box(
-        modifier = Modifier
-            .background(
-                color = Color.Red,
-                shape = CircleShape
-            )
-            .padding(
-                horizontal = if (count > 99) 8.dp else 6.dp,
-                vertical = 4.dp
-            )
-    ) {
-        Text(
-            text = if (count > 99) "99+" else count.toString(),
-            color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
 @Composable
 fun NotificationItem(
     notification: Notification,
@@ -340,7 +317,7 @@ fun NotificationItem(
 
 
 fun getNotificationColorByType(type: String): Color {
-    return when (type.toLowerCase()) {
+    return when (type.lowercase(Locale.ROOT)) {
         "daily_hydration", "info" -> Color(0xFF4CAF50)
         "warning" -> Color(0xFFFFC107)
         "error" -> Color(0xFFF44336)
@@ -349,7 +326,7 @@ fun getNotificationColorByType(type: String): Color {
 }
 
 fun getNotificationIconByType(type: String): ImageVector {
-    return when (type.toLowerCase()) {
+    return when (type.lowercase(Locale.ROOT)) {
         "daily_hydration", "info" -> Icons.Filled.Info
         "warning" -> Icons.Filled.Warning
         "error" -> Icons.Filled.Close
