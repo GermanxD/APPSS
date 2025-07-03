@@ -16,6 +16,7 @@ import app.cui.ro.R
 import app.cui.ro.db.AppDatabase
 import app.cui.ro.db.Notification
 import app.cui.ro.main.MainActivity
+import app.cui.ro.sharedpreferences.PreferencesManager
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -123,9 +124,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 }
 
-class NotificationViewModel(application: Application) : AndroidViewModel(application) {
+class VMNotifications(application: Application) : AndroidViewModel(application) {
 
     private val notificationDao = AppDatabase.getDatabase(application).notificationDao()
+    private val prefs = PreferencesManager(application)
 
     private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
     val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
@@ -144,6 +146,7 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
         FirebaseMessaging.getInstance().unsubscribeFromTopic("daily")
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    prefs.savePushEnabled(false)
                     Log.d("FCM", "Desuscripción del topic 'daily' exitosa")
                 } else {
                     Log.e("FCM", "Error al desuscribirse de 'daily'", task.exception)
@@ -155,12 +158,15 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
         FirebaseMessaging.getInstance().subscribeToTopic("daily")
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    prefs.savePushEnabled(true)
                     Log.d("FCM", "Suscripción al topic 'daily' exitosa")
                 } else {
                     Log.e("FCM", "Error al suscribirse a 'daily'", task.exception)
                 }
             }
     }
+
+    fun isPushEnabled(): Boolean = prefs.isPushEnabled()
 
     private fun loadNotifications() {
         viewModelScope.launch {

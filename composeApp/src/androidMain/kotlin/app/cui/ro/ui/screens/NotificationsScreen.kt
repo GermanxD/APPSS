@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items // Importante: items para Long id
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,8 +25,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch // Mantén esto si lo usas
-import androidx.compose.material.SwitchDefaults // Mantén esto si lo usas
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -36,14 +36,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Notifications // Icono para Settings
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf // Para settings si no están en VM
-import androidx.compose.runtime.remember // Para settings si no están en VM
-import androidx.compose.runtime.setValue // Para settings si no están en VM
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,17 +54,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.cui.ro.auth.AuthService
-import app.cui.ro.db.Notification // Asegúrate que la ruta sea correcta
-import app.cui.ro.models.NotificationViewModel
+import app.cui.ro.db.Notification
+import app.cui.ro.models.VMNotifications
 import app.cui.ro.ui.theme.CuiroColors
 
 @Composable
 fun NotificationsScreen(
     authService: AuthService,
-    notificationsViewModel: NotificationViewModel = viewModel()
+    notificationsViewModel: VMNotifications = viewModel()
 ) {
     val userId = remember { authService.getUserId() }
-    var pushEnabled by remember { mutableStateOf(true) }
+    val pushEnabledState = remember { mutableStateOf(notificationsViewModel.isPushEnabled()) }
     var emailEnabled by remember { mutableStateOf(false) }
     val notifications by notificationsViewModel.notifications.collectAsState()
     val isLoading by notificationsViewModel.isLoading.collectAsState()
@@ -259,10 +259,10 @@ fun NotificationsScreen(
                         icon = Icons.Default.Notifications,
                         title = "Notificaciones Push",
                         subtitle = "Recibir notificaciones en tiempo real",
-                        isChecked = pushEnabled,
-                        onCheckedChange = {
-                            pushEnabled = it
-                            if (it) {
+                        isChecked = pushEnabledState.value,
+                        onCheckedChange = { enabled ->
+                            pushEnabledState.value = enabled
+                            if (enabled) {
                                 notificationsViewModel.subscribeToTopic()
                             } else {
                                 notificationsViewModel.unsubscribeFromTopic()

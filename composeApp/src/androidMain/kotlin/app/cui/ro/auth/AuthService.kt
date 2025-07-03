@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import app.cui.ro.models.NotificationViewModel
+import app.cui.ro.models.VMNotifications
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -145,7 +145,7 @@ class AuthService {
 
     // Cerrar sesión
     fun logout(context: Context) {
-        val notifications = NotificationViewModel(application = Application())
+        val notifications = VMNotifications(application = Application())
         Log.d(TAG, "Cerrando sesión")
 
         notifications.unsubscribeFromTopic()
