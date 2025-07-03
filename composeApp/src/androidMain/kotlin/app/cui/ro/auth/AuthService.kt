@@ -1,8 +1,10 @@
 package app.cui.ro.auth
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import app.cui.ro.models.NotificationViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -143,16 +145,10 @@ class AuthService {
 
     // Cerrar sesión
     fun logout(context: Context) {
+        val notifications = NotificationViewModel(application = Application())
         Log.d(TAG, "Cerrando sesión")
 
-        FirebaseMessaging.getInstance().unsubscribeFromTopic("daily")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d("FCM", "Desuscripción del topic 'daily' exitosa")
-                } else {
-                    Log.e("FCM", "Error al desuscribirse de 'daily'", task.exception)
-                }
-            }
+        notifications.unsubscribeFromTopic()
 
         firebaseAuth.signOut()
 

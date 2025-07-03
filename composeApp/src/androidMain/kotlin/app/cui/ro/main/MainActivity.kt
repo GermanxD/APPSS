@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import app.cui.ro.models.NotificationViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -72,6 +73,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupFirebaseMessaging() {
+        val notifications = NotificationViewModel(application)
         Log.d("FCM", "Configurando Firebase Cloud Messaging...")
 
         // Obtener token FCM
@@ -87,13 +89,6 @@ class MainActivity : ComponentActivity() {
         }
 
         // Suscribirse a topic 'daily'
-        FirebaseMessaging.getInstance().subscribeToTopic("daily")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d("FCM", "Suscripción a topic 'daily' exitosa")
-                } else {
-                    Log.e("FCM", "Error al suscribirse a 'daily'", task.exception)
-                }
-            }
+        notifications.subscribeToTopic()
     }
 }
