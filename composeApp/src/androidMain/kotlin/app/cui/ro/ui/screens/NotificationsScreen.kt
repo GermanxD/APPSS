@@ -4,11 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -70,27 +73,20 @@ fun NotificationsScreen(
     val isLoading by notificationsViewModel.isLoading.collectAsState()
     val unreadCount by notificationsViewModel.unreadCount.collectAsState()
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color.White),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Card header con título y badge
+        // Header
+        item {
             Card(
                 shape = RoundedCornerShape(16.dp),
                 elevation = 6.dp,
                 backgroundColor = Color.White,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     modifier = Modifier
@@ -105,23 +101,22 @@ fun NotificationsScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colors.onSurface
                     )
-
                     if (unreadCount > 0) {
                         NotificationBadge(count = unreadCount)
                     }
                 }
             }
+        }
 
-            // Card de acciones rápidas
+        // Acciones rápidas
+        item {
             Card(
                 shape = RoundedCornerShape(16.dp),
                 elevation = 6.dp,
                 backgroundColor = Color.White,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
+                Column(modifier = Modifier.padding(20.dp)) {
                     Text(
                         text = "Acciones",
                         style = MaterialTheme.typography.h6,
@@ -135,58 +130,34 @@ fun NotificationsScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Button(
-                            onClick = {
-                                notificationsViewModel.markAllAsRead()
-                            },
+                            onClick = { notificationsViewModel.markAllAsRead() },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = CuiroColors.ObjectsPink
-                            ),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = CuiroColors.ObjectsPink),
                             shape = RoundedCornerShape(12.dp),
-                            enabled = unreadCount > 0 // El ViewModel actualiza unreadCount
+                            enabled = unreadCount > 0
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Marcar todas",
-                                modifier = Modifier.size(16.dp),
-                                tint = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Marcar todas",
-                                color = Color.White,
-                                fontSize = 12.sp
-                            )
+                            Icon(Icons.Default.Check, "Marcar todas", Modifier.size(16.dp), Color.White)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Marcar todas", color = Color.White, fontSize = 12.sp)
                         }
 
                         Button(
-                            onClick = {
-                                notificationsViewModel.clearAllNotifications()
-                            },
+                            onClick = { notificationsViewModel.clearAllNotifications() },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color.Gray
-                            ),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Limpiar",
-                                modifier = Modifier.size(16.dp),
-                                tint = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Limpiar",
-                                color = Color.White,
-                                fontSize = 12.sp
-                            )
+                            Icon(Icons.Default.Clear, "Limpiar", Modifier.size(16.dp), Color.White)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Limpiar", color = Color.White, fontSize = 12.sp)
                         }
                     }
                 }
             }
+        }
 
-            // Card de lista de notificaciones
+        // Recientes
+        item {
             Card(
                 shape = RoundedCornerShape(16.dp),
                 elevation = 6.dp,
@@ -204,49 +175,55 @@ fun NotificationsScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    if (isLoading) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(100.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = CuiroColors.ObjectsPink
-                            )
+                    when {
+                        isLoading -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(100.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = CuiroColors.ObjectsPink)
+                            }
                         }
-                    } else if (notifications.isEmpty()) {
-                        EmptyNotificationsView()
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.height(400.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(notifications, key = { it.id }) { notification ->
-                                NotificationItem(
-                                    notification = notification,
-                                    onMarkAsRead = { notificationId ->
-                                        notificationsViewModel.markNotificationAsRead(notificationId)
-                                    },
-                                    onDelete = { notificationId ->
-                                        notificationsViewModel.deleteNotification(notificationId)
-                                    }
-                                )
+
+                        notifications.isEmpty() -> {
+                            EmptyNotificationsView()
+                        }
+
+                        else -> {
+                            // LazyColumn scrollable solo dentro de la Card
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 400.dp), // Limita la altura máxima
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(notifications, key = { it.id }) { notification ->
+                                    NotificationItem(
+                                        notification = notification,
+                                        onMarkAsRead = { notificationsViewModel.markNotificationAsRead(it) },
+                                        onDelete = { notificationsViewModel.deleteNotification(it) }
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
+        }
 
+        // Configuración
+        item {
             Card(
                 shape = RoundedCornerShape(16.dp),
                 elevation = 6.dp,
                 backgroundColor = Color.White,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
+                Column(modifier = Modifier.padding(20.dp)) {
                     Text(
                         text = "Configuración",
                         style = MaterialTheme.typography.h6,
@@ -285,6 +262,7 @@ fun NotificationsScreen(
     }
 }
 
+
 @Composable
 fun NotificationBadge(count: Int) {
     Box(
@@ -317,7 +295,7 @@ fun NotificationItem(
         shape = RoundedCornerShape(12.dp),
         elevation = if (notification.isRead) 2.dp else 4.dp,
         backgroundColor = if (notification.isRead) Color(0xFFF8F8F8) else Color.White,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
