@@ -80,34 +80,6 @@ fun NotificationsScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Header
-        item {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                elevation = 6.dp,
-                backgroundColor = Color.White,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(24.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Notificaciones",
-                        style = MaterialTheme.typography.h5,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colors.onSurface
-                    )
-                    if (unreadCount > 0) {
-                        NotificationBadge(count = unreadCount)
-                    }
-                }
-            }
-        }
-
         // Acciones rápidas
         item {
             Card(
