@@ -218,16 +218,6 @@ fun NotificationsScreen(
                             }
                         }
                     )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    NotificationSettingRow(
-                        icon = Icons.Default.Email,
-                        title = "Notificaciones por Email",
-                        subtitle = "Recibir resumen diario por correo",
-                        isChecked = emailEnabled,
-                        onCheckedChange = { emailEnabled = it }
-                    )
                 }
             }
         }
