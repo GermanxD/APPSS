@@ -379,35 +379,6 @@ fun DrawerContent(
             }
 
             item {
-                // Herramientas
-                DrawerSectionHeader(title = "Herramientas")
-
-                DrawerItem(
-                    icon = Icons.Default.Search,
-                    label = "Buscar"
-                ) {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Screen.Home.route)
-                }
-
-                DrawerItem(
-                    icon = Icons.Default.Info,
-                    label = "Historial"
-                ) {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Screen.Home.route)
-                }
-
-                DrawerItem(
-                    icon = Icons.Default.Favorite,
-                    label = "Guardados"
-                ) {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Screen.Home.route)
-                }
-            }
-
-            item {
                 // Configuración y Soporte
                 DrawerSectionHeader(title = "Configuración")
 
