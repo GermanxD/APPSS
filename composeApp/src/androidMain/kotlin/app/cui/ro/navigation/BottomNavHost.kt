@@ -29,7 +29,7 @@ import app.cui.ro.R
 import app.cui.ro.auth.AuthService
 import app.cui.ro.models.BottomNavItem
 import app.cui.ro.models.VMHealthConnect
-import app.cui.ro.ui.screens.NavBarScreenContact
+import app.cui.ro.ui.screens.NavBarScreenRoutine
 import app.cui.ro.ui.screens.NavBarScreenForo
 import app.cui.ro.ui.screens.NavBarScreenMessage
 import app.cui.ro.ui.screens.NavBarScreenHome
@@ -70,7 +70,7 @@ fun BottomNavHost(navController: NavHostController, onMenuClick: () -> Unit) {
         composable("profile_route") { NavBarScreenProfile(
             authService = AuthService()
         ) }
-        composable("contacts_route") { NavBarScreenContact(
+        composable("routine_route") { NavBarScreenRoutine(
             authService = AuthService(),
             vmHealthConnect = vmHealthConnect
         ) }
@@ -88,9 +88,9 @@ fun BottomNavigationBar(navController: NavController) {
             icon = painterResource(id = R.drawable.ic_profile)
         ),
         BottomNavItem(
-            name = "Contactos",
-            route = "contacts_route",
-            icon = painterResource(id = R.drawable.ic_contacts)
+            name = "Rutina",
+            route = "routine_route",
+            icon = painterResource(id = R.drawable.ic_routine)
         ),
         BottomNavItem(
             name = "Inicio",
@@ -113,7 +113,7 @@ fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     BottomNavigation(
-        backgroundColor = CuiroColors.ObjectsPink, // Cambiado a blanco
+        backgroundColor = CuiroColors.ObjectsPink,
         modifier = Modifier.fillMaxWidth()
     ) {
         items.forEach { item ->
@@ -123,13 +123,13 @@ fun BottomNavigationBar(navController: NavController) {
                         painter = item.icon,
                         contentDescription = item.name,
                         modifier = Modifier.size(30.dp),
-                        tint = if (currentRoute == item.route) Color.Black else Color.Gray
+                        tint = if (currentRoute == item.route) Color.Black else CuiroColors.WhiteLess
                     )
                 },
                 label = {
                     Text(
                         text = item.name,
-                        color = if (currentRoute == item.route) Color.Black else Color.Gray,
+                        color = if (currentRoute == item.route) Color.Black else CuiroColors.WhiteLess,
                         fontSize = 10.sp
                     )
                 },

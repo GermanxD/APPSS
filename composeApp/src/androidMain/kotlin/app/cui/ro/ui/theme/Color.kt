@@ -9,4 +9,5 @@ object CuiroColors {
     val SectionsPink = Color(0xFFFFDCDA)
     val FontBrown = Color(0xFF594012)
     val PinkFields = Color(0xFFD4D2D3)
+    val WhiteLess = Color(0xFFF8EDEB)
 }

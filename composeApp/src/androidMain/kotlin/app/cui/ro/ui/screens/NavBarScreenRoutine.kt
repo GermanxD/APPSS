@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
 @Composable
-fun NavBarScreenContact(
+fun NavBarScreenRoutine(
     authService: AuthService,
     vmHealthConnect: VMHealthConnect = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
