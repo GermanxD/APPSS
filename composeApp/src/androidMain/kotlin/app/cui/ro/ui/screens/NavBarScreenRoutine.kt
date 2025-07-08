@@ -69,7 +69,9 @@ import app.cui.ro.models.VMHealthConnect
 import app.cui.ro.ui.AnimatedWaterDrop
 import app.cui.ro.ui.theme.CuiroColors
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun NavBarScreenRoutine(
@@ -159,6 +161,7 @@ fun SeccionRegistroDiario(
                 .padding(8.dp)
         )
         SeccionHidratacion(
+            userId = userId!!,
             userFirstName = userFirstName,
             database = db,
             modifier = Modifier
@@ -301,6 +304,7 @@ fun SeccionPasos(
 @Composable
 fun SeccionHidratacion(
     userFirstName: String,
+    userId: String,
     database: AppDatabase,
     modifier: Modifier = Modifier
 ) {
@@ -308,19 +312,32 @@ fun SeccionHidratacion(
     val scope = rememberCoroutineScope()
     var cantidadMl by remember { mutableStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        val progreso = dao.getProgreso()
-        cantidadMl = progreso?.cantidadMl ?: 0
+    LaunchedEffect(userId) {
+        val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+        val progreso = dao.getProgreso(userId)
+
+        if (progreso == null || progreso.fecha != today) {
+            dao.insertarProgreso(
+                HidratacionEntity(
+                    userId = userId,
+                    cantidadMl = 0,
+                    fecha = today
+                )
+            )
+            cantidadMl = 0
+        } else {
+            cantidadMl = progreso.cantidadMl
+        }
     }
 
     Card(
-        modifier = modifier
-            .padding(8.dp),
+        modifier = modifier.padding(8.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = 4.dp,
         backgroundColor = Color.White
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
@@ -394,7 +411,15 @@ fun SeccionHidratacion(
                         .clickable {
                             scope.launch {
                                 val nuevoProgreso = (cantidadMl + 200).coerceAtMost(1800)
-                                dao.insertarProgreso(HidratacionEntity(cantidadMl = nuevoProgreso))
+                                val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+
+                                dao.insertarProgreso(
+                                    HidratacionEntity(
+                                        userId = userId,
+                                        cantidadMl = nuevoProgreso,
+                                        fecha = today
+                                    )
+                                )
                                 cantidadMl = nuevoProgreso
                             }
                         }
@@ -403,6 +428,7 @@ fun SeccionHidratacion(
         }
     }
 }
+
 
 @Composable
 fun MedicionPasos(

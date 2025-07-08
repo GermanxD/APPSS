@@ -15,19 +15,21 @@ import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "hidratacion")
 data class HidratacionEntity(
-    @PrimaryKey val id: Int = 0, // Siempre 0 porque solo manejamos un progreso
-    val cantidadMl: Int // cantidad de agua en mililitros
+    @PrimaryKey val userId: String,
+    val cantidadMl: Int,
+    val fecha: String
 )
-
 
 @Dao
 interface HidratacionDao {
-    @Query("SELECT * FROM hidratacion WHERE id = 0")
-    suspend fun getProgreso(): HidratacionEntity?
+
+    @Query("SELECT * FROM hidratacion WHERE userId = :userId LIMIT 1")
+    suspend fun getProgreso(userId: String): HidratacionEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarProgreso(hidratacion: HidratacionEntity)
 }
+
 
 @Entity(tableName = "notifications")
 data class Notification(
@@ -74,7 +76,7 @@ interface NotificationDao {
 
 @Database(
     entities = [Notification::class, HidratacionEntity::class],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

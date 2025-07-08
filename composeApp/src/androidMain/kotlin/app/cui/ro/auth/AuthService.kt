@@ -145,7 +145,7 @@ class AuthService {
 
     // Cerrar sesión
     fun logout(context: Context) {
-        val notifications = VMNotifications(application = Application())
+        val notifications = VMNotifications(application = context.applicationContext as Application)
         Log.d(TAG, "Cerrando sesión")
 
         notifications.unsubscribeFromTopic()
