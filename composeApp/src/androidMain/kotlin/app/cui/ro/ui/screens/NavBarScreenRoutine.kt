@@ -66,6 +66,7 @@ import app.cui.ro.auth.AuthService
 import app.cui.ro.db.AppDatabase
 import app.cui.ro.db.HidratacionEntity
 import app.cui.ro.models.VMHealthConnect
+import app.cui.ro.ui.AnimatedWaterDrop
 import app.cui.ro.ui.theme.CuiroColors
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
@@ -329,14 +330,16 @@ fun SeccionHidratacion(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(bottom = 16.dp).weight(1f),
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .weight(1f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Image(
-                    painter = painterResource(R.drawable.ic_persona_agua),
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp)
+
+                AnimatedWaterDrop(
+                    fillPercentage = cantidadMl / 1800f,
+                    modifier = Modifier.size(48.dp)
                 )
             }
 
@@ -382,6 +385,7 @@ fun SeccionHidratacion(
                     color = Color.Gray,
                     modifier = Modifier.weight(1f)
                 )
+
                 Image(
                     painter = painterResource(R.drawable.ic_add),
                     contentDescription = "Añadir agua",

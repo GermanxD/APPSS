@@ -1,8 +1,18 @@
 package app.cui.ro.ui
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,20 +44,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cui.ro.R
 import app.cui.ro.ui.theme.CuiroColors
+import kotlin.math.sin
 
 @Composable
 fun DataColumn(
@@ -223,5 +240,115 @@ fun CustomTextField(
                 Modifier.align(Alignment.End)
             )
         }
+    }
+}
+
+@Composable
+fun AnimatedWaterDrop(
+    fillPercentage: Float,
+    modifier: Modifier = Modifier,
+    size: Dp = 38.dp,
+    onClick: () -> Unit = {}
+) {
+    val animatedFillPercentage by animateFloatAsState(
+        targetValue = fillPercentage,
+        animationSpec = tween(
+            durationMillis = 800,
+            easing = FastOutSlowInEasing
+        ),
+        label = "water_fill"
+    )
+
+    val waveOffset by rememberInfiniteTransition(label = "wave").animateFloat(
+        initialValue = 0f,
+        targetValue = 2 * Math.PI.toFloat(),
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "wave_offset"
+    )
+
+    Canvas(
+        modifier = modifier
+            .size(size)
+            .clickable { onClick() }
+    ) {
+        val dropPath = Path()
+        val centerX = size.toPx() / 2
+        val centerY = size.toPx() / 2
+        val radius = size.toPx() / 2.5f
+
+        // Crear forma de gota
+        dropPath.moveTo(centerX, centerY - radius * 1.2f) // Punta superior
+        dropPath.cubicTo(
+            centerX - radius * 0.8f, centerY - radius * 0.8f,
+            centerX - radius, centerY + radius * 0.2f,
+            centerX, centerY + radius * 0.8f
+        )
+        dropPath.cubicTo(
+            centerX + radius, centerY + radius * 0.2f,
+            centerX + radius * 0.8f, centerY - radius * 0.8f,
+            centerX, centerY - radius * 1.2f
+        )
+
+        // Dibujar contorno de la gota
+        drawPath(
+            path = dropPath,
+            color = Color(0xFF4FC3F7),
+            style = Stroke(width = 2.dp.toPx())
+        )
+
+        // Crear path para el agua (fill)
+        val waterPath = Path()
+        val waterHeight = (size.toPx() * 0.9f) * animatedFillPercentage
+        val waterY = centerY + radius * 0.8f - waterHeight
+
+        if (animatedFillPercentage > 0f) {
+            // Crear efecto de onda
+            val waveHeight = 4.dp.toPx()
+            val waveWidth = size.toPx() / 3
+
+            waterPath.moveTo(centerX - radius, waterY)
+
+            // Dibujar onda en la superficie del agua
+            for (x in 0..(size.toPx().toInt()) step 2) {
+                val relativeX = x - centerX + radius
+                val waveY = waterY + sin(waveOffset + (relativeX / waveWidth) * 2 * Math.PI) * waveHeight
+                waterPath.lineTo(centerX - radius + x, waveY.toFloat())
+            }
+
+            // Completar el path del agua
+            waterPath.lineTo(centerX + radius, centerY + radius * 0.8f)
+            waterPath.cubicTo(
+                centerX, centerY + radius * 0.8f,
+                centerX - radius, centerY + radius * 0.2f,
+                centerX - radius, waterY
+            )
+
+            // Clipear el agua con la forma de la gota
+            clipPath(dropPath) {
+                drawPath(
+                    path = waterPath,
+                    color = Color(0xFF81D4FA).copy(alpha = 0.8f)
+                )
+            }
+        }
+
+        // Añadir brillo/highlight
+        val highlightPath = Path()
+        highlightPath.addOval(
+            Rect(
+                centerX - radius * 0.3f,
+                centerY - radius * 0.9f,
+                centerX + radius * 0.1f,
+                centerY - radius * 0.5f
+            )
+        )
+
+        drawPath(
+            path = highlightPath,
+            color = Color.White.copy(alpha = 0.6f)
+        )
     }
 }
